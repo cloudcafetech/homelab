@@ -13,8 +13,8 @@ resource "null_resource" "k8s-ecosystem-setup" {
     provisioner "remote-exec" {
       inline = [
         "curl -#OL https://raw.githubusercontent.com/cloudcafetech/k8s-terraform/master/all-ing.yaml",
-        "sed -i 's:34.125.24.130:${var.k8s-haproxy-lb}:g' all-ing.yaml",
-        "sed -i 's:1.2.3.4:${var.k8s-haproxy-lb}:g' all-ing.yaml",
+        "sed -i 's:34.125.24.130:${var.k8s_haproxy_lb}:g' all-ing.yaml",
+        "sed -i 's:1.2.3.4:${var.k8s_haproxy_lb}:g' all-ing.yaml",
         "sh ./k8setup.sh k8secoa",
       ]
     }
