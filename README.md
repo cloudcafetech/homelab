@@ -27,7 +27,7 @@ mv CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2 centos-stream-8.qcow2
 
 ```
 qemu-img resize ubuntu-22-04.qcow2 35G
-qemu-img resize centos-stream-9.qcow2 35G
+qemu-img resize centos-stream-8.qcow2 35G
 ```
 
 - Create the VM template using CLI
@@ -40,7 +40,7 @@ qm set 8000 --ide2 local-lvm:cloudinit
 qm set 8000 --boot c --bootdisk scsi0
 qm set 8000 --serial0 socket --vga serial0
 
-qm create 9000 --name centos-9-template --memory 2048 --core 2 --agent enabled=1 --net0 virtio,bridge=vmbr0
+qm create 9000 --name centos-8-template --memory 2048 --core 2 --agent enabled=1 --net0 virtio,bridge=vmbr0
 qm importdisk 9000 centos-stream-9.qcow2 local-lvm
 qm set 9000 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-9000-disk-0,discard=on,ssd=1
 qm set 9000 --ide2 local-lvm:cloudinit
