@@ -72,7 +72,7 @@ resource "null_resource" "k8srke2-master1-setup" {
     provisioner "remote-exec" {
       inline = [
         "sudo mkdir -p /etc/rancher/rke2/",
-        "echo 'token: ksrkePK\nwrite-kubeconfig-mode: 0644\ncluster-cidr: 192.168.0.0/16\nservice-cidr: 192.167.0.0/16\nnode-label:\n- region=master\ntls-san:\n  - ${var.k8s_master01_ip}\n  - ${var.k8s_master02_ip}\n  - ${var.k8s-haproxy-lb}\n  - k8s-haproxy-lb\n  - k8srke2-master-1\n  - k8srke2-master-2\ndisable:\n  - rke2-snapshot-controller\n  - rke2-snapshot-controller-crd\n  - rke2-snapshot-validation-webhook\n' > config.yaml",
+        "echo 'token: ksrkePK\nwrite-kubeconfig-mode: 0644\ncluster-cidr: 192.168.0.0/16\nservice-cidr: 192.167.0.0/16\nnode-label:\n- region=master\ntls-san:\n  - ${var.k8s_master01_ip}\n  - ${var.k8s_master02_ip}\n  - ${var.k8s_haproxy_lb}\n  - k8s-haproxy-lb\n  - k8srke2-master-1\n  - k8srke2-master-2\ndisable:\n  - rke2-snapshot-controller\n  - rke2-snapshot-controller-crd\n  - rke2-snapshot-validation-webhook\n' > config.yaml",
         "sudo mv config.yaml /etc/rancher/rke2/config.yaml",
         "sudo chown root:root /etc/rancher/rke2/config.yaml",
         "chmod +x ./k8setup.sh",
@@ -102,7 +102,7 @@ resource "null_resource" "k8srke2-master2-setup" {
     provisioner "remote-exec" {
       inline = [
         "sudo mkdir -p /etc/rancher/rke2/",
-        "echo 'server: https://${var.k8s_master01_ip}:9345\ntoken: ksrkePK\nwrite-kubeconfig-mode: 0644\ncluster-cidr: 192.168.0.0/16\nservice-cidr: 192.167.0.0/16\nnode-label:\n- region=master\ntls-san:\n  - ${var.k8s_master01_ip}\n  - ${var.k8s_master02_ip}\n  - ${var.k8s-haproxy-lb}\n  - k8s-haproxy-lb\n  - k8srke2-master-1\n  - k8srke2-master-2\n' > config.yaml",
+        "echo 'server: https://${var.k8s_master01_ip}:9345\ntoken: ksrkePK\nwrite-kubeconfig-mode: 0644\ncluster-cidr: 192.168.0.0/16\nservice-cidr: 192.167.0.0/16\nnode-label:\n- region=master\ntls-san:\n  - ${var.k8s_master01_ip}\n  - ${var.k8s_master02_ip}\n  - ${var.k8s_haproxy_lb}\n  - k8s-haproxy-lb\n  - k8srke2-master-1\n  - k8srke2-master-2\n' > config.yaml",
         "sudo mv config.yaml /etc/rancher/rke2/config.yaml",
         "sudo chown root:root /etc/rancher/rke2/config.yaml",
         "chmod +x ./k8setup.sh",
