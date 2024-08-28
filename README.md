@@ -93,26 +93,55 @@ qm template 9000
 qm template 8000
 ```
 
+### Kubeadm Setup
+
 - Create VM from Template
 
 ```
-qm clone 8000 501 --name jumphost --full
-qm set 501 --memory 2048 --cores 2
+qm clone 8000 501 --name ubuntu--full
+qm set 501 --memory 1024 --cores 1
 ```
 
-- Kubeadm Setup
+- Login ubuntu host
+
+- Installing Terraform & Ansible
+
+```
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+add-apt-repository --yes --update ppa:ansible/ansible
+apt update
+apt install terraform ansible git -y
+terraform version
+ansible --version
+```
+- Download repo, edit provider.tf and modify ```credentials``` part
+
+```
+git clone https://github.com/cloudcafetech/homelab
+cd homelab/kubeadm
+```
+
+- Start K8s Setup using Kubeadm
+
+```
+ssh-keygen -t rsa -N '' -f ./gcpkey -C cloudcafe -b 2048
+terraform init
+terraform plan 
+terraform apply -auto-approve
+```
+
+- Destroy Setup 
+```terraform destroy -auto-approve```
+
+
+### RKE2 Setup
 
 ```
 
 ```
 
-- RKE2 Setup
-
-```
-
-```
-
-- Openshift Setup
+### Openshift Setup
 
 ```
 
