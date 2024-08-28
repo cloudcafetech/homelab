@@ -1,4 +1,4 @@
-variable "proxmox_host_mac" {
+variable "proxmox_host_ip" {
   type        = string
   description = "IP address of your Proxmox host"
   default     = "192.168.29.112"
@@ -159,51 +159,48 @@ variable "ocp_worker02_ip" {
 
 variable "bootstrap_hn" {
   type        = string
-  descrhntion = "Hostname of ocp bootstrap"
+  description = "Hostname of ocp bootstrap"
   default = "bootstrap"
 }
 
 variable "ocpmaster01_hn" {
   type        = string
-  descrhntion = "Hostname of ocp master 01"
+  description = "Hostname of ocp master 01"
   default = "ocpmaster1"
 }
 
 variable "ocpmaster02_hn" {
   type        = string
-  descrhntion = "Hostname of ocp master 02"
+  description = "Hostname of ocp master 02"
   default = "ocpmaster2"
 }
 
 variable "ocpmaster03_hn" {
   type        = string
-  descrhntion = "Hostname of ocp master 03"
+  description = "Hostname of ocp master 03"
   default = "ocpmaster3"
 }
 
 variable "ocpinfra01_hn" {
   type        = string
-  descrhntion = "Hostname of ocp infra 01"
+  description = "Hostname of ocp infra 01"
   default = "ocpinfra01"
 }
 
 variable "ocpinfra02_hn" {
   type        = string
-  descrhntion = "Hostname of ocp infra 02"
+  description = "Hostname of ocp infra 02"
   default = "ocpinfra02"
 }
 
 variable "ocpworker01_hn" {
   type        = string
-  descrhntion = "Hostname of ocp worker 01"
+  description = "Hostname of ocp worker 01"
   default = "ocpworker01"
 }
 
 variable "ocpworker02_hn" {
   type        = string
-  descrhntion = "Hostname of ocp worker 02"
+  description = "Hostname of ocp worker 02"
   default = "ocpworker02"
 }
-
-
-
