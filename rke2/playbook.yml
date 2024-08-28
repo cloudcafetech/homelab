@@ -1,0 +1,11 @@
+- hosts: all
+  name: fetch kubeconfig file
+  gather_facts: false
+  become: yes
+  tasks:
+  - name: fetch kubeconfig file
+    ansible.builtin.fetch:
+      src: /home/cloudcafe/.kube/config
+      dest: /root/homelab/rke2/
+      flat: yes
+      validate_checksum: false
