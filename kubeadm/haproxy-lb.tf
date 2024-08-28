@@ -47,7 +47,6 @@ resource "null_resource" "k8s-haproxy-lb-setup" {
       inline = [
         "chmod +x ./k8setup.sh",
         "sudo sh ./k8setup.sh lbsetup",
-        "#curl -#OL https://raw.githubusercontent.com/cloudcafetech/k8s-terraform/master/kubeadm/haproxy.cfg",
         "sed -i -e 's:VMDNS1:k8skube-master-1:g' -e 's:VMDNS2:k8skube-master-2:g' -e 's:VMIP1:${var.k8s_master01_ip}:g' -e 's:VMIP2:${var.k8s_master02_ip}:g' haproxy.cfg",
         "sed -i '/VMDNS3/d' haproxy.cfg",
         "sudo mv haproxy.cfg /etc/haproxy/haproxy.cfg",
