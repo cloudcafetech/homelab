@@ -3,6 +3,8 @@ Setup Container (Kubeadm/RKE2/Openshift) Platform on Proxmox (Homelab)
 
 - Create PROXMOX Host
 
+- Generate SSH Key using puttyget gui tool and save private & public key
+
 - Create VM from GUI
 
 - Login VM
