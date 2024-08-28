@@ -29,9 +29,10 @@ git clone https://github.com/cloudcafetech/homelab
 cd homelab/kubeadm
 ```
 
+### Copy SSH key (gcpkey) pair in this folder
+
 ### Start K8s Setup using Kubeadm
 ```
-ssh-keygen -t rsa -N '' -f ./gcpkey -C cloudcafe -b 2048
 terraform init
 terraform plan 
 terraform apply -auto-approve
