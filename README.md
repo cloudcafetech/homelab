@@ -137,13 +137,43 @@ terraform plan
 terraform apply -auto-approve
 ```
 
-- Destroy Setup 
-```terraform destroy -auto-approve```
-
 ### RKE2 Setup
 
+- Create VM from Template
+
+```
+qm clone 8000 502 --name ubuntu-rke2--full
+qm set 502 --memory 1024 --cores 1
 ```
 
+- Login ubuntu-rke2 host
+
+- Installing Terraform & Ansible
+
+```
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+add-apt-repository --yes --update ppa:ansible/ansible
+apt update
+apt install terraform ansible git -y
+terraform version
+ansible --version
+```
+
+- Download repo, edit provider.tf and modify ```credentials``` part
+
+```
+git clone https://github.com/cloudcafetech/homelab
+cd homelab/rke2
+```
+
+- Start K8s Setup using RKE2
+
+```
+ssh-keygen -t rsa -N '' -f ./gcpkey -C cloudcafe -b 2048
+terraform init
+terraform plan 
+terraform apply -auto-approve
 ```
 
 ### Openshift Setup
@@ -151,11 +181,11 @@ terraform apply -auto-approve
 - Create VM from Template
 
 ```
-qm clone 9000 501 --name centos--full
-qm set 601 --memory 1024 --cores 1
+qm clone 9000 503 --name centos--full
+qm set 503 --memory 1024 --cores 1
 ```
 
-- Login ubuntu host
+- Login centos host
 
 - Installing Terraform & Ansible
 
@@ -173,7 +203,7 @@ git clone https://github.com/cloudcafetech/homelab
 cd homelab/ocp
 ```
 
-- Download pullsecret
+- Download pullsecret & save it in homelab/ocp folder
 
 - Start Openshift
 
