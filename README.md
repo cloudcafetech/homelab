@@ -1,6 +1,12 @@
 ## Setup Container Platform on Proxmox
 Setup Container (Kubeadm/RKE2/Openshift) Platform on Proxmox (Homelab)
 
+- Create PROXMOX Host
+
+- Create VM from GUI
+
+- Login VM
+  
 - Download the ISO 
 
 ```
