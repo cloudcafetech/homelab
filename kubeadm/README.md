@@ -24,14 +24,6 @@ pip3 install ansible
 ### Installing Git
 ```yum install git -y```
 
-### Configure gcloud CLI
-```
-wget -q https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-470.0.0-linux-x86_64.tar.gz
-tar -xf google-cloud-cli-470.0.0-linux-x86_64.tar.gz
-./google-cloud-sdk/install.sh
-./google-cloud-sdk/bin/gcloud init
-```
-
 ### Download repo, edit provider.tf and modify ```credentials``` part
 ```
 git clone https://github.com/cloudcafetech/homelab
@@ -40,7 +32,7 @@ cd homelab/kubeadm
 
 ### Start K8s Setup using Kubeadm
 ```
-ssh-keygen -t rsa -N '' -f ./gcpkey -C k8sgcp -b 2048
+ssh-keygen -t rsa -N '' -f ./gcpkey -C cloudcafe -b 2048
 terraform init
 terraform plan 
 terraform apply -auto-approve
