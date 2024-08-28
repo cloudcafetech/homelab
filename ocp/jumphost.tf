@@ -2,7 +2,7 @@ resource "proxmox_vm_qemu" "jumphost" {
 
   name                      = "jumphost"
   target_node               = var.pve_node_name
-  clone                     = "centos-9-template"
+  clone                     = "centos-8-template"
   os_type                   = "cloud-init"
   cpu                       = "host"
   agent                     = 1
