@@ -14,7 +14,7 @@ apt install terraform ansible -y
 terraform version
 ansible --version
 ```
-- Amazon Linux
+- Centos
 ```
 sudo yum install -y yum-utils
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
