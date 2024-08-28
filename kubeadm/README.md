@@ -14,15 +14,14 @@ apt install terraform ansible -y
 terraform version
 ansible --version
 ```
-- Centos
+- CentOS
+
 ```
 sudo yum install -y yum-utils
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-sudo yum -y install terraform
+sudo yum -y install terraform git
 pip3 install ansible
 ```
-### Installing Git
-```yum install git -y```
 
 ### Download repo, edit provider.tf and modify ```credentials``` part
 ```
