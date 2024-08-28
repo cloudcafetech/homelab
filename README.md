@@ -162,15 +162,18 @@ qm set 601 --memory 1024 --cores 1
 ```
 sudo yum install -y yum-utils
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-sudo yum -y install terraform
+sudo yum -y install terraform git net-tools nmstate syslinux bind-utils
 pip3 install ansible
 ```
+
 - Download repo, edit provider.tf and modify ```credentials``` part
 
 ```
 git clone https://github.com/cloudcafetech/homelab
 cd homelab/ocp
 ```
+
+- Download pullsecret
 
 - Start Openshift
 
