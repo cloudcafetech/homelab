@@ -134,7 +134,6 @@ terraform apply -auto-approve
 - Destroy Setup 
 ```terraform destroy -auto-approve```
 
-
 ### RKE2 Setup
 
 ```
@@ -143,6 +142,38 @@ terraform apply -auto-approve
 
 ### Openshift Setup
 
-```
+- Create VM from Template
 
 ```
+qm clone 9000 501 --name centos--full
+qm set 601 --memory 1024 --cores 1
+```
+
+- Login ubuntu host
+
+- Installing Terraform & Ansible
+
+```
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+sudo yum -y install terraform
+pip3 install ansible
+```
+- Download repo, edit provider.tf and modify ```credentials``` part
+
+```
+git clone https://github.com/cloudcafetech/homelab
+cd homelab/ocp
+```
+
+- Start Openshift
+
+```
+terraform init
+terraform plan 
+terraform apply -auto-approve
+```
+
+### Destroy Setup 
+
+```terraform destroy -auto-approve```
