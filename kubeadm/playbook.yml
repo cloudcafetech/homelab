@@ -6,12 +6,12 @@
   - name: fetch kubeadm output file
     ansible.builtin.fetch:
       src: /home/cloudcafe/kubeadm-output.txt
-      dest: /root/proxmox/kubeadm/
+      dest: /root/homelab/kubeadm/
       flat: yes
       validate_checksum: false
   - name: fetch kubeconfig file
     ansible.builtin.fetch:
       src: /home/cloudcafe/config
-      dest: /root/proxmox/kubeadm/
+      dest: /root/homelab/kubeadm/
       flat: yes
       validate_checksum: false
