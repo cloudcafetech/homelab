@@ -1,4 +1,4 @@
-# Kubernetes on HOME Lab using Proxmox, Kubeadm/RKE2 and Terraform
+# Kubernetes on HOME Lab using Proxmox, Kubeadm and Terraform
 
 ## Installing tools
 
@@ -34,8 +34,8 @@ tar -xf google-cloud-cli-470.0.0-linux-x86_64.tar.gz
 
 ### Download repo, edit provider.tf and modify ```credentials``` part
 ```
-git clone https://github.com/cloudcafetech/k8s-terraform
-cd k8s-terraform/kubeadm
+git clone https://github.com/cloudcafetech/homelab
+cd homelab/kubeadm
 ```
 
 ### Start K8s Setup using Kubeadm
