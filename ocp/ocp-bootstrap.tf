@@ -3,6 +3,7 @@ resource "proxmox_vm_qemu" "bootstrap" {
 
   name                      = "var.bootstrap_hn"
   target_node               = var.pve_node_name
+  vmid                      = var.ocp_bootstrap_ip
   cpu                       = "host"  
   agent                     = 0
   cores                     = 4
