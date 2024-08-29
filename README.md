@@ -101,11 +101,12 @@ qm template 8000
 
 ### Kubeadm Setup
 
-- Create VM from Template
+- Create VM from Template by Login ProxmoX host
 
 ```
-qm clone 8000 501 --name ubuntu--full
+qm clone 8000 501 --name ubuntu --full
 qm set 501 --memory 1024 --cores 1
+qm start 501
 ```
 
 - Login ubuntu host
@@ -141,11 +142,12 @@ terraform apply -auto-approve
 
 ### RKE2 Setup
 
-- Create VM from Template
+- Create VM from Template by Login ProxmoX host
 
 ```
 qm clone 8000 502 --name ubuntu-rke2 --full
 qm set 502 --memory 1024 --cores 1
+qm start 502
 ```
 
 - Login ubuntu-rke2 host
@@ -183,11 +185,12 @@ terraform apply -auto-approve
 
 ### Openshift Setup
 
-- Create VM from Template
+- Create VM from Template by Login ProxmoX host
 
 ```
-qm clone 9000 503 --name centos--full
+qm clone 9000 503 --name centos --full
 qm set 503 --memory 1024 --cores 1
+qm start 503
 ```
 
 - Login centos host
