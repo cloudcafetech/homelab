@@ -1,6 +1,7 @@
 resource "proxmox_vm_qemu" "jumphost" {
 
   name                      = "jumphost"
+  vmid                      = var.ocp_jump_ip
   target_node               = var.pve_node_name
   clone                     = "centos-8-template"
   os_type                   = "cloud-init"
