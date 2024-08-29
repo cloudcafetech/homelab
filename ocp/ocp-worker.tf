@@ -6,6 +6,7 @@ resource "proxmox_vm_qemu" "ocpworker1" {
 
   name                      = "var.ocpworker1_hn"
   target_node               = var.pve_node_name
+  vmid                      = var.ocp_worker01_ip
   cpu                       = "host"  
   agent                     = 0
   cores                     = 4
@@ -35,6 +36,7 @@ resource "proxmox_vm_qemu" "ocpworker2" {
 
   name                      = "var.ocpworker2_hn"
   target_node               = var.pve_node_name
+  vmid                      = var.ocp_worker02_ip
   cpu                       = "host"  
   agent                     = 0
   cores                     = 4
