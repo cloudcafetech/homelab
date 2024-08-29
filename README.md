@@ -62,7 +62,7 @@ runcmd:
   - apt install -y qemu-guest-agent vim iputils-ping apt-transport-https ca-certificates gpg nfs-common curl wget git net-tools unzip jq zip nmap telnet dos2unix
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
-  - reboot
+  #- reboot
 EOF
 
 cat <<EOF > /var/lib/vz/snippets/centos.yaml
@@ -73,7 +73,7 @@ runcmd:
   - sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
   - yum install -y qemu-guest-agent git curl wget bind-utils jq zip unzip go nmap telnet dos2unix net-tools nmstate
   - systemctl enable --now qemu-guest-agent
-  - reboot
+  #- reboot
 EOF
 
 cat gcpkey.pub > sshkey
