@@ -122,7 +122,7 @@ apt install terraform ansible git -y
 terraform version
 ansible --version
 ```
-- Download repo, edit provider.tf and modify ```credentials``` part
+- Download repo, edit and modify tf files as per environment
 
 ```
 git clone https://github.com/cloudcafetech/homelab
@@ -164,7 +164,7 @@ terraform version
 ansible --version
 ```
 
-- Download repo, edit provider.tf and modify ```credentials``` part
+- Download repo, edit and modify tf files as per environment
 
 ```
 git clone https://github.com/cloudcafetech/homelab
@@ -204,7 +204,7 @@ sudo yum -y install terraform git net-tools nmstate syslinux bind-utils
 pip3 install ansible
 ```
 
-- Download repo, edit provider.tf and modify ```credentials``` part
+- Download repo, edit and modify tf files as per environment
 
 ```
 git clone https://github.com/cloudcafetech/homelab
