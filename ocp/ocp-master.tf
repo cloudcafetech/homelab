@@ -48,19 +48,26 @@ resource "proxmox_vm_qemu" "ocpmaster2" {
   agent                     = 0
   cores                     = 4
   memory                    = 6114
-  boot                      = "order=scsi0;ide2;net0" 
+  boot                      = "order=scsi0;ide2;net0"
+  pxe                       = true
   onboot                    = true
   scsihw                    = "virtio-scsi-pci"
   bootdisk                  = "scsi0"
-  disk {
-    size    = "40G"
-    type    = "scsi"
-    storage = "local-lvm"
-    #iothread = 1
+  disks {
+    scsi {
+      scsi0 {
+        disk {
+          discard = true
+          emulatessd = true
+          storage = "local-lvm"
+          size = 40
+        }
+      }
+    }
   }
   network {
-    model   = "virtio"
-    bridge  = vmbr0
+    bridge = "vmbr0"
+    model = "virtio"
     macaddr = var.ocp_master02_mac
   }
 }
@@ -77,19 +84,26 @@ resource "proxmox_vm_qemu" "ocpmaster3" {
   agent                     = 0
   cores                     = 4
   memory                    = 6114
-  boot                      = "order=scsi0;ide2;net0" 
+  boot                      = "order=scsi0;ide2;net0"
+  pxe                       = true
   onboot                    = true
   scsihw                    = "virtio-scsi-pci"
   bootdisk                  = "scsi0"
-  disk {
-    size    = "40G"
-    type    = "scsi"
-    storage = "local-lvm"
-    #iothread = 1
+  disks {
+    scsi {
+      scsi0 {
+        disk {
+          discard = true
+          emulatessd = true
+          storage = "local-lvm"
+          size = 40
+        }
+      }
+    }
   }
   network {
-    model   = "virtio"
-    bridge  = vmbr0
+    bridge = "vmbr0"
+    model = "virtio"
     macaddr = var.ocp_master03_mac
   }
 }
