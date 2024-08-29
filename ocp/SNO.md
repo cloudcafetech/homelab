@@ -175,4 +175,4 @@ fi
 EOF
 ```
 
-Ref 1(https://ibm.github.io/waiops-tech-jam/blog/single-node-openshift-deployment-with-static-ip/)
+{Ref1}(https://ibm.github.io/waiops-tech-jam/blog/single-node-openshift-deployment-with-static-ip/)
