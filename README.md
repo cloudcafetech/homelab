@@ -198,10 +198,10 @@ qm start 503
 - Installing Terraform & Ansible
 
 ```
-sudo yum install -y yum-utils
+sudo yum install -y yum-utils python3 python3-pip
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
 sudo yum -y install terraform git net-tools nmstate syslinux bind-utils
-pip3 install ansible
+python3 -m pip install ansible==4.10.0
 ```
 
 - Download repo, edit and modify tf files as per environment
