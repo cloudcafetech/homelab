@@ -6,6 +6,7 @@ resource "proxmox_vm_qemu" "ocpmaster1" {
 
   name                      = "var.ocpmaster1_hn"
   target_node               = var.pve_node_name
+  vmid                      = var.ocp_master01_ip
   cpu                       = "host"  
   agent                     = 0
   cores                     = 4
@@ -35,6 +36,7 @@ resource "proxmox_vm_qemu" "ocpmaster2" {
 
   name                      = "var.ocpmaster2.hn"
   target_node               = var.pve_node_name
+  vmid                      = var.ocp_master02_ip
   cpu                       = "host"  
   agent                     = 0
   cores                     = 4
