@@ -58,6 +58,7 @@ platform:
 pullSecret: 'PULL-SECRET'
 sshKey: "SSH-KEY"
 EOF
+```
 
 - Create single node ignition file
 
