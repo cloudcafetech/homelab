@@ -170,10 +170,10 @@ systemctl restart dnsmasq
 sed -i '1s/^/nameserver 192.168.29.230\n/' /etc/resolv.conf
 echo "search cloudcafe.tech" >> /etc/resolv.conf
 
+nmcli con mod ens18 +ipv4.dns-search cloudcafe.tech
 nmcli con mod ens18 -ipv4.dns 192.168.29.1
 nmcli con mod ens18 +ipv4.dns 192.168.29.230
 nmcli con mod ens18 +ipv4.dns 192.168.29.1
-nmcli con mod ens18 +ipv4.dns-search cloudcafe.tech
 nmcli con up ens18
 
 echo "192.168.29.230 api.sno-414.cloudcafe.tech console-openshift-console.apps.sno-414.cloudcafe.tech integrated-oauth-server-openshift-authentication.apps.sno-414.cloudcafe.tech oauth-openshift.apps.sno-414.cloudcafe.tech prometheus-k8s-openshift-monitoring.apps.sno-414.cloudcafe.tech grafana-openshift-monitoring.apps.sno-414.cloudcafe.tech" >> /etc/hosts
@@ -182,11 +182,14 @@ echo "192.168.29.230 api.sno-414.cloudcafe.tech console-openshift-console.apps.s
 - Set hostname after 2nd boot
 
 ```
-nmcli con mod br-ex -ipv4.dns 192.168.29.1
-nmcli con mod br-ex +ipv4.dns 192.168.29.230
-nmcli con mod br-ex +ipv4.dns 192.168.29.1
-nmcli con mod br-ex +ipv4.dns-search cloudcafe.tech
-nmcli con up br-ex
+cat << EOF > /etc/dnsmasq.d/single-node.conf
+address=/apps.sno-414.cloudcafe.tech/192.168.29.230
+address=/api-int.sno-414.cloudcafe.tech/192.168.29.230
+address=/api.sno-414.cloudcafe.tech/192.168.29.230
+EOF
+
+systemctl enable dnsmasq
+systemctl restart dnsmasq
 hostnamectl set-hostname ocpsno
 ```
 
