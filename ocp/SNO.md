@@ -161,24 +161,13 @@ EOF
 systemctl enable dnsmasq
 systemctl restart dnsmasq
 
-cat << EOF > /etc/NetworkManager/dispatcher.d/forcedns
-export IP="192.168.29.230"
-export BASE_RESOLV_CONF=/run/NetworkManager/resolv.conf
-if [ "$2" = "dhcp4-change" ] || [ "$2" = "dhcp6-change" ] || [ "$2" = "up" ] || [ "$2" = "connectivity-change" ]; then
-    if ! grep -q "$IP" /etc/resolv.conf; then
-      export TMP_FILE=$(mktemp /etc/forcedns_resolv.conf.XXXXXX)
-      cp  $BASE_RESOLV_CONF $TMP_FILE
-      chmod --reference=$BASE_RESOLV_CONF $TMP_FILE
-      sed -i -e "s/sno-414.cloudcafe.tech//" \
-      -e "s/search /& sno-414.cloudcafe.tech /" \
-      -e "0,/nameserver/s/nameserver/& $IP\n&/" $TMP_FILE
-      mv $TMP_FILE /etc/resolv.conf
-    fi
-fi
-EOF
-
-chmod 755 /etc/NetworkManager/dispatcher.d/forcedns
-nmcli conn up ens18
+nmcli con mod br-ex -ipv4.dns 192.168.29.1
+nmcli con mod br-ex +ipv4.dns 192.168.29.230
+nmcli con mod br-ex +ipv4.dns 192.168.29.1
+nmcli con mod br-ex +ipv4.dns-search cloudcafe.tech
+hostnamectl set-hostname ocpsno
+nmcli con up br-ex
+echo "192.168.29.230 api.sno-414.cloudcafe.tech console-openshift-console.apps.sno-414.cloudcafe.tech integrated-oauth-server-openshift-authentication.apps.sno-414.cloudcafe.tech oauth-openshift.apps.sno-414.cloudcafe.tech prometheus-k8s-openshift-monitoring.apps.sno-414.cloudcafe.tech grafana-openshift-monitoring.apps.sno-414.cloudcafe.tech" >> /etc/hosts
 ```
 
 [Ref1](https://ibm.github.io/waiops-tech-jam/blog/single-node-openshift-deployment-with-static-ip/)
