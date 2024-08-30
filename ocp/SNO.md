@@ -147,9 +147,15 @@ coreos-installer iso ignition show rhcos-live-414.x86_64.iso
 
 ```
 
-### Setup DNSMASQ after the 2nd boot
+### Post boot setup
 
+- login from jumphost
+
+```
 ssh -i cloudcafe core@192.168.29.230
+```
+
+- Setup DNSMASQ after login
 
 ```
 cat << EOF > /etc/dnsmasq.d/single-node.conf
@@ -165,9 +171,20 @@ nmcli con mod br-ex -ipv4.dns 192.168.29.1
 nmcli con mod br-ex +ipv4.dns 192.168.29.230
 nmcli con mod br-ex +ipv4.dns 192.168.29.1
 nmcli con mod br-ex +ipv4.dns-search cloudcafe.tech
-hostnamectl set-hostname ocpsno
 nmcli con up br-ex
 echo "192.168.29.230 api.sno-414.cloudcafe.tech console-openshift-console.apps.sno-414.cloudcafe.tech integrated-oauth-server-openshift-authentication.apps.sno-414.cloudcafe.tech oauth-openshift.apps.sno-414.cloudcafe.tech prometheus-k8s-openshift-monitoring.apps.sno-414.cloudcafe.tech grafana-openshift-monitoring.apps.sno-414.cloudcafe.tech" >> /etc/hosts
+```
+
+- Set hostname after 2nd boot
+
+```hostnamectl set-hostname ocpsno```
+
+- Check the cluster operator status
+
+```
+export KUBECONFIG=./ocp/auth/kubeconfig
+oc get co
+oc get no
 ```
 
 [Ref1](https://ibm.github.io/waiops-tech-jam/blog/single-node-openshift-deployment-with-static-ip/)
