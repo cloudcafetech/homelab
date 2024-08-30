@@ -41,7 +41,7 @@ resource "proxmox_vm_qemu" "ocpinfra2" {
     ocpmaster1
  ]
 
-  name                      = "var.ocpinfra2.hn"
+  name                      = "var.ocpinfra2_hn"
   target_node               = var.pve_node_name
   vmid                      = var.ocp_infra02_ip
   cpu                       = "host"  
