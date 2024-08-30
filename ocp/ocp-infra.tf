@@ -6,7 +6,7 @@ resource "proxmox_vm_qemu" "ocpinfra1" {
 
   name                      = var.ocpinfra1_hn
   target_node               = var.pve_node_name
-  vmid                      = var.ocp_infra02_ip
+  vmid                      = var.ocp_infra01_ip
   cpu                       = "host"  
   agent                     = 0
   cores                     = 4
