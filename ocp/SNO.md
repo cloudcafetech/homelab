@@ -1,16 +1,18 @@
 # Single Node Openshift (SNO)
 
-- Install necessary packages
+- Install necessary packages & create ssh key
 
 ```
-yum install podman -y
-
 mkdir -p /root/sno
 cd /root/sno
 VERSION=4.14.34
+PULLSECRET='copy-and-paste-secret-file'
 
-ssh-keygen -f cloudcafe
+ssh-keygen -t rsa -N '' -f cloudcafe
 
+SSHKEY=`cat cloudcafe`
+
+yum install podman -y
 curl -k https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/openshift-client-linux.tar.gz > oc-$VERSION.tar.gz
 tar zxf oc-$VERSION.tar.gz
 chmod +x oc
@@ -55,8 +57,8 @@ BootstrapInPlace:
   InstallationDisk: /dev/sda
 platform:
   none: {}
-pullSecret: 'PULL-SECRET'
-sshKey: "SSH-KEY"
+pullSecret: '$PULLSECRET'
+sshKey: '$SSHKEY'
 EOF
 ```
 
