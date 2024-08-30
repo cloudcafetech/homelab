@@ -17,6 +17,7 @@ curl -k https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/opens
 tar zxf oc-$VERSION.tar.gz
 chmod +x oc
 mv oc /usr/local/bin/
+mv kubectl /usr/local/bin/
 
 curl -k https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/openshift-install-linux.tar.gz > openshift-install-linux-$VERSION.tar.gz
 tar zxvf openshift-install-linux-$VERSION.tar.gz
