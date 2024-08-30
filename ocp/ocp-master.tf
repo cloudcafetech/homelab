@@ -41,7 +41,7 @@ resource "proxmox_vm_qemu" "ocpmaster2" {
      bootstrap
   ]
 
-  name                      = var.ocpmaster2.hn
+  name                      = var.ocpmaster2_hn
   target_node               = var.pve_node_name
   vmid                      = var.ocp_master02_ip
   cpu                       = "host"  
@@ -78,7 +78,7 @@ resource "proxmox_vm_qemu" "ocpmaster3" {
      bootstrap
   ]
 
-  name                      = var.ocpmaster3.hn
+  name                      = var.ocpmaster3_hn
   target_node               = var.pve_node_name
   cpu                       = "host"  
   agent                     = 0
