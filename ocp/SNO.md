@@ -176,6 +176,9 @@ if [ "$2" = "dhcp4-change" ] || [ "$2" = "dhcp6-change" ] || [ "$2" = "up" ] || 
     fi
 fi
 EOF
+
+chmod 755 /etc/NetworkManager/dispatcher.d/forcedns
+nmcli conn up ens18
 ```
 
 [Ref1](https://ibm.github.io/waiops-tech-jam/blog/single-node-openshift-deployment-with-static-ip/)
