@@ -80,6 +80,7 @@ resource "proxmox_vm_qemu" "ocpmaster3" {
 
   name                      = var.ocpmaster3_hn
   target_node               = var.pve_node_name
+  vmid                      = var.ocp_master03_ip
   cpu                       = "host"  
   agent                     = 0
   cores                     = 4
