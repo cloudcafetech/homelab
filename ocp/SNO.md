@@ -168,6 +168,7 @@ systemctl enable dnsmasq
 systemctl restart dnsmasq
 
 sed -i '1s/^/nameserver 192.168.29.230\n/' /etc/resolv.conf
+echo "search cloudcafe.tech" >> /etc/resolv.conf
 
 nmcli con mod ens18 -ipv4.dns 192.168.29.1
 nmcli con mod ens18 +ipv4.dns 192.168.29.230
