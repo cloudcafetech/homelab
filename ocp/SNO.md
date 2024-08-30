@@ -167,18 +167,24 @@ EOF
 systemctl enable dnsmasq
 systemctl restart dnsmasq
 
+nmcli con mod ens18 -ipv4.dns 192.168.29.1
+nmcli con mod ens18 +ipv4.dns 192.168.29.230
+nmcli con mod ens18 +ipv4.dns 192.168.29.1
+nmcli con mod ens18 +ipv4.dns-search cloudcafe.tech
+nmcli con up ens18
+
 echo "192.168.29.230 api.sno-414.cloudcafe.tech console-openshift-console.apps.sno-414.cloudcafe.tech integrated-oauth-server-openshift-authentication.apps.sno-414.cloudcafe.tech oauth-openshift.apps.sno-414.cloudcafe.tech prometheus-k8s-openshift-monitoring.apps.sno-414.cloudcafe.tech grafana-openshift-monitoring.apps.sno-414.cloudcafe.tech" >> /etc/hosts
 ```
 
 - Set hostname after 2nd boot
 
 ```
-hostnamectl set-hostname ocpsno
 nmcli con mod br-ex -ipv4.dns 192.168.29.1
 nmcli con mod br-ex +ipv4.dns 192.168.29.230
 nmcli con mod br-ex +ipv4.dns 192.168.29.1
 nmcli con mod br-ex +ipv4.dns-search cloudcafe.tech
 nmcli con up br-ex
+hostnamectl set-hostname ocpsno
 ```
 
 - Check the cluster operator status
