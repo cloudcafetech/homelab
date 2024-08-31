@@ -205,27 +205,17 @@ sudo yum -y install terraform git net-tools nmstate bind-utils
 python3 -m pip install ansible==4.10.0
 ```
 
-- Prepare Jumphost for DNSMASQ,TFTP,WEB & OCP deplyoment (Modify below script based as per requirement)
+- Download repo, prepare Jumphost for DNSMASQ,TFTP,WEB & OCP deplyoment (Modify files based as per requirement)
 
 ```
-wget https://raw.githubusercontent.com/cloudcafetech/homelab/main/ocp/ocp-jumphost.sh
+git clone https://github.com/cloudcafetech/homelab
+cd homelab/ocp
 chmod 755 ocp-jumphost.sh
 ./ocp-jumphost.sh
 sed -i '1s/^/nameserver 192.168.29.214\n/' /etc/resolv.conf
 ```
 
-- Download repo, edit and modify tf files as per environment
-
-```
-git clone https://github.com/cloudcafetech/homelab
-cd homelab/ocp
-```
-
 - Download pullsecret & save it in homelab/ocp folder
-
-- Copy sshkey files (gcpkey & gcpkey.pub) from proxmox
-
-```scp root@<proxmox-host>:/root/gcp* .```
 
 - Start Openshift
 
