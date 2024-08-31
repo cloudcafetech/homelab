@@ -1,10 +1,7 @@
 resource "proxmox_vm_qemu" "ocpmaster1" {
-  depends_on = [ 
-     jumphost,
-     bootstrap
-  ]
+  depends_on = [ proxmox_vm_qemu.bootstrap ]
 
-  name                      = var.ocpmaster1_hn
+  name                      = var.ocpmaster01_hn
   target_node               = var.pve_node_name
   vmid                      = var.ocp_master01_ip
   cpu                       = "host"  
@@ -36,12 +33,9 @@ resource "proxmox_vm_qemu" "ocpmaster1" {
 }
 
 resource "proxmox_vm_qemu" "ocpmaster2" {
-  depends_on = [ 
-     jumphost,
-     bootstrap
-  ]
+  depends_on = [ proxmox_vm_qemu.bootstrap ]
 
-  name                      = var.ocpmaster2_hn
+  name                      = var.ocpmaster02_hn
   target_node               = var.pve_node_name
   vmid                      = var.ocp_master02_ip
   cpu                       = "host"  
@@ -73,12 +67,9 @@ resource "proxmox_vm_qemu" "ocpmaster2" {
 }
 
 resource "proxmox_vm_qemu" "ocpmaster3" {
-  depends_on = [ 
-     jumphost,
-     bootstrap
-  ]
+  depends_on = [ proxmox_vm_qemu.bootstrap ]
 
-  name                      = var.ocpmaster3_hn
+  name                      = var.ocpmaster03_hn
   target_node               = var.pve_node_name
   vmid                      = var.ocp_master03_ip
   cpu                       = "host"  
