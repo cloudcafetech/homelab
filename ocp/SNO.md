@@ -144,7 +144,12 @@ coreos-installer iso ignition show rhcos-live-414.x86_64.iso
 - ssh to proxmox and create vm 
 
 ```
-
+qm create 230 --name ocpsno --ide2 local:iso/rhcos-live-414.x86_64.iso,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
+  --cpu cputype=max --cores 6 --sockets 1 --memory 10240 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --net0 virtio,bridge=vmbr0 --scsi0 local-lvm:60,discard=on,ssd=1 \
+  --serial0 socket --onboot yes
+sleep 10
+qm start 230
 ```
 
 ### Post boot setup
