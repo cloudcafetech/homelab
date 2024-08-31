@@ -201,6 +201,14 @@ systemctl start dnsmasq
 hostnamectl set-hostname ocpsno
 ```
 
+- Check the Bootstrap status
+
+```openshift-install --dir ocp/ wait-for bootstrap-complete --log-level=debug```
+
+- Check the Install status
+
+```openshift-install --dir ocp/ wait-for install-complete --log-level=debug```
+
 - Check the cluster operator status
 
 ```
