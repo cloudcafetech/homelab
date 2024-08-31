@@ -113,7 +113,7 @@ Subnet: Subnet = 192.168.3.0/24, Gateway = 192.168.3.1, SNAT (check)
 
 - Apply config: SDN --> Apply
 
-- Edit once again networkintefaces.
+- Edit once again networkintefaces
 
 ```
 cat <<EOF > /etc/network/intefaces
