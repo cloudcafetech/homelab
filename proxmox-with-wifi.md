@@ -69,7 +69,6 @@ EOF
 
 - Configure network intefaces:
 
-
 ```
 cat <<EOF > /etc/network/intefaces
 auto lo
@@ -112,9 +111,9 @@ Zone: Simple, ID = Zone1 (use any name you like for ID)
 Vnet: Name = vnet1 (use any name you like for Name), Zone = Zone1 (must match Zone ID)
 Subnet: Subnet = 192.168.3.0/24, Gateway = 192.168.3.1, SNAT (check)
 
-13) Apply config: SDN --> Apply
+- Apply config: SDN --> Apply
 
-14) Edit once again networkintefaces.
+- Edit once again networkintefaces.
 
 ```
 cat <<EOF > /etc/network/intefaces
