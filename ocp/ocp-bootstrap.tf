@@ -1,5 +1,5 @@
 resource "proxmox_vm_qemu" "bootstrap" {
-  depends_on = [ proxmox_vm_qemu.jumphost ]
+  #depends_on = [ proxmox_vm_qemu.jumphost ]
 
   name                      = var.bootstrap_hn
   target_node               = var.pve_node_name
