@@ -211,6 +211,7 @@ python3 -m pip install ansible==4.10.0
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/main/ocp/ocp-jumphost.sh
 chmod 755 ocp-jumphost.sh
 ./ocp-jumphost.sh
+sed -i '1s/^/nameserver 192.168.29.214\n/' /etc/resolv.conf
 ```
 
 - Download repo, edit and modify tf files as per environment
