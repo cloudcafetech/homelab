@@ -170,10 +170,10 @@ address=/api.sno-414.cloudcafe.tech/192.168.29.230
 EOF
 
 systemctl enable dnsmasq
-systemctl restart dnsmasq
+systemctl start dnsmasq
 
-sed -i '1s/^/nameserver 192.168.29.230\n/' /etc/resolv.conf
-echo "search cloudcafe.tech" >> /etc/resolv.conf
+#sed -i '1s/^/nameserver 192.168.29.230\n/' /etc/resolv.conf
+#echo "search cloudcafe.tech" >> /etc/resolv.conf
 
 nmcli con mod ens18 +ipv4.dns-search cloudcafe.tech
 nmcli con mod ens18 -ipv4.dns 192.168.29.1
@@ -194,7 +194,7 @@ address=/api.sno-414.cloudcafe.tech/192.168.29.230
 EOF
 
 systemctl enable dnsmasq
-systemctl restart dnsmasq
+systemctl start dnsmasq
 hostnamectl set-hostname ocpsno
 ```
 
