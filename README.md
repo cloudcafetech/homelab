@@ -208,7 +208,7 @@ python3 -m pip install ansible==4.10.0
 - Prepare Jumphost for DNSMASQ,TFTP,WEB & OCP deplyoment (Modify below script based as per requirement)
 
 ```
-wget https://raw.githubusercontent.com/cloudcafetech/nestedk8s/main/ocp-jumphost.sh
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/main/ocp/ocp-jumphost.sh
 chmod 755 ocp-jumphost.sh
 ./ocp-jumphost.sh
 ```
