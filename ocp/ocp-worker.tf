@@ -1,10 +1,7 @@
 resource "proxmox_vm_qemu" "ocpworker1" {
-  depends_on = [ 
-    jumphost,
-    ocpmaster1
- ]
+  depends_on = [ proxmox_vm_qemu.ocpmaster1 ]
 
-  name                      = "var.ocpworker1_hn"
+  name                      = var.ocpworker01_hn
   target_node               = var.pve_node_name
   vmid                      = var.ocp_worker01_ip
   cpu                       = "host"  
@@ -36,12 +33,9 @@ resource "proxmox_vm_qemu" "ocpworker1" {
 }
 
 resource "proxmox_vm_qemu" "ocpworker2" {
-  depends_on = [ 
-    jumphost,
-    ocpmaster1
- ]
+  depends_on = [ proxmox_vm_qemu.ocpmaster1 ]
 
-  name                      = "var.ocpworker2_hn"
+  name                      = var.ocpworker02_hn
   target_node               = var.pve_node_name
   vmid                      = var.ocp_worker02_ip
   cpu                       = "host"  
