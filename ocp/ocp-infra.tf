@@ -1,10 +1,7 @@
 resource "proxmox_vm_qemu" "ocpinfra1" {
-  depends_on = [ 
-    jumphost,
-    ocpmaster1
- ]
+  depends_on = [ proxmox_vm_qemu.ocpmaster1 ]
 
-  name                      = var.ocpinfra1_hn
+  name                      = var.ocpinfra01_hn
   target_node               = var.pve_node_name
   vmid                      = var.ocp_infra01_ip
   cpu                       = "host"  
@@ -36,12 +33,9 @@ resource "proxmox_vm_qemu" "ocpinfra1" {
 }
 
 resource "proxmox_vm_qemu" "ocpinfra2" {
-  depends_on = [ 
-    jumphost,
-    ocpmaster1
- ]
+  depends_on = [ proxmox_vm_qemu.ocpmaster1 ]
 
-  name                      = "var.ocpinfra2_hn"
+  name                      = var.ocpinfra02_hn
   target_node               = var.pve_node_name
   vmid                      = var.ocp_infra02_ip
   cpu                       = "host"  
