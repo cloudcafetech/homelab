@@ -211,13 +211,23 @@ python3 -m pip install ansible==4.10.0
 git clone https://github.com/cloudcafetech/homelab
 cd homelab/ocp
 chmod 755 ocp-jumphost.sh
-./ocp-jumphost.sh
+#./ocp-jumphost.sh
 sed -i '1s/^/nameserver 192.168.29.214\n/' /etc/resolv.conf
 ```
 
-- Download pullsecret & save it in homelab/ocp folder
+- Download pullsecret & put it in ocp-jumphost.sh
 
-- Start Openshift
+- Create VMs
+
+Bootstrap first, once its ready then start Master1, Master2 &  Master3 then rest of VMs
+
+```
+
+```
+
+#### OR 
+
+- Start Openshift using Terraform
 
 ```
 terraform init
