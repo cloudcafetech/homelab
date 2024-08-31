@@ -10,7 +10,7 @@ PULLSECRET='copy-and-paste-secret-file'
 
 ssh-keygen -t rsa -N '' -f cloudcafe
 
-SSHKEY=`cat cloudcafe`
+SSHKEY=`cat cloudcafe.pub`
 
 yum install podman -y
 curl -k https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/openshift-client-linux.tar.gz > oc-$VERSION.tar.gz
