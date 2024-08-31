@@ -224,3 +224,4 @@ oc get no
 [Ref#1](https://ibm.github.io/waiops-tech-jam/blog/single-node-openshift-deployment-with-static-ip/)
 [Ref#2](https://k8s.co.il/openshift/how-to-deploy-single-node-openshift/)
 [Ref#3](https://www.certdepot.net/rhel7-configure-ipv4-addresses/)
+[Cert Expiry](https://k8s.co.il/security/fix-openshift-certificate-has-expired-or-is-not-yet-valid-error/)
