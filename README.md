@@ -205,8 +205,7 @@ sudo yum -y install terraform git net-tools nmstate syslinux bind-utils
 python3 -m pip install ansible==4.10.0
 ```
 
-- Prepare Jumphost for DNSMASQ,TFTP,WEB & OCP deplyoment
-Download below script & modify based on your requirement
+- Prepare Jumphost for DNSMASQ,TFTP,WEB & OCP deplyoment (Modify below script based as per requirement)
 
 ```
 wget https://raw.githubusercontent.com/cloudcafetech/nestedk8s/main/ocp-jumphost.sh
