@@ -201,7 +201,7 @@ qm start 214
 ```
 sudo yum install -y yum-utils python3 python3-pip
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-sudo yum -y install terraform git net-tools nmstate syslinux bind-utils
+sudo yum -y install terraform git net-tools nmstate bind-utils
 python3 -m pip install ansible==4.10.0
 ```
 
