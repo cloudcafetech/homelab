@@ -58,8 +58,8 @@ BootstrapInPlace:
   InstallationDisk: /dev/sda
 platform:
   none: {}
-pullSecret: '$PULLSECRET'
-sshKey: '$SSHKEY'
+pullSecret: $PULLSECRET
+sshKey: $SSHKEY
 EOF
 ```
 
