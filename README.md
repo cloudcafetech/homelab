@@ -188,12 +188,13 @@ terraform apply -auto-approve
 - Create VM from Template by Login ProxmoX host
 
 ```
-qm clone 9000 503 --name centos --full
-qm set 503 --memory 1024 --cores 1
-qm start 503
+qm clone 9000 214 --name jumphost --full
+qm set 214 --memory 2048 --cores 2
+qm set 214 --ipconfig0 ip=192.168.29.214/24,gw=192.168.29.1
+qm start 214
 ```
 
-- Login centos host
+- Login jumphost host
 
 - Installing Terraform & Ansible
 
@@ -202,6 +203,15 @@ sudo yum install -y yum-utils python3 python3-pip
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
 sudo yum -y install terraform git net-tools nmstate syslinux bind-utils
 python3 -m pip install ansible==4.10.0
+```
+
+- Prepare Jumphost for DNSMASQ,TFTP,WEB & OCP deplyoment
+Download below script & modify based on your requirement
+
+```
+wget https://raw.githubusercontent.com/cloudcafetech/nestedk8s/main/ocp-jumphost.sh
+chmod 755 ocp-jumphost.sh
+./ocp-jumphost.sh
 ```
 
 - Download repo, edit and modify tf files as per environment
