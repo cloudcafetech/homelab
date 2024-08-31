@@ -217,6 +217,10 @@ oc get co
 oc get no
 ```
 
+- Validate Certificate
+
+```openssl s_client -servername api.sno-414.cloudcafe.tech -connect api.sno-414.cloudcafe.tech:6443 | openssl x509 -noout -dates```
+
 [Ref#1](https://ibm.github.io/waiops-tech-jam/blog/single-node-openshift-deployment-with-static-ip/)
 [Ref#2](https://k8s.co.il/openshift/how-to-deploy-single-node-openshift/)
 [Ref#3](https://www.certdepot.net/rhel7-configure-ipv4-addresses/)
