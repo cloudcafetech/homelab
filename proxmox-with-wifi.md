@@ -31,7 +31,7 @@ systemctl disable wpa_supplicant
 wpa_passphrase SSIDNAME PASSWORD >> /etc/wpa_supplicant/wpa_supplicant.conf
 ```
 
-5) Determine wireless adapter device name. (example: wlp0s20f3)
+- Determine wireless adapter device name. (example: wlp0s20f3)
 
 ```
 dmesg | grep -i wlp
@@ -39,8 +39,7 @@ dmesg | grep -i wlp
 
 ##### output: ([    4.098921] iwlwifi 0000:00:14.3 wlp0s20f3: renamed from wlan0)
 
-6) Create /etc/systemd/system/wpa_supplicant.service and add configuration:
-
+- Create /etc/systemd/system/wpa_supplicant.service and add configuration:
 
 ```
 cat <<EOF > /etc/systemd/system/wpa_supplicant.service
@@ -62,6 +61,7 @@ Restart=always
 WantedBy=multi-user.target
 Alias=dbus-fi.w1.wpa_supplicant1.service
 EOF
+```
 
 - Enable wpasupplicant service:
 
