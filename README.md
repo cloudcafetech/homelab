@@ -219,11 +219,11 @@ sed -i '1s/^/nameserver 192.168.29.214\n/' /etc/resolv.conf
 
 - Create VMs
 
-Bootstrap first, once its ready then start Master1, Master2 &  Master3 then rest of VMs
+##### Bootstrap first, make sure Bootstrap process complete
 
 ```
 qm create 216 --name bootstrap --ide2 none,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
-  --cpu cputype=max --cores 4 --sockets 1 --memory 6144 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --cpu cputype=max --cores 4 --sockets 1 --memory 10240 --scsihw virtio-scsi-pci --bootdisk scsi0 \
   --net0 bridge=vmbr0,virtio=BC:24:11:11:22:88 --scsi0 local-lvm:40,discard=on,ssd=1 \
   --serial0 socket --onboot yes
 
@@ -231,50 +231,60 @@ qm start 216
 
 openshift-install --dir ~/ocp-install wait-for bootstrap-complete --log-level=debug
 
+ssh -i /root/.ssh/id_rsa core@192.168.29.216
+
+sudo su -
+
+journalctl -b -f -u release-image.service -u bootkube.service
+```
+
+##### Start Master1, Master2 &  Master3 then rest of VMs
+
+```
 qm create 217 --name ocpmaster1 --ide2 none,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
-  --cpu cputype=max --cores 4 --sockets 1 --memory 6144 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --cpu cputype=max --cores 4 --sockets 1 --memory 8192 --scsihw virtio-scsi-pci --bootdisk scsi0 \
   --net0 bridge=vmbr0,virtio=BC:24:11:11:22:11 --scsi0 local-lvm:40,discard=on,ssd=1 \
   --serial0 socket --onboot yes
 
 qm start 217
 
 qm create 218 --name ocpmaster2 --ide2 none,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
-  --cpu cputype=max --cores 4 --sockets 1 --memory 6144 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --cpu cputype=max --cores 4 --sockets 1 --memory 8192 --scsihw virtio-scsi-pci --bootdisk scsi0 \
   --net0 bridge=vmbr0,virtio=BC:24:11:11:22:22 --scsi0 local-lvm:40,discard=on,ssd=1 \
   --serial0 socket --onboot yes
 
 qm start 218
 
 qm create 219 --name ocpmaster3 --ide2 none,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
-  --cpu cputype=max --cores 4 --sockets 1 --memory 6144 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --cpu cputype=max --cores 4 --sockets 1 --memory 8192 --scsihw virtio-scsi-pci --bootdisk scsi0 \
   --net0 bridge=vmbr0,virtio=BC:24:11:11:22:33 --scsi0 local-lvm:40,discard=on,ssd=1 \
   --serial0 socket --onboot yes
 
 qm start 219
 
 qm create 220 --name ocpinfra1 --ide2 none,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
-  --cpu cputype=max --cores 4 --sockets 1 --memory 6144 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --cpu cputype=max --cores 4 --sockets 1 --memory 8192 --scsihw virtio-scsi-pci --bootdisk scsi0 \
   --net0 bridge=vmbr0,virtio=BC:24:11:11:22:44 --scsi0 local-lvm:40,discard=on,ssd=1 \
   --serial0 socket --onboot yes
 
 qm start 220
 
 qm create 221 --name ocpinfra2 --ide2 none,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
-  --cpu cputype=max --cores 4 --sockets 1 --memory 6144 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --cpu cputype=max --cores 4 --sockets 1 --memory 8192 --scsihw virtio-scsi-pci --bootdisk scsi0 \
   --net0 bridge=vmbr0,virtio=BC:24:11:11:22:55 --scsi0 local-lvm:40,discard=on,ssd=1 \
   --serial0 socket --onboot yes
 
 qm start 221
 
 qm create 222 --name ocpworker1 --ide2 none,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
-  --cpu cputype=max --cores 4 --sockets 1 --memory 6144 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --cpu cputype=max --cores 4 --sockets 1 --memory 8192 --scsihw virtio-scsi-pci --bootdisk scsi0 \
   --net0 bridge=vmbr0,virtio=BC:24:11:11:22:66 --scsi0 local-lvm:40,discard=on,ssd=1 \
   --serial0 socket --onboot yes
 
 qm start 222
 
 qm create 223 --name ocpworker2 --ide2 none,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
-  --cpu cputype=max --cores 4 --sockets 1 --memory 6144 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --cpu cputype=max --cores 4 --sockets 1 --memory 8192 --scsihw virtio-scsi-pci --bootdisk scsi0 \
   --net0 bridge=vmbr0,virtio=BC:24:11:11:22:77 --scsi0 local-lvm:40,discard=on,ssd=1 \
   --serial0 socket --onboot yes
 
