@@ -122,8 +122,8 @@ iface lo inet loopback
 
 iface enp1s0 inet manual
 
-auto wlp2s0
-iface wlp2s0 inet manual
+auto wlp0s20f3
+iface wlp0s20f3 inet manual
                address 192.168.29.100/24
                gateway 192.168.29.1
 
