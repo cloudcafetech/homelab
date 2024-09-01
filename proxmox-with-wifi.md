@@ -21,7 +21,7 @@ Gateway = 192.168.29.100 (specify IP address of wifi adapter)
 - After the install completes and the system has rebooted, install wpasupplicant (and install vim while you're at it):
 
 ```
-apt update && apt install wpasupplicant vim
+apt update -y && apt install wpasupplicant vim -y
 systemctl disable wpa_supplicant
 ```
 
