@@ -7,6 +7,7 @@ DOMAIN=cloudcafe.tech
 CTX=ocp414
 OCPVERM=4.14
 OCPVER=4.14.34
+SW=OKD
 
 PULLSECRET='{"auths":{"fake":{"auth": "bar"}}}'
 #PULLSECRET='copy-and-paste-secret-file'
@@ -79,37 +80,50 @@ nor=$(tput sgr0)
 toolsetup() {
 
 echo "$bld$grn Downloading & Installing Openshift binary $nor"
-curl -s -o openshift-install-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/$OCPVER/openshift-install-linux.tar.gz
-tar xpvf openshift-install-linux.tar.gz
-rm -rf openshift-install-linux.tar.gz
-mv openshift-install /usr/local/bin
 
-curl -s -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/$OCPVER/openshift-client-linux.tar.gz
+if [[ "$SW" == "OKD" ]]; then
+  wget -q https://github.com/okd-project/okd/releases/download/4.12.0-0.okd-2023-02-18-033438/openshift-install-linux-4.12.0-0.okd-2023-02-18-033438.tar.gz -O openshift-install-linux.tar.gz
+  wget -q https://github.com/okd-project/okd/releases/download/4.12.0-0.okd-2023-02-18-033438/openshift-client-linux-4.12.0-0.okd-2023-02-18-033438.tar.gz -O openshift-client-linux.tar.gz
+else
+  curl -s -o openshift-install-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/$OCPVER/openshift-install-linux.tar.gz
+  curl -s -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/$OCPVER/openshift-client-linux.tar.gz
+fi
+
+tar xvf openshift-install-linux.tar.gz
+rm -rf openshift-install-linux.tar.gz
+mv -f openshift-install /usr/local/bin
+
 tar xvf openshift-client-linux.tar.gz
 rm -rf openshift-client-linux.tar.gz
-mv oc kubectl /usr/local/bin
+mv -f oc kubectl /usr/local/bin
 
 echo "$bld$grn Downloading Openshift ISO ... $nor"
-curl -s -o rhcos-live.x86_64.iso https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-live.x86_64.iso
+if [[ "$SW" == "OKD" ]]; then
+  curl -s -o rhcos-live.x86_64.iso https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/37.20221127.3.0/x86_64/fedora-coreos-37.20221127.3.0-live.x86_64.iso
+else
+  curl -s -o rhcos-live.x86_64.iso https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-live.x86_64.iso
+fi
 
 echo "$bld$grn Downloading Openshift Initramfs Images ... $nor"
-curl -s -o rhcos-initramfs.img https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-$OCPVER-x86_64-live-initramfs.x86_64.img
+if [[ "$SW" == "OKD" ]]; then
+  curl -s -o rhcos-initramfs.img https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/37.20221127.3.0/x86_64/fedora-coreos-37.20221127.3.0-live-initramfs.x86_64.img
+else
+  curl -s -o rhcos-initramfs.img https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-$OCPVER-x86_64-live-initramfs.x86_64.img
+fi
 
 echo "$bld$grn Downloading Openshift Kernel ... $nor"
-curl -s -o rhcos-kernel https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-$OCPVER-x86_64-live-kernel-x86_64
+if [[ "$SW" == "OKD" ]]; then
+  curl -s -o rhcos-kernel https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/37.20221127.3.0/x86_64/fedora-coreos-37.20221127.3.0-live-kernel-x86_64
+else
+  curl -s -o rhcos-kernel https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-$OCPVER-x86_64-live-kernel-x86_64
+fi
 
 echo "$bld$grn Downloading Openshift Rootfs Image ... $nor"
-curl -s -o rhcos-rootfs.img https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-$OCPVER-x86_64-live-rootfs.x86_64.img
-
-#curl -s -o rhcos-metal.raw.gz https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-$OCPVER-x86_64-metal.x86_64.raw.gz
-#curl -s -o rhcos-metal.x86_64.raw.gz https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-metal.x86_64.raw.gz
-#curl -s -o rhcos-qemu.x86_64.qcow2.gz https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-qemu.x86_64.qcow2.gz
-#sleep 5
-#gunzip rhcos-qemu.x86_64.qcow2.gz
-#file rhcos-qemu.x86_64.qcow2
-
-#curl -s -o rhcos-live.x86_64.iso https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/latest/latest/rhcos-live.x86_64.iso
-#curl -s -o rhcos-metal.x86_64.raw.gz https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/latest/latest/rhcos-metal.x86_64.raw.gz
+if [[ "$SW" == "OKD" ]]; then
+  curl -s -o rhcos-rootfs.img https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/37.20221127.3.0/x86_64/fedora-coreos-37.20221127.3.0-live-rootfs.x86_64.img
+else
+  curl -s -o rhcos-rootfs.img https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/$OCPVERM/$OCPVER/rhcos-$OCPVER-x86_64-live-rootfs.x86_64.img
+fi
 
 }
 
