@@ -125,3 +125,5 @@ vi /etc/network/interfaces
 ```systemctl restart networking```
 
 [Ref#1](https://forum.proxmox.com/threads/howto-proxmox-ve-8-1-2-wifi-w-snat.142831/)
+
+[Ref#2](https://x88.in/proxmox-with-wifi/)
