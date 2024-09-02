@@ -70,26 +70,27 @@ EOF
 - Configure network intefaces:
 
 ```
-cat <<EOF > /etc/network/intefaces
-auto lo
-iface lo inet loopback
-
-iface enp1s0 inet manual
-
-auto wlp0s20f3  		## specify your wireless device here
-iface wlp0s20f3 inet manual	## specify your wireless device here
+cat <<EOF > add-wifi
+auto wlp0s20f3  		               ## specify your wireless device here
+iface wlp0s20f3 inet manual	     ## specify your wireless device here
     address 192.168.29.100/24
     gateway 192.168.29.1
 
-auto vmbr0
-iface vmbr0 inet static
-    address 192.168.29.112/24
-    bridge-ports none
-    bridge-stp off
-    bridge-fd 0
-EOF
+# remove comment after SDN create (step #13)
+#iface vnet1 inet static
+#               address 192.168.3.1/24
+#               bridge-ports none
+#               bridge-stp off
+#               bridge-fd 0
+#               post-up echo 1 > /proc/sys/net/ipv4/ip_forward
+#               post-up iptables -t nat -A POSTROUTING -s '192.168.3.0/24' -o wlp0s20f3 -j MASQUERADE     ## specify your wireless device here
+#               post-up iptables -t raw -I PREROUTING -i fwbr+ -j CT --zone zone1  ## Zone ID
+#               post-down iptables -t nat -D POSTROUTING -s '192.168.3.0/24' -o wlp0s20f3 -j MASQUERADE   ## specify your wireless device here
+#               post-down iptables -t raw -D PREROUTING -i fwbr+ -j CT --zone zone1  ## Zone ID
 
 source /etc/network/interfaces.d/*
+EOF
+cat add-wifi >> /etc/network/interfaces
 ```
 
 - Restart wpa_supplicant and networking services to connect wireless adapter to wifi network:
@@ -103,9 +104,9 @@ sed -Ezi.bak "s/(Ext.Msg.show\(\{\s+title: gettext\('No valid sub)/void\(\{ \/\/
 systemctl restart pveproxy.service
 ```
 
-- Log into proxmox web interface: https://<ip_of_your_wifi_adapter>:8006
+- Log into proxmox web interface: https://192.168.29.100:8006
 
-- Create SDN config (Datacenter --> SDN):
+- Create SDN config (Datacenter --> SDN): (step #13)
 
 Zone: Simple, ID = Zone1 (use any name you like for ID)
 Vnet: Name = vnet1 (use any name you like for Name), Zone = Zone1 (must match Zone ID)
@@ -113,40 +114,10 @@ Subnet: Subnet = 192.168.3.0/24, Gateway = 192.168.3.1, SNAT (check)
 
 - Apply config: SDN --> Apply
 
-- Edit once again networkintefaces
+- Edit once again network intefaces & remove # (which we did earlier steps)
 
 ```
-cat <<EOF > /etc/network/intefaces
-auto lo
-iface lo inet loopback
-
-iface enp1s0 inet manual
-
-auto wlp0s20f3
-iface wlp0s20f3 inet manual
-               address 192.168.29.100/24
-               gateway 192.168.29.1
-
-auto vmbr0
-iface vmbr0 inet static
-               address 192.168.29.1/24
-               bridge-ports none
-               bridge-stp off
-               bridge-fd 0
-
-iface vnet1 inet static
-               address 192.168.3.1/24
-               bridge-ports none
-               bridge-stp off
-               bridge-fd 0
-               post-up echo 1 > /proc/sys/net/ipv4/ip_forward
-               post-up iptables -t nat -A POSTROUTING -s '192.168.3.0/24' -o wlp2s0 -j MASQUERADE
-               post-up iptables -t raw -I PREROUTING -i fwbr+ -j CT --zone zone1  ## Zone ID
-               post-down iptables -t nat -D POSTROUTING -s '192.168.3.0/24' -o wlp2s0 -j MASQUERADE
-               post-down iptables -t raw -D PREROUTING -i fwbr+ -j CT --zone zone1  ## Zone ID
-EOF
-
-source /etc/network/interfaces.d/*
+vi /etc/network/interfaces
 ```
 
 - Restart network service:
