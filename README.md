@@ -8,7 +8,7 @@ Setup Container (Kubeadm/RKE2/Openshift) Platform on Proxmox (Homelab)
 - Generate SSH Key using puttygen tool and create private, public & ppk key
 
 ```
-apt install putty wget -y
+apt install putty wget vim libguestfs-tools p7zip-full -y
 ssh-keygen -t rsa -N '' -f ./gcpkey -C cloudcafe -b 2048
 puttygen gcpkey -O private -o gcpkey.ppk
 ```
@@ -17,6 +17,9 @@ puttygen gcpkey -O private -o gcpkey.ppk
 ```
 wget https://cloud-images.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64.img
 wget https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2
+wget https://cdimage.kali.org/kali-2024.2/kali-linux-2024.2-qemu-amd64.7z
+7z x kali-linux-2024.2-qemu-amd64.7z
+rm -rf kali-linux-2024.2-qemu-amd64.7z
 ```
 
 - Change the file extension of the image to .qcow2
@@ -24,6 +27,7 @@ wget https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.4.2
 ```
 mv ubuntu-22.04-minimal-cloudimg-amd64.img ubuntu-22-04.qcow2
 mv CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2 centos-stream-8.qcow2
+mv kali-linux-2024.2-qemu-amd64.qcow2 kali-2024.qcow2
 ```
 
 - Resize the downloaded cloud image
@@ -31,11 +35,19 @@ mv CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2 centos-stream-8.qcow2
 ```
 qemu-img resize ubuntu-22-04.qcow2 35G
 qemu-img resize centos-stream-8.qcow2 35G
+qemu-img resize kali-2024.qcow2 35G
 ```
 
 - Create the VM template using CLI
 
 ```
+qm create 7000 --name kali-2024-template --memory 2048 --core 2 --agent enabled=1 --net0 virtio,bridge=vmbr0
+qm importdisk 7000 kali-2024.qcow2 local-lvm
+qm set 7000 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-7000-disk-0,discard=on,ssd=1
+qm set 7000 --ide2 local-lvm:cloudinit
+qm set 7000 --boot c --bootdisk scsi0
+qm set 7000 --serial0 socket --vga serial0
+
 qm create 8000 --name ubuntu-2204-template --memory 1024 --core 1 --agent enabled=1 --net0 virtio,bridge=vmbr0
 qm importdisk 8000 ubuntu-22-04.qcow2 local-lvm
 qm set 8000 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-8000-disk-0,discard=on,ssd=1
@@ -44,7 +56,7 @@ qm set 8000 --boot c --bootdisk scsi0
 qm set 8000 --serial0 socket --vga serial0
 
 qm create 9000 --name centos-8-template --memory 2048 --core 2 --agent enabled=1 --net0 virtio,bridge=vmbr0
-qm importdisk 9000 centos-stream-9.qcow2 local-lvm
+qm importdisk 9000 centos-stream-8.qcow2 local-lvm
 qm set 9000 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-9000-disk-0,discard=on,ssd=1
 qm set 9000 --ide2 local-lvm:cloudinit
 qm set 9000 --boot c --bootdisk scsi0
@@ -76,7 +88,24 @@ runcmd:
   #- reboot
 EOF
 
+cat <<EOF > /var/lib/vz/snippets/kali.yaml
+#cloud-config
+runcmd:
+  - apt update -y
+  - apt install -y qemu-guest-agent vim iputils-ping curl wget git net-tools telnet dos2unix
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agent
+  #- reboot
+EOF
+
 cat gcpkey.pub > sshkey
+
+qm set 7000 --cicustom "vendor=local:snippets/kali.yaml"
+qm set 7000 --cipassword cloudcafe2675
+qm set 7000 --sshkeys ./sshkey
+qm set 7000 --tags kali-template,Hack
+qm set 7000 --ciuser cloudcafe
+qm set 7000 --ipconfig0 ip=dhcp
 
 qm set 8000 --cicustom "vendor=local:snippets/ubuntu.yaml"
 qm set 8000 --cipassword cloudcafe2675
@@ -95,8 +124,9 @@ qm set 9000 --ipconfig0 ip=dhcp
 - Converting to template
 
 ```
-qm template 9000
+qm template 7000
 qm template 8000
+qm template 9000
 ```
 
 ### Kubeadm Setup
@@ -304,3 +334,16 @@ terraform apply -auto-approve
 ### Destroy Setup 
 
 ```terraform destroy -auto-approve```
+
+### Hacking Setup
+
+- Create VM from Template by Login ProxmoX host
+
+```
+qm clone 7000 100 --name kali --full
+qm set 100 --memory 2048 --cores 3
+qm set 100 --ipconfig0 ip=192.168.29.100/24,gw=192.168.29.1
+qm start 100
+```
+
+- Login kali host
