@@ -8,6 +8,9 @@ Setup Container (Kubeadm/RKE2/Openshift) Platform on Proxmox (Homelab)
 - Modify subscription
 
 ```
+echo "deb http://deb.debian.org/debian bookworm main contrib" > /etc/apt/sources.list
+echo "deb http://deb.debian.org/debian bookworm-updates main contrib" >> /etc/apt/sources.list
+echo "deb http://security.debian.org/debian-security bookworm-security main contrib" >> /etc/apt/sources.list
 echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" > /etc/apt/sources.list.d/pve-enterprise.list
 echo "deb http://download.proxmox.com/debian/ceph-quincy bookworm no-subscription" > /etc/apt/sources.list.d/ceph.list
 apt-get update -y && apt-get upgrade -y
