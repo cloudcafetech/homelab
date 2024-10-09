@@ -5,9 +5,12 @@ Setup Container (Kubeadm/RKE2/Openshift) Platform on Proxmox (Homelab)
 
 - Login CLI ProxmoX host
 
-- Generate SSH Key using puttygen tool and create private, public & ppk key
+- Modify subscription, Generate SSH Key using puttygen tool and create private, public & ppk key
 
 ```
+echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" > /etc/apt/sources.list.d/pve-enterprise.list
+echo "deb http://download.proxmox.com/debian/ceph-quincy bookworm no-subscription" > /etc/apt/sources.list.d/ceph.list
+apt-get update -y && apt-get upgrade -y
 apt install putty wget vim libguestfs-tools p7zip-full -y
 ssh-keygen -t rsa -N '' -f ./gcpkey -C cloudcafe -b 2048
 puttygen gcpkey -O private -o gcpkey.ppk
