@@ -47,7 +47,7 @@ mv kali-linux-2024.2-qemu-amd64.qcow2 kali-2024.qcow2
 ```
 qemu-img resize ubuntu-22-04.qcow2 35G
 qemu-img resize centos-stream-8.qcow2 35G
-qemu-img resize kali-2024.qcow2 35G
+qemu-img resize --shrink kali-2024.qcow2 35G
 ```
 
 - Create the VM template using CLI
