@@ -7,7 +7,7 @@ DOMAIN=apps.k8s.cloudcafe.tech
 NODE=`kubectl get no | grep -v control-plane | grep -v NAME | awk '{ print $1 }'`
 wget https://raw.githubusercontent.com/cloudcafetech/k8s-ad-integration/refs/heads/main/private-registry.yaml
 sed -i "s|apps.k8s.cloudcafe.tech|$DOMAIN|g" private-registry.yaml
-sed -i "s|node-01|$NODE|g" private-registry.yaml
+sed -i "s|worker1|$NODE|g" private-registry.yaml
 kubectl create ns registry
 kubectl create -f private-registry.yaml
 ```
