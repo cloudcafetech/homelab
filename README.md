@@ -20,7 +20,7 @@ reboot
 - Generate SSH Key using puttygen tool and create private, public & ppk key
 
 ```
-apt install putty wget vim libguestfs-tools p7zip-full -y
+apt install putty-tools wget vim libguestfs-tools p7zip-full -y
 ssh-keygen -t rsa -N '' -f ./gcpkey -C cloudcafe -b 2048
 puttygen gcpkey -O private -o gcpkey.ppk
 ```
