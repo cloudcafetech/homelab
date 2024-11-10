@@ -24,8 +24,25 @@ fi
 - Install Netboot
 
 ```
-mkdir -p /opt/netboot/{config,assets}
+mkdir -p /opt/netboot/{config,assets,dns}
 docker run -d --name=pxeboot --restart unless-stopped -p 3000:3000 -p 69:69/udp -p 8080:80 -v /opt/netboot/config:/config -v /opt/netboot/assets:/assets ghcr.io/netbootxyz/netbootxyz
+```
+
+- Install DNSMASQ
+
+```
+systemctl disable systemd-resolved
+systemctl stop systemd-resolved
+
+cat <<EOF > /opt/netboot/dns/dnsmasq.conf
+# DHCP Settings 
+dhcp-range=192.168.1.210,192.168.1.215,255.255.255.0,24h 
+dhcp-option=3,192.168.1.1 
+dhcp-option=6,192.168.1.35,192.168.1.1,8.8.8.8
+dhcp-boot=netboot.xyz.kpxe,192.168.1.35
+EOF
+
+docker run --name dnsmasq -d -p 53:53/udp -p 53:53 -v /opt/netboot/dns/dnsmasq.conf:/etc/dnsmasq.conf --cap-add=NET_ADMIN andyshinn/dnsmasq
 ```
 
 - Setup Custom Menu
