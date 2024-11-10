@@ -37,4 +37,5 @@ HIP=`ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1`
 sed -i "s/192.168.1.220/$HIP/g" /opt/netboot/config/menus/menu.ipxe
 ```
 
-
+[REF](https://gist.github.com/clemenko/8df23cb764b326defcb4624b58ab4da2)
+[Video](https://www.youtube.com/watch?v=p8woPhLJ_DA)
