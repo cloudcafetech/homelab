@@ -359,3 +359,19 @@ qm start 100
 ```
 
 - Login kali host
+
+- Talos
+
+```
+qm create 217 --name talos-k8s-m1 --ide2 ISO_bank:iso/talos.iso,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
+  --cpu cputype=max --cores 2 --sockets 1 --memory 2048 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --net0 bridge=vmbr0 --scsi0 local-lvm:40,discard=on,ssd=1 --serial0 socket --onboot yes
+
+qm set 217 --scsi1 local-lvm:50
+
+qm create 217 --name talos-k8s-m1 --ide2 ISO_bank:iso/talos.iso,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
+  --cpu cputype=max --cores 2 --sockets 1 --memory 2048 --scsihw virtio-scsi-pci --bootdisk scsi0 \
+  --net0 bridge=vmbr0 --scsi0 local-lvm:30,discard=on,ssd=1 --scsi1 local-lvm:50,discard=on,ssd=1 --serial0 socket --onboot yes
+
+qm set 217 --scsi1 local-lvm:vm-217-disk-1,size=50G
+```
