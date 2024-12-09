@@ -360,7 +360,7 @@ qm start 100
 
 - Login kali host
 
-- Talos
+### Talos
 
 ```
 qm create 217 --name talos-k8s-m1 --ide2 ISO_bank:iso/talos.iso,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
