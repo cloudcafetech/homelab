@@ -363,7 +363,12 @@ qm start 100
 ### Talos
 
 ```
-qm create 217 --name talos-k8s-m1 --ide2 ISO_bank:iso/talos.iso,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
+cd /var/lib/vz/template/iso
+wget https://github.com/siderolabs/talos/releases/download/v1.8.3/metal-amd64.iso
+mv metal-amd64.iso talos-183.iso
+cd
+
+qm create 217 --name talos-k8s-m1 --ide2 ISO_bank:iso/talos-183.iso,media=cdrom --ostype l26 --boot order='scsi0;ide2;net0' \
   --cpu cputype=max --cores 2 --sockets 1 --memory 2048 --scsihw virtio-scsi-pci --bootdisk scsi0 \
   --net0 bridge=vmbr0 --scsi0 local-lvm:40,discard=on,ssd=1 --serial0 socket --onboot yes
 
