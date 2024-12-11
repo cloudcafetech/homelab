@@ -110,13 +110,13 @@ qm start 113
 qm clone 6000 114 --name talos-infra-01 --full
 qm set 114 --cpu cputype=host --cores 2 --sockets 1 --memory 2048
 qm set 114 -net0 virtio=BC:24:11:99:9F:14,bridge=vmbr0
-qm set 114 --scsi1 local-lvm:vm-114-disk-1,size=50G
+qm set 114 --scsi1 local-lvm:50
 qm start 114
 
 qm clone 6000 115 --name talos-infra-02 --full
 qm set 115 --cpu cputype=host --cores 2 --sockets 1 --memory 2048
 qm set 115 -net0 virtio=BC:24:11:99:9F:15,bridge=vmbr0
-qm set 115 --scsi1 local-lvm:vm-115-disk-1,size=50G
+qm set 115 --scsi1 local-lvm:50
 qm start 115
 
 qm clone 6000 116 --name talos-worker-01 --full
