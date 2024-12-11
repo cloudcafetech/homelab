@@ -187,3 +187,8 @@ cilium install \
   --helm-set=externalIPs.enabled=true \
   --helm-set=devices=eth+
 ```
+
+[REF #1](https://www.talos.dev/v1.8/talos-guides/install/virtualized-platforms/proxmox/)
+
+[REF #2](https://surajremanan.com/posts/automating-talos-installation-on-proxmox-with-packer-and-terraform/)
+
