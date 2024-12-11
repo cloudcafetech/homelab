@@ -95,31 +95,41 @@ rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 qm clone 6000 111 --name talos-master-01 --full
 qm set 111 --cpu cputype=host --cores 2 --sockets 1 --memory 2048
 qm set 111 -net0 virtio=BC:24:11:99:9F:11,bridge=vmbr0
+qm start 111
 
 qm clone 6000 112 --name talos-master-02 --full
 qm set 112 --cpu cputype=host --cores 2 --sockets 1 --memory 2048
 qm set 112 -net0 virtio=BC:24:11:99:9F:12,bridge=vmbr0
+qm start 112
 
 qm clone 6000 113 --name talos-master-03 --full
 qm set 113 --cpu cputype=host --cores 2 --sockets 1 --memory 2048
 qm set 113 -net0 virtio=BC:24:11:99:9F:13,bridge=vmbr0
+qm start 113
 
 qm clone 6000 114 --name talos-infra-01 --full
 qm set 114 --cpu cputype=host --cores 2 --sockets 1 --memory 2048
 qm set 114 -net0 virtio=BC:24:11:99:9F:14,bridge=vmbr0
+qm set 114 --scsi1 local-lvm:vm-114-disk-1,size=50G
+qm start 114
 
 qm clone 6000 115 --name talos-infra-02 --full
 qm set 115 --cpu cputype=host --cores 2 --sockets 1 --memory 2048
 qm set 115 -net0 virtio=BC:24:11:99:9F:15,bridge=vmbr0
+qm set 115 --scsi1 local-lvm:vm-115-disk-1,size=50G
+qm start 115
 
 qm clone 6000 116 --name talos-worker-01 --full
 qm set 116 --cpu cputype=host --cores 2 --sockets 1 --memory 2048
 qm set 116 -net0 virtio=BC:24:11:99:9F:16,bridge=vmbr0
+qm start 116
 
 qm clone 6000 117 --name talos-worker-02 --full
 qm set 117 --cpu cputype=host --cores 2 --sockets 1 --memory 2048
 qm set 117 -net0 virtio=BC:24:11:99:9F:17,bridge=vmbr0
+qm start 117
 ```
+
 - Download Talos Config yaml & modify as per above VMs setup
 
 ```
