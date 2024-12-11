@@ -2,7 +2,7 @@
 
 - [Talos K8s version mapping](https://www.talos.dev/v1.8/introduction/support-matrix/)
 
-- Download Talos ISO
+- Download Talos ISO from [Image factory](https://www.talos.dev/latest/talos-guides/install/boot-assets/#image-factory) for Proxmox
 
 ```
 cd /var/lib/vz/template/iso
@@ -53,7 +53,6 @@ mv talosctl-linux-amd64 /usr/local/bin/talosctl
 ```
 curl https://i.jpillora.com/budimanjojo/talhelper! | sudo bash
 ```
-
 
 - Install KUBECTL
 
@@ -121,7 +120,13 @@ qm clone 6000 117 --name talos-worker-02 --full
 qm set 117 --cpu cputype=host --cores 2 --sockets 1 --memory 2048
 qm set 117 -net0 virtio=BC:24:11:99:9F:17,bridge=vmbr0
 ```
+- Download Talos Config yaml & modify as per above VMs setup
 
+```
+mkdir talos
+cd talos
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talconfig.yaml
+```
 - Generating Talos Configuration using Talhelper
 
 ```
