@@ -171,8 +171,7 @@ talosctl apply-config --insecure --nodes <worker1-node ip> --file clusterconfig/
 
 mkdir -p $HOME/.talos
 cp clusterconfig/talosconfig $HOME/.talos/config
-# Note:  (use any one if you have multiple master nodes). 
-talosctl bootstrap -n <master-node ip> # The bootstrap operation should run ONCE on ANY master node
+talosctl bootstrap -n <master-node ip> # **Bootstrap should run ONCE on ANY master node**
 ```
 
 - Set Kubeconfig
