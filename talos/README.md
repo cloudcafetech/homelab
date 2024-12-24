@@ -194,7 +194,8 @@ cilium install \
   --helm-set=cgroup.hostRoot=/sys/fs/cgroup \
   --helm-set=l2announcements.enabled=true \
   --helm-set=externalIPs.enabled=true \
-  --helm-set=devices=eth+
+  --helm-set=k8sServiceHost=localhost \
+  --helm-set=k8sServicePort=7445
 ```
 
 [REF #1](https://www.talos.dev/v1.8/talos-guides/install/virtualized-platforms/proxmox/)
