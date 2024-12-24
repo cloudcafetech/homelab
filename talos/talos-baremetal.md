@@ -7,9 +7,9 @@ TALOS_VER=v1.9.0
 NIC=`ip -o -4 route show to default | awk '{print $5}'`
 HIP=`ip -o -4 addr list $NIC | awk '{print $4}' | cut -d/ -f1`
 
-DHCPS=192.168.1.30
-DHCPE=192.168.1.50
-GW=192.168.1.1
+DHCPS=192.168.0.30
+DHCPE=192.168.0.50
+GW=192.168.0.1
 ```
 
 - Download kernel & setup matchbox
