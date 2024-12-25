@@ -12,7 +12,7 @@ qm set 130 --ipconfig0 ip=192.168.0.31/24,gw=192.168.0.1
 qm start 130e information can be found [here](https://github.com/MichaelTrip/lmsensors-container). Some configuration is required. please the the README.md in the repository
 ```
 
-### Talos worker node on Baremetal
+### Worker on Baremetal
 
 - Set Env
 
