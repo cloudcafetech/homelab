@@ -38,5 +38,3 @@ sed -i "s|/root/nfs/kubedata|$NFSMOUNT|g" nfs-deployment.yaml
 kubectl create ns kubenfs
 kubectl create -f nfs-rbac.yaml -f nfs-deployment.yaml -f kubenfs-storage-class.yaml -n kubenfs
 ```
-
-```
