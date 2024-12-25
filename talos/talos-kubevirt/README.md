@@ -5,11 +5,11 @@ KubeVirt on Talos Linux.
 ### Master on Proxmox
 
 ```
-qm clone 6000 130 --name talos-master --full
-qm set 130 --cpu cputype=host --cores 3 --sockets 1 --memory 4096
-qm set 130 -net0 virtio=BC:24:11:99:9F:11,bridge=vmbr0
-qm set 130 --ipconfig0 ip=192.168.0.31/24,gw=192.168.0.1
-qm start 130e information can be found [here](https://github.com/MichaelTrip/lmsensors-container). Some configuration is required. please the the README.md in the repository
+qm clone 6000 106 --name talos-master --full
+qm set 106 --cpu cputype=host --cores 4 --sockets 1 --memory 6144
+qm set 106 -net0 virtio=BC:24:11:99:9F:11,bridge=vmbr0
+qm set 106 --ipconfig0 ip=192.168.0.106/24,gw=192.168.0.1
+qm start 106
 ```
 
 ### Worker on Baremetal
