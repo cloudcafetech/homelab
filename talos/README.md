@@ -184,6 +184,8 @@ kubectl get no
 
 - Deploy CNI
 
+If use multiple hosts with deffierence interfaces, you may face crashloopback error (**level=fatal msg="failed to start: daemon creation failed: failed to detect devices: unable to determine direct routing device. Use --direct-routing-device to specify it" subsys=daemon** ) [FIX](https://github.com/cilium/cilium/issues/33527#issuecomment-2203382474)
+
 ```
 cilium install \
   --helm-set=ipam.mode=kubernetes \
@@ -195,7 +197,8 @@ cilium install \
   --helm-set=l2announcements.enabled=true \
   --helm-set=externalIPs.enabled=true \
   --helm-set=k8sServiceHost=localhost \
-  --helm-set=k8sServicePort=7445
+  --helm-set=k8sServicePort=7445 \
+  --helm-set=devices='{eth0,eth1,eth2,eno1,eno2,br0}'
 ```
 
 [REF #1](https://www.talos.dev/v1.8/talos-guides/install/virtualized-platforms/proxmox/)
