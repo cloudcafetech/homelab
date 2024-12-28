@@ -1,0 +1,17 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: debian-webserver-pvc
+  namespace: virtualmachines
+spec:
+  source:
+    pvc:
+      name: debian-12-image
+      namespace: virtualmachines
+  pvc:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 30Gi
+    storageClassName: kubenfs-storage
