@@ -1,0 +1,17 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: fedora-vm-pvc
+  namespace: virtualmachines
+spec:
+  source:
+    pvc:
+      name: fedora-40-image
+      namespace: virtualmachines
+  pvc:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 30Gi
+    storageClassName: kubenfs-storage
