@@ -1,0 +1,66 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: ubuntu-external-vm
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: ubuntu-external-vm
+      annotations:
+        kubevirt.io/allow-pod-bridge-network-live-migration: "true"
+    spec:
+      domain:
+        cpu:
+          cores: 2
+          model: Haswell-noTSX-IBRS
+        resources:
+          requests:
+            memory: 2G
+            cpu: 1
+        devices:
+          disks:
+            - name: ubuntu-external-pvc
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+          - name: external
+            bridge: {}
+      networks:
+      - name: external
+        multus:
+          default: true
+          networkName: virtualmachines/bridge-whereabouts
+      volumes:
+        - name: ubuntu-external-pvc
+          persistentVolumeClaim:
+            claimName: ubuntu-external-pvc
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            networkData: |
+              network:
+                version: 2
+                renderer: networkd
+                ethernets:
+                    enp1s0:
+                      dhcp4: true
+            userData: |-
+              #cloud-config
+              hostname: kube-ubuntu-external-vm
+              user: root
+              password: passwd
+              chpasswd: { expire: False }
+              ssh_pwauth: True
+              disable_root: false
+              ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD6XPuoZ4Zr18Mwdy2rYYTSU0fnNva8B1zW4b9Qfk6wiR703eLC3Tv0uuSQe4aBlVwaHzrzbv3DRg5mZev2TAKvNvr/o25lJgUWUjDEmYcpJO+UbbVfDt7HJSstmQJCraLb48jeBsyVzouinJCRncXxdU6UdT4SXVmsKYomCV54pugn/OfDccKtSRL22KSZ
+RIht0XAbk2FmEzQ7aqq+O9eaixbrT7UVXdfhViWBTELsHP7Gx4ZMFqjGoXv0oY9CsMOSWlyDz05fJhncARkjSMtisyxis+GcKFo9nl/GeLQOZ8kB+8ZtK9eKBmenS+gurcNq4nAGOSHyZ5483UmyYypL cloudcafe
+              runcmd:
+                - "sudo apt update -y"
+                - "sudo apt install -y qemu-guest-agent vim iputils-ping apt-transport-https ca-certificates gpg nfs-common curl wget git net-tools unzip jq zip nmap telnet dos2unix"
+                - "sudo systemctl enable qemu-guest-agent"
+                - "sudo systemctl start qemu-guest-agent"
