@@ -1,21 +1,3 @@
-apiVersion: cdi.kubevirt.io/v1beta1
-kind: DataVolume
-metadata:
-  name: fedora-vm-pvc
-  namespace: virtualmachines
-spec:
-  source:
-    pvc:
-      name: fedora-40-image
-      namespace: virtualmachines
-  pvc:
-    accessModes:
-      - ReadWriteMany
-    resources:
-      requests:
-        storage: 15Gi
-    storageClassName: nfs-client-zimaboard
----
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
@@ -28,7 +10,6 @@ spec:
         kubevirt.io/vm: fedora-vm
       annotations:
         kubevirt.io/allow-pod-bridge-network-live-migration: "true"
-        
     spec:
       domain:
         cpu:
@@ -66,17 +47,17 @@ spec:
                     dhcp4: true
             userData: |-
               #cloud-config
-              users:
-                - name: kubevirt
-                  lock_passwd: false
-                  passwd: $6$rounds=4096$BufowxTh2FjpCdMS$Ed0n7eKs2nq.8LDi0LBp.3t4VmjM4N0sBXDFervtH6H1rQUSZl8yXbPfMx.FoE5RFXhe32f2ZC.ZlzoKwSuNl1
-                  sudo: ['ALL=(ALL) NOPASSWD:ALL']
-                  groups: sudo
-                  shell: /bin/bash
-              ssh_pwauth: true
+              hostname: fedora-vm
+              user: root
+              password: passwd
+              chpasswd: { expire: False }
+              ssh_pwauth: True
+              disable_root: false
+              ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD6XPuoZ4Zr18Mwdy2rYYTSU0fnNva8B1zW4b9Qfk6wiR703eLC3Tv0uuSQe4aBlVwaHzrzbv3DRg5mZev2TAKvNvr/o25lJgUWUjDEmYcpJO+UbbVfDt7HJSstmQJCraLb48jeBsyVzouinJCRncXxdU6UdT4SXVmsKYomCV54pugn/OfDccKtSRL22KSZRIht0XAbk2FmEzQ7aqq+O9eaixbrT7UVXdfhViWBTELsHP7Gx4ZMFqjGoXv0oY9CsMOSWlyDz05fJhncARkjSMtisyxis+GcKFo9nl/GeLQOZ8kB+8ZtK9eKBmenS+gurcNq4nAGOSHyZ5483UmyYypL cloudcafe
               runcmd:
                 - "sudo touch /root/installed /tmp/foo"
-                - "sudo dnf update" 
+                - "sudo dnf update"
                 - "sudo dnf install httpd fastfetch -y"
                 - "sudo systemctl daemon-reload"
                 - "sudo systemctl enable httpd"
@@ -85,7 +66,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
   labels:
     kubevirt.io/vm: fedora-vm
   name: fedora-vm
@@ -102,5 +82,3 @@ spec:
   selector:
     kubevirt.io/vm: fedora-vm
   type: LoadBalancer
-status:
-  loadBalancer: {}
