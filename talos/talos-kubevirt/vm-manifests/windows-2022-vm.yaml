@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: winhd
 spec:
-  storageClassName: longhorn-rwx
+  storageClassName: kubenfs-storage
   accessModes:
     - ReadWriteMany
   resources:
@@ -42,7 +42,6 @@ spec:
           interfaces:
           - name: podnet
             masquerade: {}
-           
         machine:
           type: q35
         resources:
@@ -65,7 +64,6 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  creationTimestamp: null
   labels:
     kubevirt.io/domain: server2022
   name: server2022-rdp
@@ -91,5 +89,3 @@ spec:
   selector:
     kubevirt.io/domain: server2022
   type: LoadBalancer
-status:
-  loadBalancer: {}
