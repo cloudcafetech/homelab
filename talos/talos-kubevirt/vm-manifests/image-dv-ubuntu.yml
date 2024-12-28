@@ -1,0 +1,16 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: "ubuntu-focal-image"
+  namespace: virtualmachines
+spec:
+  source:
+      http:
+        url: "https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img"
+  pvc:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: "3G"
+    storageClassName: kubenfs-storage
