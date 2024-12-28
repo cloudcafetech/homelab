@@ -26,9 +26,7 @@
 
 ### Windows 2022 
 
-This is a Kubevirt Virtual Machine Manifest that i used to test out server2022 on my KubeVirt cluster.
-
-To make this to work you first have to download a evaluation ISO from Microsoft. After that, you have to upload the iso to Kubevirt by using the `virtctl` command. And before uploading, make sure to to a port-forward to the cdi-proxy to upload the ISO.
+**First have to download a evaluation ISO from Microsoft then upload the iso to Kubevirt by using the `virtctl` command. And before uploading, make sure to to a port-forward to the cdi-proxy to upload the ISO.**
 
 - Create the port-forward to the cdi-proxy ( ```kubectl port-forward -n cdi svc/cdi-uploadproxy 8443:443``` )
 
