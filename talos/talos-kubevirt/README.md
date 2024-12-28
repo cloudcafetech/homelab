@@ -2,6 +2,8 @@
 
 KubeVirt on Talos Linux. 
 
+This config based on 1 master (VM on Proxmox) 1 worker (Baremetal) with default Flannel CNI.
+
 ### Master on Proxmox
 
 ```
