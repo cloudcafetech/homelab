@@ -1,0 +1,17 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: ubuntu-external-pvc
+  namespace: virtualmachines
+spec:
+  source:
+    pvc:
+      name: ubuntu-focal-image
+      namespace: virtualmachines
+  pvc:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 30Gi
+    storageClassName: kubenfs-storage
