@@ -60,6 +60,14 @@ nodes:
 
 patches:
 
+  # Enable KubePrism
+  - |-
+    machine:
+      features:
+        kubePrism:
+          enabled: true
+          port: 7445
+            
   # Force nameserver
   - |-
     machine:
