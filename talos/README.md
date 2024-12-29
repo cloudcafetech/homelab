@@ -202,6 +202,12 @@ cilium install \
   --helm-set=cgroup.hostRoot=/sys/fs/cgroup \
   --helm-set=l2announcements.enabled=true \
   --helm-set=externalIPs.enabled=true \
+  --helm-set=routingMode=native \
+  --helm-set="ipv4NativeRoutingCIDR=10.0.0.0/8" \
+  --helm-set=ipMasqAgent.enabled=false \
+  --helm-set=enableIPv4=true \
+  --helm-set=enableIPv4Masquerade=true \
+  --helm-set=socketLB.hostNamespaceOnly=true \
   --helm-set=k8sServiceHost=localhost \
   --helm-set=k8sServicePort=7445 \
   --helm-set=devices='{eth0,eth1,eth2,eno1,eno2,br0}'
