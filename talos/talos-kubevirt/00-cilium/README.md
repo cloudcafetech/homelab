@@ -32,3 +32,9 @@ cilium install \
   --helm-set=k8sServicePort=7445 \
   --helm-set=devices='{eth0,eth1,eth2,eno1,eno2,br0}'
 ```
+
+- Deploy LB IP Pool
+
+```
+kubectl create -f cilium-lb-pool.yaml
+```
