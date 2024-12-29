@@ -6,6 +6,7 @@
 helm repo add longhorn https://charts.longhorn.io
 helm repo update
 helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.6.1 --set defaultSettings.defaultDataPath="/var/mnt/longhorn"
+kubectl label ns longhorn-system pod-security.kubernetes.io/enforce=privileged
 ```
 
  - Storageclass ( `storageclass` that is used to configure `ReadWriteMany` for Longhorn )
