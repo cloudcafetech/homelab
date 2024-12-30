@@ -220,6 +220,7 @@ talhelper genconfig
 ```
 talosctl apply-config --insecure --nodes <master1-node ip> --file clusterconfig/talos-k8s-talos-master.yaml
 talosctl apply-config --insecure --nodes <worker1-node ip> --file clusterconfig/talos-k8s-talos-worker-01.yaml
+cp clusterconfig/talos-k8s-talos-worker-01.yaml /var/lib/matchbox/assets/
 
 mkdir -p $HOME/.talos
 cp clusterconfig/talosconfig $HOME/.talos/config
