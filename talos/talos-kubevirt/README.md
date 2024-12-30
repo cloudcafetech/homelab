@@ -19,7 +19,7 @@ qm start 106
 - Set Env
 
 ```
-TALOS_VER=v1.9.0
+TALOS_VER=v1.9.1
 NIC=`ip -o -4 route show to default | awk '{print $5}'`
 HIP=`ip -o -4 addr list $NIC | awk '{print $4}' | cut -d/ -f1`
 
@@ -32,9 +32,9 @@ GW=192.168.0.1
 
 ```
 mkdir -p /var/lib/matchbox/{assets,groups,profiles}
-wget -q https://github.com/siderolabs/talos/releases/download/$TALOS_VER/vmlinuz-amd64
-wget -q https://github.com/siderolabs/talos/releases/download/$TALOS_VER/initramfs-amd64.xz
-mv vmlinuz-amd64 /var/lib/matchbox/assets/vmlinuz
+wget -q https://factory.talos.dev/image/b553b4a25d76e938fd7a9aaa7f887c06ea4ef75275e64f4630e6f8f739cf07df/$TALOS_VER/kernel-amd64
+wget -q https://factory.talos.dev/image/b553b4a25d76e938fd7a9aaa7f887c06ea4ef75275e64f4630e6f8f739cf07df/$TALOS_VER/initramfs-amd64.xz
+mv kernel-amd64 /var/lib/matchbox/assets/vmlinuz
 mv initramfs-amd64.xz /var/lib/matchbox/assets/initramfs.xz
 
 cat <<EOF > /var/lib/matchbox/groups/default.json
