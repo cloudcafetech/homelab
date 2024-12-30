@@ -238,11 +238,7 @@ kubectl get no
 
 If use multiple hosts with deffierence interfaces, you may face crashloopback error (**level=fatal msg="failed to start: daemon creation failed: failed to detect devices: unable to determine direct routing device. Use --direct-routing-device to specify it" subsys=daemon** ) [FIX](https://github.com/cilium/cilium/issues/33527#issuecomment-2203382474)
 
-**Cilium as a LB** 
-
-[Ref#1](https://blog.mei-home.net/posts/k8s-migration-2-cilium-lb/) 
-
-[Ref#2](https://blog.stonegarden.dev/articles/2023/12/migrating-from-metallb-to-cilium/)
+**Cilium as a CNI & L4 LB**  [Ref#1](https://blog.mei-home.net/posts/k8s-migration-2-cilium-lb/)  [Ref#2](https://blog.stonegarden.dev/articles/2023/12/migrating-from-metallb-to-cilium/)
 
 ```
 cilium install \
