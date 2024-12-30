@@ -266,6 +266,12 @@ cilium install \
   --helm-set=devices='{eth0,eth1,eth2,eno1,eno2,br0}'
 ```
 
+- Cilium LB IP POOL
+
+```
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/00-cilium/cilium-lb-pool.yaml
+```
+
 ## Next deploy rest of tools
 
 - NFS Storage
