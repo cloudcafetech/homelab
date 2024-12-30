@@ -6,8 +6,8 @@ metadata:
     storageclass.kubernetes.io/is-default-class: "true"
 provisioner: nfs.csi.k8s.io
 parameters:
-  server: 10.99.102.253
-  share: /mnt/data/nfs/kubernetes_csi
+  server: 192.168.0.100
+  share: /root/nfs/kubedata
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
 mountOptions:
