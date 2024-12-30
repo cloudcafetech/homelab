@@ -239,7 +239,7 @@ kubectl get no
 
 If use multiple hosts with deffierence interfaces, you may face crashloopback error (**level=fatal msg="failed to start: daemon creation failed: failed to detect devices: unable to determine direct routing device. Use --direct-routing-device to specify it" subsys=daemon** ) [FIX](https://github.com/cilium/cilium/issues/33527#issuecomment-2203382474)
 
-Below helm option for cilium
+Below special helm options (Multus + Kubevirt)
 
 > ```cni.exclusive=false```  **Cilium with Multus integration** [Ref](https://github.com/siderolabs/talos/discussions/7914#discussioncomment-7457510)
 
