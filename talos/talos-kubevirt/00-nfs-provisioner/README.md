@@ -38,3 +38,10 @@ sed -i "s|/root/nfs/kubedata|$NFSMOUNT|g" nfs-deployment.yaml
 kubectl create ns kubenfs
 kubectl create -f nfs-rbac.yaml -f nfs-deployment.yaml -f kubenfs-storage-class.yaml -n kubenfs
 ```
+
+- NFS CSI
+
+```
+curl -skSL https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v4.9.0/deploy/install-driver.sh | bash -s v4.9.0 --
+
+```
