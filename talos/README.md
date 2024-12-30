@@ -7,7 +7,7 @@
 ```
 cd /var/lib/vz/template/iso
 wget https://geo.mirror.pkgbuild.com/iso/2024.12.01/archlinux-2024.12.01-x86_64.iso
-wget https://factory.talos.dev/image/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515/v1.8.3/nocloud-amd64.iso
+wget https://factory.talos.dev/image/b553b4a25d76e938fd7a9aaa7f887c06ea4ef75275e64f4630e6f8f739cf07df/v1.9.1/nocloud-amd64.iso
 mv archlinux-2024.12.01-x86_64.iso archlinux-20241201.iso
 mv nocloud-amd64.iso talos-1-8-3.iso
 cd
@@ -22,7 +22,7 @@ qm create 6000 --name talos-183-template --ide2 local:iso/archlinux-20241201.iso
 qm start 6000
 sleep 15
 cd /tmp
-wget https://factory.talos.dev/image/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515/v1.8.3/nocloud-amd64.raw.xz
+wget https://factory.talos.dev/image/b553b4a25d76e938fd7a9aaa7f887c06ea4ef75275e64f4630e6f8f739cf07df/v1.9.1/nocloud-amd64.raw.xz
 xz -d -c nocloud-amd64.raw.xz | dd of=/dev/mapper/pve-vm--6000--disk--0
 qm stop 6000
 qm set 6000 --tags talos-183-template,k8s
@@ -43,7 +43,7 @@ qm start 107
 - Install TALOSCTL
 
 ```
-wget https://github.com/talos-systems/talos/releases/download/v1.8.3/talosctl-linux-amd64
+wget https://github.com/talos-systems/talos/releases/download/v1.9.1/talosctl-linux-amd64
 chmod 755 talosctl-linux-amd64
 mv talosctl-linux-amd64 /usr/local/bin/talosctl 
 ```
