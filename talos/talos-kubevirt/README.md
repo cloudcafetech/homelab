@@ -259,12 +259,6 @@ cilium install \
 
 - Next deploy rest of tools
 
-[Ref #1](https://github.com/MichaelTrip/taloscon2024)
-
-[REF #2](https://surajremanan.com/posts/automating-talos-installation-on-proxmox-with-packer-and-terraform/)
-
-[REF #3](https://cozystack.io/docs/talos/installation/pxe/)
-
-[REF #4](https://github.com/dellathefella/talos-baremetal-install/tree/master)
+[Ref #1](https://github.com/MichaelTrip/taloscon2024)  [REF #2](https://surajremanan.com/posts/automating-talos-installation-on-proxmox-with-packer-and-terraform/)  [REF #3](https://cozystack.io/docs/talos/installation/pxe/)  [REF #4](https://github.com/dellathefella/talos-baremetal-install/tree/master)
 
 [Youtube](https://youtu.be/2sXQGnx5Apw?si=jWvRLVlSF69pmKkI)
