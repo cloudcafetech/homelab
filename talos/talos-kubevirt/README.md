@@ -1,4 +1,4 @@
-## Talos with Kubevirt
+## Talos with Kubevirt on Proxmox & Baremetal
 
 KubeVirt on Talos Linux. 
 
@@ -363,7 +363,33 @@ kubectl label ns longhorn-system pod-security.kubernetes.io/enforce=privileged
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/longhorn/storageclass-rwx.yml
 ```
 
+### VM Deploy
 
-[Ref #1](https://github.com/MichaelTrip/taloscon2024)  [REF #2](https://surajremanan.com/posts/automating-talos-installation-on-proxmox-with-packer-and-terraform/)  [REF #3](https://cozystack.io/docs/talos/installation/pxe/)  [REF #4](https://github.com/dellathefella/talos-baremetal-install/tree/master)
+- Ubuntu 2204 (Using multus cni)
+
+>Image pull ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/import-dv-ubuntu.yml``` )
+
+>Create VM Disks ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/ubuntu-external-dv-pvc.yaml``` )
+
+>Deploy VM ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/ubuntu-external-vm.yaml``` )
+
+- Debian 12 Webserver (Using POD network)
+
+>Image pull ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/import-dv-debian.yml``` )
+
+>Create VM Disks ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/debian-dv-pvc.yaml``` )
+
+>Deploy VM ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/debian-webserver-vm.yaml``` )
+
+- Fedora 40 (Using POD network)
+
+>Image pull ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/import-dv-fedora.yml``` )
+
+>Create VM Disks ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/fedora-dv-pvc.yaml``` )
+
+>Deploy VM ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/fedora-vm.yaml``` )
+
+
+[Ref #1](https://github.com/MichaelTrip/taloscon2024)  [REF #2](https://surajremanan.com/posts/automating-talos-installation-on-proxmox-with-packer-and-terraform/)  [REF #3](https://cozystack.io/docs/talos/installation/pxe/)  [REF #4](https://github.com/dellathefella/talos-baremetal-install/tree/master) [Ref #5](https://www.talos.dev/v1.9/advanced/install-kubevirt/)
 
 [Youtube](https://youtu.be/2sXQGnx5Apw?si=jWvRLVlSF69pmKkI)
