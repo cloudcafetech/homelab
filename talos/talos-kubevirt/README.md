@@ -2,7 +2,7 @@
 
 KubeVirt on Talos Linux. 
 
-This 2 config based on 1 master (VM on Proxmox) 1 worker (Baremetal) with default Flannel CNI & No (cilium) CNI
+This 3 config based on 1 master (VM on Proxmox) 1 worker (Baremetal) with default Flannel CNI & No (cilium) CNI including Longhorn
 
 ### Master (Talos VM) on Proxmox
 
@@ -260,6 +260,8 @@ cilium install \
   --helm-set=k8sServicePort=7445 \
   --helm-set=devices='{eth0,eth1,eth2,eno1,eno2,br0}'
 ```
+
+- Next deploy rest of tools
 
 [Ref #1](https://github.com/MichaelTrip/taloscon2024)
 
