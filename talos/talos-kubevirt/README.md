@@ -239,6 +239,12 @@ kubectl get no
 
 If use multiple hosts with deffierence interfaces, you may face crashloopback error (**level=fatal msg="failed to start: daemon creation failed: failed to detect devices: unable to determine direct routing device. Use --direct-routing-device to specify it" subsys=daemon** ) [FIX](https://github.com/cilium/cilium/issues/33527#issuecomment-2203382474)
 
+Below helm option for cilium
+
+```cni.exclusive=false```                                                   **Cilium with Multus integration** [Ref](https://github.com/siderolabs/talos/discussions/7914#discussioncomment-7457510)
+```l2announcements.enabled=true``` & ```externalIPs.enabled=true```        **No extrat tool (metallb) for LB**
+```socketLB.hostNamespaceOnly=true```                                      **For Kubevirt**
+
 **Cilium as a CNI & L4 LB**  [Ref#1](https://blog.mei-home.net/posts/k8s-migration-2-cilium-lb/)  [Ref#2](https://blog.stonegarden.dev/articles/2023/12/migrating-from-metallb-to-cilium/)
 
 ```
