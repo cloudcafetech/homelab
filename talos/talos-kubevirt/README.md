@@ -266,7 +266,97 @@ cilium install \
   --helm-set=devices='{eth0,eth1,eth2,eno1,eno2,br0}'
 ```
 
-- Next deploy rest of tools
+## Next deploy rest of tools
+
+- NFS Storage
+
+```
+NFSRV=192.168.0.100
+NFSMOUNT=/root/nfs/kubedata
+
+mkdir nfsstorage
+cd nfsstorage
+
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/nfs-rbac.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/nfs-deployment.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/kubenfs-storage-class.yaml
+
+sed -i "s/10.128.0.9/$NFSRV/g" nfs-deployment.yaml
+sed -i "s|/root/nfs/kubedata|$NFSMOUNT|g" nfs-deployment.yaml
+
+kubectl create ns kubenfs
+kubectl create -f nfs-rbac.yaml -f nfs-deployment.yaml -f kubenfs-storage-class.yaml -n kubenfs
+```
+
+- Local Path Storage
+
+```
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/01-local-path-provisioner/local-path-storage.yaml
+kubectl label ns local-path-storage pod-security.kubernetes.io/enforce=privileged
+```
+
+- Kubevirt
+
+```
+export RELEASE=$(curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt)
+kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-operator.yaml
+kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/02-kubevirt-operator/01-kubevirt-cr.yaml
+```
+
+- CDI
+
+```
+export TAG=$(curl -s -w %{redirect_url} https://github.com/kubevirt/containerized-data-importer/releases/latest)
+export VERSION=$(echo ${TAG##*/})
+kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator.yaml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/03-cdi-operator/01-cdi-cr.yaml
+```
+
+- Multus
+
+```
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/00-multus-daemonset-thick.yml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/00-ns.yaml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/01-whereabouts.cni.cncf.io_ippools.yaml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/02-whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/03-whereabouts-install.yaml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/04-networkattachmentconfig.yml
+```
+
+- Monitoring Logging and dashboard
+
+```
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/k8s-terraform/refs/heads/main/addon/metric-server.yaml
+mkdir monitoring
+cd monitoring
+
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/kubelog.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/loki.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/monitoring/kubemon.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/promtail.yaml
+
+kubectl create ns monitoring
+kubectl create -f kubemon.yaml -n monitoring
+kubectl create ns logging
+kubectl create secret generic loki -n logging --from-file=loki.yaml
+kubectl create -f kubelog.yaml -n logging
+kubectl delete ds loki-fluent-bit-loki -n logging
+kubectl create -f promtail.yaml -n logging
+kubectl delete deployment cost-model -n monitoring
+kubectl delete statefulset kubemon-grafana -n monitoring
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/06-console/ocp-console.yaml
+```
+
+- Longhorn Storage
+
+```
+helm repo add longhorn https://charts.longhorn.io
+helm repo update
+helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.6.1 --set defaultSettings.defaultDataPath="/var/mnt/longhorn"
+kubectl label ns longhorn-system pod-security.kubernetes.io/enforce=privileged
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/longhorn/storageclass-rwx.yml
+```
+
 
 [Ref #1](https://github.com/MichaelTrip/taloscon2024)  [REF #2](https://surajremanan.com/posts/automating-talos-installation-on-proxmox-with-packer-and-terraform/)  [REF #3](https://cozystack.io/docs/talos/installation/pxe/)  [REF #4](https://github.com/dellathefella/talos-baremetal-install/tree/master)
 
