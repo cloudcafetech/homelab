@@ -241,11 +241,11 @@ If use multiple hosts with deffierence interfaces, you may face crashloopback er
 
 Below helm option for cilium
 
-```cni.exclusive=false```                                                   **Cilium with Multus integration** [Ref](https://github.com/siderolabs/talos/discussions/7914#discussioncomment-7457510)
+> ```cni.exclusive=false```  **Cilium with Multus integration** [Ref](https://github.com/siderolabs/talos/discussions/7914#discussioncomment-7457510)
 
-```l2announcements.enabled=true``` & ```externalIPs.enabled=true```        **No extrat tool (metallb) for LB**
+> ```l2announcements.enabled=true``` & ```externalIPs.enabled=true```  **No extrat tool (metallb) for LB**
 
-```socketLB.hostNamespaceOnly=true```                                      **For Kubevirt**
+> ```socketLB.hostNamespaceOnly=true```  **For Kubevirt**
 
 **Cilium as a CNI & L4 LB**  [Ref#1](https://blog.mei-home.net/posts/k8s-migration-2-cilium-lb/)  [Ref#2](https://blog.stonegarden.dev/articles/2023/12/migrating-from-metallb-to-cilium/)
 
