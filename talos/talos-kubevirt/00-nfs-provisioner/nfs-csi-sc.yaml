@@ -1,15 +1,16 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: nfs-csi
+  name: kubenfs-storage
   annotations:
     storageclass.kubernetes.io/is-default-class: "true"
 provisioner: nfs.csi.k8s.io
 parameters:
   server: 192.168.0.100
   share: /root/nfs/kubedata
+  mountPermissions: "2777"
 reclaimPolicy: Delete
+allowVolumeExpansion: true
 volumeBindingMode: Immediate
 mountOptions:
-  - nfsvers=3
   - nolock
