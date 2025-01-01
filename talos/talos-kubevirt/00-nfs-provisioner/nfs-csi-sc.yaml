@@ -14,3 +14,10 @@ allowVolumeExpansion: true
 volumeBindingMode: Immediate
 mountOptions:
   - nolock
+---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: kubenfs-storage
+driver: nfs.csi.k8s.io
+deletionPolicy: Delete
