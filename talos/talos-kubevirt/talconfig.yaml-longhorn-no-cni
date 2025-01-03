@@ -7,57 +7,103 @@ talosVersion: v1.9.1
 kubernetesVersion: v1.30.0
 
 clusterName: talos-k8s
-endpoint: https://192.168.0.106:6443
+endpoint: https://192.168.0.108:6443
 clusterPodNets:
   - 10.244.0.0/16
 clusterSvcNets:
   - 10.96.0.0/12
 additionalApiServerCertSans:
-  - 192.168.0.106
+  - 192.168.0.108
   - 127.0.0.1
 additionalMachineCertSans:
-  - 192.168.0.106
+  - 192.168.0.108
   - 127.0.0.1
+
 nodes:
   - hostname: talos-master
     controlPlane: true
-    ipAddress: 192.168.0.106
+    ipAddress: 192.168.0.108
     installDisk: /dev/sda
-    talosImageURL: factory.talos.dev/installer/b553b4a25d76e938fd7a9aaa7f887c06ea4ef75275e64f4630e6f8f739cf07df
+
+    nodeLabels:
+      region: master
+
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "BC:24:11:99:9F:11"
         dhcp: false
-    nodeLabels:
-        region: master
+
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/gvisor
+            - siderolabs/intel-ucode
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
+            - siderolabs/lldpd
+    extensionServices:
+      - name: lldpd
+        configFiles:
+          - mountPath: /usr/local/etc/lldpd/lldpd.conf
+            content: configure lldpd portidsubtype ifname
+
   - hostname: talos-worker-01
     controlPlane: false
     ipAddress: 192.168.0.109
     installDisk: /dev/nvme0n1
-    talosImageURL: factory.talos.dev/installer/b553b4a25d76e938fd7a9aaa7f887c06ea4ef75275e64f4630e6f8f739cf07df
-    networkInterfaces:
-      - deviceSelector:
-          hardwareAddr: "98:FA:9B:10:25:02"
-        dhcp: false
+
     nodeLabels:
-        region: worker
+      region: worker
+
+    networkInterfaces:
+      - interface: br0
+        mtu: 1500
+        dhcp: false
+        bridge:
+          stp:
+            enabled: true
+          interfaces:
+            - bond0
+        addresses:
+          - 192.168.0.109/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
+
+      - interface: bond0
+        mtu: 1500
+        bond:
+          mode: active-backup
+          primary: eno2
+          primaryReselect: better
+          deviceSelectors:
+            # Onboard Intel 1GbE (eno1)
+            - driver: e1000e
+              physical: true
+
+    schematic:
+      customization:
+        extraKernelArgs:
+          - intel_iommu=on
+          - iommu=pt
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/gvisor
+            - siderolabs/gvisor-debug
+            - siderolabs/i915
+            - siderolabs/intel-ucode
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
+            - siderolabs/lldpd
+    extensionServices:
+      - name: lldpd
+        configFiles:
+          - mountPath: /usr/local/etc/lldpd/lldpd.conf
+            content: configure lldpd portidsubtype ifname
     patches:
       - |-
         machine:
-          network:
-            interfaces:
-              - interface: br0
-                addresses:
-                  - 192.168.0.109/24
-                bridge:
-                  stp:
-                    enabled: true
-                  interfaces:
-                    - eno2
-                routes:
-                  - network: 0.0.0.0/0
-                    gateway: 192.168.0.1
-
           # Longhorn configuration
           kubelet:
             extraMounts:
@@ -84,7 +130,7 @@ patches:
         kubePrism:
           enabled: true
           port: 7445
-            
+
   # Force nameserver
   - |-
     machine:
