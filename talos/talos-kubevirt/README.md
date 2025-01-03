@@ -13,7 +13,7 @@ This 3 config based on 1 master (VM on Proxmox) 1 worker (Baremetal) with defaul
 ```
 cd /var/lib/vz/template/iso
 wget https://geo.mirror.pkgbuild.com/iso/2024.12.01/archlinux-2024.12.01-x86_64.iso
-wget https://factory.talos.dev/image/b553b4a25d76e938fd7a9aaa7f887c06ea4ef75275e64f4630e6f8f739cf07df/v1.9.1/nocloud-amd64.iso
+wget https://factory.talos.dev/image/f8c7004f900329b6c00fe7a7e2458cb31e494a54f0cf1c3f1101d403a0a60af1/v1.9.1/nocloud-amd64.iso
 mv archlinux-2024.12.01-x86_64.iso archlinux-20241201.iso
 mv nocloud-amd64.iso talos-1-8-3.iso
 cd
@@ -28,7 +28,7 @@ qm create 6000 --name talos-191-template --ide2 local:iso/archlinux-20241201.iso
 qm start 6000
 sleep 15
 cd /tmp
-wget https://factory.talos.dev/image/b553b4a25d76e938fd7a9aaa7f887c06ea4ef75275e64f4630e6f8f739cf07df/v1.9.1/nocloud-amd64.raw.xz
+wget https://factory.talos.dev/image/f8c7004f900329b6c00fe7a7e2458cb31e494a54f0cf1c3f1101d403a0a60af1/v1.9.1/nocloud-amd64.raw.xz
 xz -d -c nocloud-amd64.raw.xz | dd of=/dev/mapper/pve-vm--6000--disk--0
 qm stop 6000
 qm set 6000 --tags talos-191-template,k8s
@@ -40,11 +40,11 @@ cd
 - Create VM (Master)
 
 ```
-qm clone 6000 106 --name talos-master --full
-qm set 106 --cpu cputype=host --cores 4 --sockets 1 --memory 6144
-qm set 106 -net0 virtio=BC:24:11:99:9F:11,bridge=vmbr0
-qm set 106 --ipconfig0 ip=192.168.0.106/24,gw=192.168.0.1
-qm start 106
+qm clone 6000 108 --name talos-master --full
+qm set 108 --cpu cputype=host --cores 4 --sockets 1 --memory 6144
+qm set 108 -net0 virtio=BC:24:11:99:9F:11,bridge=vmbr0
+qm set 108 --ipconfig0 ip=192.168.0.108/24,gw=192.168.0.1
+qm start 108
 ```
 
 ### Jumphost setup
@@ -125,8 +125,8 @@ GW=192.168.0.1
 
 ```
 mkdir -p /var/lib/matchbox/{assets,groups,profiles}
-wget -q https://factory.talos.dev/image/b553b4a25d76e938fd7a9aaa7f887c06ea4ef75275e64f4630e6f8f739cf07df/$TALOS_VER/kernel-amd64
-wget -q https://factory.talos.dev/image/b553b4a25d76e938fd7a9aaa7f887c06ea4ef75275e64f4630e6f8f739cf07df/$TALOS_VER/initramfs-amd64.xz
+wget -q https://factory.talos.dev/image/8b43d8668ab19b5aed93b9aa9bb8fca512c16be7d259483e58f702bb461fd9dc/v1.9.1/kernel-amd64
+wget -q https://factory.talos.dev/image/8b43d8668ab19b5aed93b9aa9bb8fca512c16be7d259483e58f702bb461fd9dc/v1.9.1/initramfs-amd64.xz
 mv kernel-amd64 /var/lib/matchbox/assets/vmlinuz
 mv initramfs-amd64.xz /var/lib/matchbox/assets/initramfs.xz
 
