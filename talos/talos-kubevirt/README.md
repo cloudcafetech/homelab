@@ -333,21 +333,15 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 ```
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/k8s-terraform/refs/heads/main/addon/metric-server.yaml
-mkdir monitoring
-cd monitoring
-
-wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/kubelog.yaml
-wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/loki.yaml
-wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/monitoring/kubemon.yaml
-wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/promtail.yaml
-
 kubectl create ns monitoring
-kubectl create -f kubemon.yaml -n monitoring
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/monitoring/kubemon.yaml -n monitoring
 kubectl create ns logging
+rm -rf loki.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/loki.yaml
 kubectl create secret generic loki -n logging --from-file=loki.yaml
-kubectl create -f kubelog.yaml -n logging
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/kubelog.yaml -n logging
 kubectl delete ds loki-fluent-bit-loki -n logging
-kubectl create -f promtail.yaml -n logging
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/promtail.yaml -n logging
 kubectl delete deployment cost-model -n monitoring
 kubectl delete statefulset kubemon-grafana -n monitoring
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/06-console/ocp-console.yaml
