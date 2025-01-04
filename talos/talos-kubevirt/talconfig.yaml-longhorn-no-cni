@@ -7,31 +7,47 @@ talosVersion: v1.9.1
 kubernetesVersion: v1.30.0
 
 clusterName: talos-k8s
-endpoint: https://192.168.0.108:6443
+endpoint: https://192.168.0.41:6443
 clusterPodNets:
   - 10.244.0.0/16
 clusterSvcNets:
   - 10.96.0.0/12
 additionalApiServerCertSans:
-  - 192.168.0.108
+  - 192.168.0.41
   - 127.0.0.1
 additionalMachineCertSans:
-  - 192.168.0.108
+  - 192.168.0.41
   - 127.0.0.1
 
 nodes:
   - hostname: talos-master
     controlPlane: true
-    ipAddress: 192.168.0.108
+    ipAddress: 192.168.0.41
     installDisk: /dev/sda
 
     nodeLabels:
       region: master
 
     networkInterfaces:
-      - deviceSelector:
-          hardwareAddr: "BC:24:11:99:9F:11"
+      - interface: eth0
+        bond:
+          deviceSelectors:
+            - hardwareAddr: "BC:24:11:99:9F:11"
+        addresses:
+          - 192.168.0.41/24
+        mtu: 1500
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
         dhcp: false
+
+      - interface: bond0
+        mtu: 1500
+        bond:
+          deviceSelectors:
+            - permanentAddr: 'BC:24:11:99:9F:11'
+            # VirtIO NIC
+              driver: virtio_net
 
     schematic:
       customization:
@@ -78,7 +94,7 @@ nodes:
           primary: eno2
           primaryReselect: better
           deviceSelectors:
-            # Onboard Intel 1GbE (eno1)
+            # Onboard Intel 1GbE (eno2)
             - driver: e1000e
               physical: true
 
