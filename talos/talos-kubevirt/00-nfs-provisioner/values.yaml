@@ -1,0 +1,32 @@
+controller:
+  resources:
+    csiProvisioner:
+      limits:
+        memory: 1024Mi
+    csiSnapshotter:
+      limits:
+        memory: 1024Mi
+    livenessProbe:
+      limits:
+        memory: 1024Mi
+    nfs:
+      limits:
+        memory: 1024Mi
+
+externalSnapshotter:
+  enabled: true
+  customResourceDefinitions:
+    enabled: true
+
+## StorageClass resource example:
+storageClass:
+  create: true
+  name: kubenfs-storage
+  annotations:
+    storageclass.kubevirt.io/is-default-virt-class: "true"
+    storageclass.kubernetes.io/is-default-class: "true"
+  parameters:
+    server: 192.168.0.100
+    share: /root/nfs/kubedata
+    mountPermissions: "2777"
+    subDir: ${pvc.metadata.namespace}-${pvc.metadata.name}-${pv.metadata.name}
