@@ -285,6 +285,7 @@ helm install csi-driver-nfs csi-driver-nfs/csi-driver-nfs \
   --version v0.0.0 \
   --values values.yaml
 
+kubectl label ns csi-nfs pod-security.kubernetes.io/enforce=privileged
 kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/00-nfs-provisioner/volumesnapshotclass.yaml
 ```
 
@@ -353,6 +354,13 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 ### VM Deploy
 
+[BUG](https://github.com/kubevirt/kubevirt/issues/13607) [FIX](https://github.com/kubevirt/kubevirt/issues/13607#issuecomment-2568972586)
+
+```
+kubectl create ns virtualmachines
+kubectl label ns virtualmachines pod-security.kubernetes.io/enforce=privileged
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/disable-selinux.yaml
+```
 - Ubuntu 2204 (Using multus cni)
 
 >Image pull ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/import-dv-ubuntu.yml``` )
