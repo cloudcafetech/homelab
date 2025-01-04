@@ -274,24 +274,18 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 ## Next deploy rest of tools
 
-- NFS Storage
+- CSI NFS Storage
 
 ```
-NFSRV=192.168.0.100
-NFSMOUNT=/root/nfs/kubedata
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/00-nfs-provisioner/values.yaml
+helm repo add csi-driver-nfs https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
+helm install csi-driver-nfs csi-driver-nfs/csi-driver-nfs \
+  --create-namespace \
+  --namespace csi-nfs \
+  --version v0.0.0 \
+  --values values.yaml
 
-mkdir nfsstorage
-cd nfsstorage
-
-wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/nfs-rbac.yaml
-wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/nfs-deployment.yaml
-wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/kubenfs-storage-class.yaml
-
-sed -i "s/10.128.0.9/$NFSRV/g" nfs-deployment.yaml
-sed -i "s|/root/nfs/kubedata|$NFSMOUNT|g" nfs-deployment.yaml
-
-kubectl create ns kubenfs
-kubectl create -f nfs-rbac.yaml -f nfs-deployment.yaml -f kubenfs-storage-class.yaml -n kubenfs
+kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/00-nfs-provisioner/volumesnapshotclass.yaml
 ```
 
 - Local Path Storage
