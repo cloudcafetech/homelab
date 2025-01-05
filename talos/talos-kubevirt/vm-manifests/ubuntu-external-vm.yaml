@@ -66,4 +66,4 @@ spec:
                 - "sudo apt install -y qemu-guest-agent vim iputils-ping apt-transport-https ca-certificates gpg nfs-common curl wget git net-tools unzip jq zip nmap telnet dos2unix"
                 - "sudo systemctl enable qemu-guest-agent"
                 - "sudo systemctl start qemu-guest-agent"
-                - "sudo sed -i '1s/^/nameserver 192.168.29.214\n/' /etc/resolv.conf"
+                - "sudo sed -i '1s/^/nameserver 192.168.1.1\n/' /etc/resolv.conf"
