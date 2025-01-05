@@ -48,6 +48,9 @@ spec:
                 ethernets:
                     enp1s0:
                       dhcp4: true
+                      nameservers:
+                        #search: [cloudcafe.tech]
+                        addresses: [192.168.1.1, 8.8.8.8, 1.1.1.1]                      
             userData: |-
               #cloud-config
               hostname: kube-ubuntu-external-vm
