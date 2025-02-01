@@ -218,8 +218,8 @@ talhelper genconfig
 - Bootsrap Talos
 
 ```
-talosctl apply-config --insecure --nodes <master1-node ip> --file clusterconfig/talos-k8s-talos-master.yaml
-talosctl apply-config --insecure --nodes <worker1-node ip> --file clusterconfig/talos-k8s-talos-worker-01.yaml
+talosctl apply-config --insecure -n <master1-node ip> -f clusterconfig/talos-k8s-talos-master.yaml
+talosctl apply-config --insecure -n <worker1-node ip> -f clusterconfig/talos-k8s-talos-worker-01.yaml
 cp clusterconfig/talos-k8s-talos-worker-01.yaml /var/lib/matchbox/assets/
 
 mkdir -p $HOME/.talos
@@ -350,6 +350,7 @@ helm repo update
 helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.6.1 --set defaultSettings.defaultDataPath="/var/mnt/longhorn"
 kubectl label ns longhorn-system pod-security.kubernetes.io/enforce=privileged
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/longhorn/storageclass-rwx.yml
+kubectl patch svc longhorn-frontend -n longhorn-system --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
 ```
 
 ### VM Deploy
