@@ -296,6 +296,17 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 kubectl label ns local-path-storage pod-security.kubernetes.io/enforce=privileged
 ```
 
+- MinIO object storage
+
+```
+kubectl create ns minio-store
+kubectl label ns minio-store pod-security.kubernetes.io/enforce=privileged
+wget https://raw.githubusercontent.com/cloudcafetech/k8sdemo/refs/heads/main/minio/snd/minio.yaml
+sed -i 's/local-path/kubenfs-storage/g' minio.yaml
+sed -i 's/5Gi/15Gi/g' minio.yaml
+kubectl create -f minio.yaml
+```
+
 - Kubevirt
 
 ```
