@@ -48,6 +48,12 @@ spec:
 EOF
 ```
 
+- Deploy Forklift Console Plugins
+
+```
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/migration/forklift-console-plugins.yaml
+```
+
 ### Migration from VMware to Kubevirt
 
 - Create Secret & Provider
