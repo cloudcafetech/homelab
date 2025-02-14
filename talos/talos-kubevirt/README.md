@@ -395,6 +395,14 @@ kubectl -n $HCONS wait deployment/hyperconverged-cluster-webhook --for=condition
 kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
 ```
 
+- [ISSUE Hostpath Provisioner CSI not started](https://github.com/kubevirt/hostpath-provisioner-operator/tree/main?tab=readme-ov-file#hostpath-provisioner-operator)
+
+```
+kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/hostpath-provisioner-operator-webhook.yaml
+kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/hostpath-provisioner-csi.yaml
+kubectl get po -n kubevirt-hyperconverged | grep hostpath-provisioner-csi
+```
+
 ## OR Kubevirt CDI and Multus
 
 - Kubevirt
