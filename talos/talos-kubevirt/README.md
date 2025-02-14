@@ -391,9 +391,11 @@ kubectl -n $HCONS wait deployment/hyperconverged-cluster-webhook --for=condition
 
 - Create an HCO CustomResource, which creates the KubeVirt CR, launching KubeVirt
 
-```kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml```
+```
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
+```
 
-## OR Kubevirt and CDI
+## OR Kubevirt CDI and Multus
 
 - Kubevirt
 
@@ -452,7 +454,7 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 >Deploy VM ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/fedora-vm.yaml``` )
 
-- Migration
+## Migration
 
 [Follow Doc](https://github.com/cloudcafetech/homelab/blob/main/talos/talos-kubevirt/migration/README.md)
 
