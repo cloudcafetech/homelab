@@ -454,9 +454,9 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 >Deploy VM ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/fedora-vm.yaml``` )
 
-## Migration
+## [Migration](https://github.com/cloudcafetech/homelab/blob/main/talos/talos-kubevirt/migration/README.md)
 
-[Follow Doc](https://github.com/cloudcafetech/homelab/blob/main/talos/talos-kubevirt/migration/README.md)
+### Reference
 
 [Ref #1](https://github.com/MichaelTrip/taloscon2024)  [REF #2](https://surajremanan.com/posts/automating-talos-installation-on-proxmox-with-packer-and-terraform/)  [REF #3](https://cozystack.io/docs/talos/installation/pxe/)  [REF #4](https://github.com/dellathefella/talos-baremetal-install/tree/master) [Ref #5](https://www.talos.dev/v1.9/advanced/install-kubevirt/)
 
