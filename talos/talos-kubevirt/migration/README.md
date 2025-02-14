@@ -93,6 +93,8 @@ spec:
   type: vsphere
   url: 'https://$VCURL/sdk'
 EOF
+
+kubectl create -f vsphere-provider.yaml
 ```
 
 - Create Resource mapping
@@ -176,3 +178,5 @@ spec:
     name: vm-mig-plan
     namespace: konveyor-forklift
 EOF
+
+kubectl create -f resource-mapping.yaml
