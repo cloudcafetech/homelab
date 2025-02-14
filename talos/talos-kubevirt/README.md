@@ -307,27 +307,20 @@ sed -i 's/5Gi/15Gi/g' minio.yaml
 kubectl create -f minio.yaml
 ```
 
-- Kubevirt
+- Longhorn Storage
 
 ```
-export RELEASE=$(curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt)
-kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-operator.yaml
-kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/02-kubevirt-operator/01-kubevirt-cr.yaml
+helm repo add longhorn https://charts.longhorn.io
+helm repo update
+helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.6.1 --set defaultSettings.defaultDataPath="/var/mnt/longhorn"
+kubectl label ns longhorn-system pod-security.kubernetes.io/enforce=privileged
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/longhorn/storageclass-rwx.yml
+kubectl patch svc longhorn-frontend -n longhorn-system --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
 ```
 
-- CDI
+- Whereabouts
 
 ```
-export TAG=$(curl -s -w %{redirect_url} https://github.com/kubevirt/containerized-data-importer/releases/latest)
-export VERSION=$(echo ${TAG##*/})
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator.yaml
-kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/03-cdi-operator/01-cdi-cr.yaml
-```
-
-- Multus
-
-```
-kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/00-multus-daemonset-thick.yml
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/00-ns.yaml
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/01-whereabouts.cni.cncf.io_ippools.yaml
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/02-whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml
@@ -353,15 +346,74 @@ kubectl delete statefulset kubemon-grafana -n monitoring
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/06-console/ocp-console.yaml
 ```
 
-- Longhorn Storage
+### HCO [Hyperconverged Cluster Operator](https://github.com/kubevirt/hyperconverged-cluster-operator?tab=readme-ov-file#using-the-hco-without-olm-or-marketplace)
+
+- Create namespaces 
 
 ```
-helm repo add longhorn https://charts.longhorn.io
-helm repo update
-helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.6.1 --set defaultSettings.defaultDataPath="/var/mnt/longhorn"
-kubectl label ns longhorn-system pod-security.kubernetes.io/enforce=privileged
-kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/longhorn/storageclass-rwx.yml
-kubectl patch svc longhorn-frontend -n longhorn-system --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
+HCONS=kubevirt-hyperconverged
+for ns in $HCONS openshift konveyor-forklift virtualmachines olm; do  kubectl create ns $ns; done
+for ns in $HCONS openshift konveyor-forklift virtualmachines olm; do  kubectl label ns $ns pod-security.kubernetes.io/enforce=privileged ; done
+```
+
+- Deploy CRDs
+
+```
+LABEL_SELECTOR_ARG="-l name!=ssp-operator,name!=hyperconverged-cluster-cli-download"
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/cluster-network-addons00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/containerized-data-importer00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/hco00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/kubevirt00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/hostpath-provisioner00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/scheduling-scale-performance00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/application-aware-quota00.crd.yaml
+
+- Deploy Cert Manager for webhook certificates
+
+```
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/cert-manager.yaml
+kubectl -n cert-manager wait deployment/cert-manager --for=condition=Available --timeout="300s"
+kubectl -n cert-manager wait deployment/cert-manager-webhook --for=condition=Available --timeout="300s"
+```
+
+- Deploy Service Accounts, Cluster Role(Binding)s and Operators
+
+```
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/cluster_role.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/service_account.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/cluster_role_binding.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/webhooks.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/operator.yaml
+
+kubectl -n $HCONS wait deployment/hyperconverged-cluster-webhook --for=condition=Available --timeout="300s"
+
+- Create an HCO CustomResource, which creates the KubeVirt CR, launching KubeVirt
+
+```kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml```
+
+## OR Kubevirt and CDI
+
+- Kubevirt
+
+```
+export RELEASE=$(curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt)
+kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-operator.yaml
+kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/02-kubevirt-operator/01-kubevirt-cr.yaml
+```
+
+- CDI
+
+```
+export TAG=$(curl -s -w %{redirect_url} https://github.com/kubevirt/containerized-data-importer/releases/latest)
+export VERSION=$(echo ${TAG##*/})
+kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator.yaml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/03-cdi-operator/01-cdi-cr.yaml
+```
+
+- Multus
+
+```
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/00-multus-daemonset-thick.yml
 ```
 
 ### VM Deploy
@@ -397,6 +449,9 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 >Deploy VM ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/fedora-vm.yaml``` )
 
+- Migration
+
+[Follow Doc](https://github.com/cloudcafetech/homelab/blob/main/talos/talos-kubevirt/migration/README.md)
 
 [Ref #1](https://github.com/MichaelTrip/taloscon2024)  [REF #2](https://surajremanan.com/posts/automating-talos-installation-on-proxmox-with-packer-and-terraform/)  [REF #3](https://cozystack.io/docs/talos/installation/pxe/)  [REF #4](https://github.com/dellathefella/talos-baremetal-install/tree/master) [Ref #5](https://www.talos.dev/v1.9/advanced/install-kubevirt/)
 
