@@ -48,7 +48,7 @@ spec:
 EOF
 ```
 
-- Deploy Forklift Console Plugins
+- Deploy Forklift Console Plugins and Dashboard
 
 ```
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/migration/forklift-console-plugins.yaml
