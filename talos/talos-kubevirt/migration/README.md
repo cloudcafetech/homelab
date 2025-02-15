@@ -52,6 +52,7 @@ EOF
 
 ```
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/migration/forklift-console-plugins.yaml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/migration/ocp-console.yaml
 ```
 
 ### Migration from VMware to Kubevirt
