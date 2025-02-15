@@ -110,8 +110,8 @@ metadata:
 spec:
   map:
     - destination:
-        storageClass: longhorn-rwx
-        accessMode: ReadWriteMany
+        storageClass: kubenfs-storage
+        accessMode: ReadWriteOnly
       source:
         name: datastore1
   provider:
