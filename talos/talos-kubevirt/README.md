@@ -389,10 +389,13 @@ kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.c
 kubectl -n $HCONS wait deployment/hyperconverged-cluster-webhook --for=condition=Available --timeout="300s"
 ```
 
-- Create an HCO CustomResource, which creates the KubeVirt CR, launching KubeVirt
+- Create an HCO CustomResource, which creates the KubeVirt CR, launching KubeVirt [Ref Config](https://github.com/kubevirt/hyperconverged-cluster-operator/blob/main/docs/cluster-configuration.md)
 
 ```
-kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
+wget https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
+# Change Hostpath Storage Class as per environment
+#echo "  scratchSpaceStorageClass: hostpath-csi" >> hco.cr.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f hco.cr.yaml
 ```
 
 - [ISSUE Hostpath Provisioner CSI not started](https://github.com/kubevirt/hostpath-provisioner-operator/tree/main?tab=readme-ov-file#hostpath-provisioner-operator)
