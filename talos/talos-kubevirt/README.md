@@ -393,6 +393,8 @@ kubectl -n $HCONS wait deployment/hyperconverged-cluster-webhook --for=condition
 
 ```
 wget https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
+# Enable KubeSecondaryDNS
+sed -i 's/    deployKubeSecondaryDNS: false/    deployKubeSecondaryDNS: true/g' hco.cr.yaml
 # Change Hostpath Storage Class as per environment
 #echo "  scratchSpaceStorageClass: hostpath-csi" >> hco.cr.yaml
 kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f hco.cr.yaml
