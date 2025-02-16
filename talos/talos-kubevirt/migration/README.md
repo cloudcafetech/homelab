@@ -39,6 +39,7 @@ metadata:
   name: forklift-controller
   namespace: konveyor-forklift
 spec:
+  feature_must_gather_api: true
   feature_ui: true
   feature_validation: true
   inventory_tls_enabled: false
