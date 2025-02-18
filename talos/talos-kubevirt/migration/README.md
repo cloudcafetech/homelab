@@ -99,7 +99,7 @@ EOF
 kubectl create -f vsphere-provider.yaml
 ```
 
-- Download Resource mapping file modify and deploy
+- Download Resource mapping file modify (VM name, Datastore & Network)
 
 ```
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/migration/resource-mapping-windows.yaml
