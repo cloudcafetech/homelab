@@ -64,9 +64,7 @@ Migrate from VMware make sure VMware-tool should be installed.
 
 >Windows step1: ```Mount VMware image mount in windows VM and run setup.exe```
 
->Windows step2: (Change Block Tracking (CBT) is enable) ``` Edit settings of VM > VM Options > Advanced > Configuration Parameters  >> EDIT CONFIGURATION >> add parameter ctkEnabled = "TRUE".
- 
-The option ctkEnabled = "TRUE"
+>Windows step2: [Change Block Tracking (CBT) is enable] ```Edit settings of VM > VM Options > Advanced > Configuration Parameters  >> EDIT CONFIGURATION >> add parameter ctkEnabled = "TRUE"```
 
 - Create Secret & Provider
 
