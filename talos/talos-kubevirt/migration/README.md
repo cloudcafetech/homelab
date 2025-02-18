@@ -99,86 +99,16 @@ EOF
 kubectl create -f vsphere-provider.yaml
 ```
 
-- Create Resource mapping
+- Download Resource mapping file modify and deploy
 
 ```
-cat <<EOF > resource-mapping.yaml
-apiVersion: forklift.konveyor.io/v1beta1
-kind: StorageMap
-metadata:
-  name: vmware-storage-map
-  namespace: konveyor-forklift
-spec:
-  map:
-    - destination:
-        storageClass: kubenfs-storage
-        accessMode: ReadWriteOnly
-      source:
-        name: datastore1
-  provider:
-    destination:
-      name: host
-      namespace: konveyor-forklift
-    source:
-      name: vsphere-provider
-      namespace: konveyor-forklift
----
-apiVersion: forklift.konveyor.io/v1beta1
-kind: NetworkMap
-metadata:
-  name: vmware-network-map
-  namespace: konveyor-forklift
-spec:
-  map:
-    - destination:
-        type: pod
-      source:
-        name: pk-lan
-  provider:
-    destination:
-      name: host
-      namespace: konveyor-forklift
-    source:
-      name: vsphere-provider
-      namespace: konveyor-forklift
----
-apiVersion: forklift.konveyor.io/v1beta1
-kind: Plan
-metadata:
-  name: vm-mig-plan
-  namespace: konveyor-forklift
-spec:
-  archived: false
-  description: ''
-  map:
-    network:
-      name: vmware-network-map
-      namespace: konveyor-forklift
-    storage:
-      name: vmware-storage-map
-      namespace: konveyor-forklift
-  provider:
-    destination:
-      name: host
-      namespace: konveyor-forklift
-    source:
-      name: vsphere-provider
-      namespace: konveyor-forklift
-  targetNamespace: virtualmachines
-  vms:
-    - hooks: []
-      name: vw-jumphost
-  warm: false
----
-apiVersion: forklift.konveyor.io/v1beta1
-kind: Migration
-metadata:
-  name: v2kv-migration
-  namespace: konveyor-forklift
-spec:
-  plan:
-    name: vm-mig-plan
-    namespace: konveyor-forklift
-EOF
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/migration/resource-mapping-windows.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/migration/resource-mapping-linux.yaml
+```
 
-kubectl create -f resource-mapping.yaml
+- Deploy Resource mapping
+
+```
+kubectl create -f resource-mapping-windows.yaml
+kubectl create -f resource-mapping-linux.yaml
+```
