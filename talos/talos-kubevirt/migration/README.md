@@ -58,6 +58,12 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 ### Migration from VMware to Kubevirt
 
+Migrate from VMware make sure VMware-tool should be installed.
+
+>Ubuntu: ```sudo apt-get install open-vm-tools-desktop -y```
+
+>Windows: ```Mount VMware image mount in windows VM and run setup.exe```
+
 - Create Secret & Provider
 
 ```
