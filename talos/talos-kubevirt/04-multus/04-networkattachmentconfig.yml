@@ -9,6 +9,7 @@ spec:
       "name": "bridge-whereabouts",
       "type": "bridge",
       "bridge": "br0",
+      "promiseMode": "true",       
       "ipam": {
         "type": "whereabouts",
         "range": "192.168.0.0/24",
