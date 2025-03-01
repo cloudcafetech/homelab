@@ -38,7 +38,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: hostpathprovisioner.kubevirt.io
   annotations:
-    cert-manager.io/inject-ca-from: hostpath-provisioner/hostpath-provisioner-operator-webhook-service-cert
+    cert-manager.io/inject-ca-from: kubevirt-hyperconverged/hostpath-provisioner-operator-webhook-service-cert
   labels:
     name: hostpath-provisioner-operator
 webhooks:
