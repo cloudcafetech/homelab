@@ -16,7 +16,7 @@ metadata:
 spec:
   secretName: hostpath-provisioner-operator-webhook-service-cert
   dnsNames:
-  - hostpath-provisioner-operator-webhook-service.hostpath-provisioner.svc
+  - hostpath-provisioner-operator-webhook-service.kubevirt-hyperconverged.svc
   issuerRef:
     name: selfsigned-issuer
 ---
