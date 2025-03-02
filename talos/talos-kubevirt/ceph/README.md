@@ -32,7 +32,7 @@ kubectl create -f crds.yaml -f common.yaml -f operator.yaml
 echo - Installing Cluster and StorageClass
 kubectl create -f cephcluster.yaml
 sleep 30
-kubectl create -f cephfs.yaml -f ceph-rbd-default.yaml -f ceph-rbd-scratch.yaml
+kubectl create -f cephfs.yaml -f ceph-rbd-default.yaml -f ceph-rbd-scratch.yaml -f dashboard-external-https.yaml
 ```
 
 - Get Password for Dashboard
