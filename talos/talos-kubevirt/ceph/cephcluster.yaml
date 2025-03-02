@@ -1,0 +1,43 @@
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: rook-ceph
+  namespace: rook-ceph
+spec:
+  cephVersion:
+    image: quay.io/ceph/ceph:v19.2.0
+    allowUnsupported: false
+  dataDirHostPath: /var/lib/rook
+  skipUpgradeChecks: false
+  monitoring:
+    enabled: false
+  mon:
+    count: 3
+  mgr:
+    count: 1
+  dashboard:
+    enabled: true
+    ssl: false
+  placement:
+    all:
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+#      tolerations:
+#        - key: "storage"
+#          operator: "Equal"
+#          value: "true"
+#          effect: "NoSchedule"
+  storage:
+    useAllNodes: false
+    useAllDevices: false
+    nodes:
+      - name: "lenevo-tc-w02"
+        devices:
+          - name: "/dev/nvme0n1"
+      - name: "lenevo-ts-w03"
+        devices:
+          - name: "/dev/nvme0n1"
+  network:
+    hostNetwork: true
