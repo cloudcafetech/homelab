@@ -7,19 +7,32 @@ echo - Downloading Files
 mkdir $PWD/ceph; cd $PWD/ceph
 kubectl create ns rook-ceph
 kubectl label ns rook-ceph pod-security.kubernetes.io/enforce=privileged
-wget https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/crds.yaml
-wget https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/common.yaml
-wget https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/operator.yaml
-wget https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/cluster.yaml
-wget https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/dashboard-external-https.yaml
+wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/crds.yaml
+wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/common.yaml
+wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/operator.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/cephcluster.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/cephfs.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/ceph-rbd-default.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/ceph-rbd-scratch.yaml
+wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/dashboard-external-https.yaml
 ```
 
-- Install CRDs, Operators and Cluster
+- Install CRDs and Operators 
 
 ```
 echo - Installing CRDs and Operators
 kubectl create -f crds.yaml -f common.yaml -f operator.yaml
+```
+
+- Install Cluster and StorageClass
+
+> Modify files as per environment
+
+```
+echo - Installing Cluster and StorageClass
 kubectl create -f cephcluster.yaml
+sleep 30
+kubectl create -f cephfs.yaml -f ceph-rbd-default.yaml -f ceph-rbd-scratch.yaml
 ```
 
 - Get Password for Dashboard
