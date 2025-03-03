@@ -318,6 +318,10 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 kubectl patch svc longhorn-frontend -n longhorn-system --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
 ```
 
+- Ceph Storage
+
+[Install](https://github.com/cloudcafetech/homelab/blob/main/talos/talos-kubevirt/ceph/README.md)
+
 - Whereabouts
 
 ```
