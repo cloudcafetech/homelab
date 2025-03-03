@@ -12,12 +12,13 @@ spec:
   monitoring:
     enabled: false
   mon:
-    count: 3
+    count: 2
   mgr:
-    count: 1
+    count: 2
   dashboard:
     enabled: true
-    ssl: false
+    ssl: true
+#    ssl: false
   placement:
     all:
       tolerations:
@@ -29,6 +30,16 @@ spec:
 #          operator: "Equal"
 #          value: "true"
 #          effect: "NoSchedule"
+    mon:
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+    mgr:
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
   storage:
     useAllNodes: false
     useAllDevices: false
