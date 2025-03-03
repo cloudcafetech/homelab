@@ -1,0 +1,43 @@
+# Disk clean wipefs deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wipefs-deployment
+  namespace: kube-system
+  labels:
+    app: wipefs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wipefs
+  template:
+    metadata:
+      labels:
+        app: wipefs
+    spec:
+      nodeSelector:
+        region: worker
+      containers:
+      containers:
+      - image: docker.io/library/alpine:latest
+        command:
+        - /bin/sh
+        args:
+        - -c
+        - apk update && apk add util-linux-misc coreutils && wipefs -a /dev/nvme0n1
+        securityContext:
+          privileged: true
+          seccompProfile:
+            type: Unconfined
+        imagePullPolicy: Always
+        name: wipefs
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirstWithHostNet
+      hostIPC: true
+      hostPID: true
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 300
