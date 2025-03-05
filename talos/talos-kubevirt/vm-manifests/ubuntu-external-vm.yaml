@@ -3,23 +3,26 @@ kind: VirtualMachine
 metadata:
   name: ubuntu-external-vm
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:
         kubevirt.io/vm: ubuntu-external-vm
       annotations:
-        kubevirt.io/allow-pod-bridge-network-live-migration: "true"
+        #kubevirt.io/allow-pod-bridge-network-live-migration: "true"
+        kubevirt.io/allow-pod-bridge-network-live-migration: ""
     spec:
       domain:
         cpu:
+          sockets: 1
           cores: 2
-          model: Haswell-noTSX-IBRS
-        resources:
-          requests:
-            memory: 2G
-            cpu: 2
+          threads: 2
+        memory:
+          guest: 4G
+        machine:
+          type: q35
         devices:
+          rng: {}
           disks:
             - name: ubuntu-external-pvc
               disk:
@@ -30,6 +33,12 @@ spec:
           interfaces:
           - name: external
             bridge: {}
+        features:
+          smm:
+            enabled: true
+        firmware:
+          bootloader:
+            efi: {}
       networks:
       - name: external
         multus:
@@ -50,7 +59,7 @@ spec:
                       dhcp4: true
                       nameservers:
                         #search: [cloudcafe.tech]
-                        addresses: [192.168.1.1, 8.8.8.8, 1.1.1.1]
+                        addresses: [192.168.29.1, 8.8.8.8, 1.1.1.1]
             userData: |-
               #cloud-config
               hostname: kv-ubuntu-ext
@@ -63,10 +72,9 @@ spec:
               - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+8+uOiUp2wV0lNEafqC5RcBpTIVVVQ35RRRwbBNauJhvHO63BcXOpVyaqbDAx1NXboLvDSKrqBti0/8OZeF247ggMe5mov4r0dQN5TOr5d8RwqA8m4zNoVaDlWt4t1Mi+b/sZ8kgbMN9ZTL56js6tO7QM7wLaxBFXs8wjLGU1kBe1VWHwzKB6CnxJwWcXGliEqjtOSs089OuhfA4ju9L1rxVRIzsQN1iaftgmuGXDrAzltLdAg7JvPMRhcUBK3ccMN2hGuVPX1bMbzQ/QIbvam8lLenGQS0X3H9Qd53J/fNOk/ME+B7xls17YBIb/Xyh8ATzXdC0jx1sP2qiAW3Ov cloudcafe
               runcmd:
                 - "sudo apt update -y"
-                - "sudo apt install -y qemu-guest-agent vim iputils-ping apt-transport-https ca-certificates gpg nfs-commo
-n curl wget git net-tools unzip jq zip nmap telnet dos2unix"
+                - "sudo apt install -y qemu-guest-agent vim iputils-ping apt-transport-https ca-certificates gpg nfs-common curl wget git net-tools unzip jq zip nmap telnet dos2unix"
                 - "sudo systemctl enable qemu-guest-agent"
                 - "sudo systemctl start qemu-guest-agent"
-                - "sudo sed -i '1s/^/nameserver 192.168.1.1\n/' /etc/resolv.conf"
+                - "sudo sed -i '1s/^/nameserver 192.168.29.1\n/' /etc/resolv.conf"
                 #- "sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config"
                 #- "sudo systemctl restart ssh"
