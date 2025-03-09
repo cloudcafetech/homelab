@@ -1,0 +1,240 @@
+# This config based on 1 master (VM on Proxmox) 1 worker (Baremetal) with NO (cilium) CNI and ceph
+# yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
+---
+# renovate: datasource=docker depName=ghcr.io/siderolabs/installer
+talosVersion: v1.9.2
+# renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
+kubernetesVersion: v1.30.0
+
+clusterName: talos-k8s
+endpoint: https://192.168.0.111:6443
+clusterPodNets:
+  - 10.244.0.0/16
+clusterSvcNets:
+  - 10.96.0.0/12
+additionalApiServerCertSans:
+  - 192.168.0.111
+  - 127.0.0.1
+additionalMachineCertSans:
+  - 192.168.0.111
+  - 127.0.0.1
+
+nodes:
+  - hostname: talos-master
+    controlPlane: true
+    ipAddress: 192.168.0.111
+    installDisk: /dev/sda
+
+    nodeLabels:
+      region: master
+
+    networkInterfaces:
+      - interface: eth0
+        mtu: 1500
+        dhcp: false
+        bridge:
+          stp:
+            enabled: true
+          interfaces:
+            - bond0
+        addresses:
+          - 192.168.0.111/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
+
+      - interface: bond0
+        mtu: 1500
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            # VirtIO NIC
+            - driver: virtio_net
+              physical: true
+
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/gvisor
+            - siderolabs/intel-ucode
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
+            - siderolabs/lldpd
+            - siderolabs/drbd
+    extensionServices:
+      - name: lldpd
+        configFiles:
+          - mountPath: /usr/local/etc/lldpd/lldpd.conf
+            content: configure lldpd portidsubtype ifname
+
+  - hostname: lenevo-tc-w02
+    controlPlane: false
+    ipAddress: 192.168.0.107
+    installDisk: /dev/sdb
+
+    nodeLabels:
+      region: worker
+
+    networkInterfaces:
+      - interface: br0
+        mtu: 1500
+        dhcp: false
+        bridge:
+          stp:
+            enabled: true
+          interfaces:
+            - bond0
+        addresses:
+          - 192.168.0.107/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
+
+      - interface: bond0
+        mtu: 1500
+        bond:
+          mode: active-backup
+          primary: eno2
+          primaryReselect: better
+          deviceSelectors:
+            # Onboard Intel 1GbE (eno2)
+            - driver: e1000e
+              physical: true
+
+    schematic:
+      customization:
+        extraKernelArgs:
+          - intel_iommu=on
+          - iommu=pt
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/gvisor
+            - siderolabs/gvisor-debug
+            - siderolabs/i915
+            - siderolabs/intel-ucode
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
+            - siderolabs/lldpd
+            - siderolabs/drbd
+    extensionServices:
+      - name: lldpd
+        configFiles:
+          - mountPath: /usr/local/etc/lldpd/lldpd.conf
+            content: configure lldpd portidsubtype ifname
+
+    patches:
+      - |-
+        machine:
+          # Wipe disk for Ceph
+          disks:
+              - device: /dev/nvme0n1
+                wipe: true
+
+  - hostname: lenevo-ts-w03
+    controlPlane: false
+    ipAddress: 192.168.0.106
+    installDisk: /dev/nvme1n1
+
+    nodeLabels:
+      region: worker
+
+    networkInterfaces:
+      - interface: br0
+        mtu: 1500
+        dhcp: false
+        bridge:
+          stp:
+            enabled: true
+          interfaces:
+            - bond0
+        addresses:
+          - 192.168.0.106/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
+
+      - interface: bond0
+        mtu: 1500
+        bond:
+          mode: active-backup
+          primary: eno2
+          primaryReselect: better
+          deviceSelectors:
+            # Onboard Intel 1GbE (eno2)
+            - driver: e1000e
+              physical: true
+
+    schematic:
+      customization:
+        extraKernelArgs:
+          - intel_iommu=on
+          - iommu=pt
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/gvisor
+            - siderolabs/gvisor-debug
+            - siderolabs/i915
+            - siderolabs/intel-ucode
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
+            - siderolabs/lldpd
+            - siderolabs/drbd
+    extensionServices:
+      - name: lldpd
+        configFiles:
+          - mountPath: /usr/local/etc/lldpd/lldpd.conf
+            content: configure lldpd portidsubtype ifname
+
+    patches:
+      - |-
+        machine:
+          # Wipe disk for Ceph
+          disks:
+              - device: /dev/nvme0n1
+                wipe: true
+
+patches:
+
+  # Enable KubePrism
+  - |-
+    machine:
+      features:
+        kubePrism:
+          enabled: true
+          port: 7445
+
+  # Force nameserver
+  - |-
+    machine:
+      network:
+        nameservers:
+          - 192.168.29.1
+          - 1.1.1.1
+          - 8.8.8.8
+
+  # Configure NTP
+  - |-
+    machine:
+      time:
+        disabled: false
+        servers: ["time.cloudflare.com"]
+
+controlPlane:
+  patches:
+    # Cluster configuration
+    - |-
+      cluster:
+        # allowSchedulingOnControlPlanes: true
+        controllerManager:
+          extraArgs:
+            bind-address: 0.0.0.0
+        proxy:
+          disabled: true
+        network:
+          cni:
+            name: none
+          dnsDomain: cluster.local
+        scheduler:
+          extraArgs:
+            bind-address: 0.0.0.0
