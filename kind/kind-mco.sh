@@ -21,6 +21,11 @@ kind create cluster --name "${hub}"
 kind create cluster --name "${c1}"
 kind create cluster --name "${c2}"
 
+echo - Downloading Kubeconfig
+kind get kubeconfig -n hub > hub-kubeconfig
+kind get kubeconfig -n cluster1 > cluster1-kubeconfig
+kind get kubeconfig -n cluster2 > cluster2-kubeconfig
+
 echo "Download and install clusteradm"
 wget -qO- https://github.com/open-cluster-management-io/clusteradm/releases/latest/download/clusteradm_linux_amd64.tar.gz | sudo tar -xvz -C /usr/local/bin/
 sudo chmod +x /usr/local/bin/clusteradm
