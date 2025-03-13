@@ -14,6 +14,10 @@ echo "deb http://security.debian.org/debian-security bookworm-security main cont
 echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" > /etc/apt/sources.list.d/pve-enterprise.list
 echo "deb http://download.proxmox.com/debian/ceph-quincy bookworm no-subscription" > /etc/apt/sources.list.d/ceph.list
 apt-get update -y && apt-get upgrade -y
+# Remove subscription banner
+cp /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js-bkp
+awk -i inplace 'NR==1,/Ext.Msg.show/{sub(/Ext.Msg.show/, "void({ //Ext.Msg.show")} 1' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+systemctl restart pveproxy.service
 reboot
 ```
 
