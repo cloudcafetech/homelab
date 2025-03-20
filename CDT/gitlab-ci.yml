@@ -1,0 +1,70 @@
+image: p-boss-gitlab-01.eng.tdc.net:5050/it-design-and-development/platform/tools/docker-kubectl:0.2.2
+
+variables:
+  DRYRUN: "true"
+  # TODO: consider using CI variable
+  GIT_SOURCE: 'https://p-boss-gitlab-01.eng.tdc.net/cloud-and-platform-ops/iac/server-image-builder'
+  TARGET: 'values-$CI_JOB_STAGE.yaml'
+  CONFIG_REPO: 'kubevirt-rhel9-image.git'
+
+stages:
+  - vm_build
+  - readonly_image
+  - validation
+  - terminate_vm
+
+# VM build in that cluster
+vm_build:
+  stage: vm_build
+  rules:
+  - if: $KV_PP_CLUSTER && $CI_COMMIT_REF_NAME == "r-nephle-west-00"
+  variables:
+    KUBE_URL: '$KV_PP_WEST_KUBE_URL'
+    KUBE_TOKEN: '$KV_PP_WEST_KUBE_TOKEN'
+  script:
+    - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KV_PP_KUBE_PEM_FILE"
+    - ./scripts/gi-ci-pipeline.sh vm_build
+
+# Prepare readonly PVC
+readonly_image:
+  stage: readonly_image
+  rules:
+  - if: $KV_PP_CLUSTER && $CI_COMMIT_REF_NAME == "r-nephle-west-00"
+  variables:
+    KUBE_URL: '$KV_PP_WEST_KUBE_URL'
+    KUBE_TOKEN: '$KV_PP_WEST_KUBE_TOKEN'
+  needs:
+    - vm_build
+  script:
+    - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KV_PP_KUBE_PEM_FILE"
+    - ./scripts/gi-ci-pipeline.sh readonly_image
+
+# Validate readonly PVC
+validation:
+  stage: validation
+  rules:
+  - if: $KV_PP_CLUSTER && $CI_COMMIT_REF_NAME == "r-nephle-west-00"
+  variables:
+    KUBE_URL: '$KV_PP_WEST_KUBE_URL'
+    KUBE_TOKEN: '$KV_PP_WEST_KUBE_TOKEN'
+  needs:
+    - readonly_image    
+  script:
+    - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KV_PP_KUBE_PEM_FILE"
+    - ./scripts/gi-ci-pipeline.sh validation
+    
+# Terminate VM 
+terminate_vm:
+  stage: terminate_vm
+  rules:
+  - if: $KV_PP_CLUSTER && $CI_COMMIT_REF_NAME == "r-nephle-west-00"
+  variables:
+    KUBE_URL: '$KV_PP_WEST_KUBE_URL'
+    KUBE_TOKEN: '$KV_PP_WEST_KUBE_TOKEN'
+  needs:
+    - vm_build 
+  script:
+    - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KV_PP_KUBE_PEM_FILE"
+    - kubectl delete -f $pwd/templates/vm.yaml
+    
+    
