@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: "1"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"annotations":{},"name":"vlan-config","namespace":"kube-system"},"spec":{"selector":{"matchLabels":{"app":"vlan-config"}},"template":{"metadata":{"labels":{"app":"vlan-config"}},"spec":{"containers":[{"args":["while true; do\n  success=true\n  for vlan in $VLAN_LIST; do\n    if ! bridge vlan show dev bond0 | grep -q \"$vlan\"; then\n      if bridge vlan add vid $vlan dev bond0; then\n        echo $HOST \"VLAN $vlan added to bond0 successfully\"\n      else\n        echo \"Error: Failed to add VLAN $vlan to bond0\" \u003e\u00262\n        success=false\n      fi\n    fi\n  done\n  if ! $success; then\n    echo \"Some VLANs failed to configure. Will retry in 30 seconds.\"\n  fi\n  echo $NODE_NAME\n  bridge vlan\n  sleep 3000\ndone\n"],"command":["/bin/sh","-c"],"env":[{"name":"VLAN_LIST","value":"233 234"},{"name":"NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}}],"image":"nicolaka/netshoot","name":"vlan-config","resources":{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"50m","memory":"50Mi"}},"securityContext":{"privileged":true}}],"hostNetwork":true,"tolerations":[{"operator":"Exists"}]}}}}
+  creationTimestamp: "2025-03-07T11:51:15Z"
+  generation: 1
+  name: vlan-config
+  namespace: kube-system
+  resourceVersion: "18716213"
+  uid: 56555ec2-afc8-49d2-93a8-959f92d99353
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: vlan-config
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: vlan-config
+    spec:
+      containers:
+      - args:
+        - |
+          while true; do
+            success=true
+            for vlan in $VLAN_LIST; do
+              if ! bridge vlan show dev bond0 | grep -q "$vlan"; then
+                if bridge vlan add vid $vlan dev bond0; then
+                  echo $HOST "VLAN $vlan added to bond0 successfully"
+                else
+                  echo "Error: Failed to add VLAN $vlan to bond0" >&2
+                  success=false
+                fi
+              fi
+            done
+            if ! $success; then
+              echo "Some VLANs failed to configure. Will retry in 30 seconds."
+            fi
+            echo $NODE_NAME
+            bridge vlan
+            sleep 3000
+          done
+        command:
+        - /bin/sh
+        - -c
+        env:
+        - name: VLAN_LIST
+          value: 233 234
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        image: nicolaka/netshoot
+        imagePullPolicy: Always
+        name: vlan-config
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 50m
+            memory: 50Mi
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - operator: Exists
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+status:
+  currentNumberScheduled: 6
+  desiredNumberScheduled: 6
+  numberAvailable: 6
+  numberMisscheduled: 0
+  numberReady: 6
+  observedGeneration: 1
+  updatedNumberScheduled: 6
