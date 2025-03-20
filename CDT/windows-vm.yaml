@@ -1,0 +1,107 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: win22-iso
+spec:
+  source:
+    pvc:
+      name: windows-2022 
+      namespace: windows-vm
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: ceph-rbd
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: winhd
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 25Gi
+  storageClassName: cephfs
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: pk-win2022
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: pk-win2022
+    spec:
+      domain:
+        cpu:
+          sockets: 1
+          cores: 2
+          threads: 3
+        memory:
+          guest: 12G
+        machine:
+          type: q35
+        devices:
+          rng: {}
+          disks:
+          - name: cdromiso
+            bootOrder: 1
+            cdrom:
+              bus: sata          
+          - name: harddrive
+            bootOrder: 2
+            disk:
+              bus: virtio
+          - name: virtiocontainerdisk
+            bootOrder: 3
+            cdrom:
+              bus: sata          
+          interfaces:
+            - name: default
+              model: e1000
+              masquerade: {}
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            relaxed: {}
+            spinlocks:
+              spinlocks: 8191
+            vapic: {}
+          smm: {}
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+      - name: cdromiso
+        persistentVolumeClaim:
+          claimName: win22-iso
+      - name: harddrive
+        persistentVolumeClaim:
+          claimName: winhd
+      - name: virtiocontainerdisk
+        containerDisk:
+          image: docker.io/kubevirt/virtio-container-disk
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: windows
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: rdp
+    nodePort: 30389
+    port: 3389
+    protocol: TCP
+    targetPort: 3389
+  selector:
+    kubevirt.io/domain: pk-win2022
+    vm.kubevirt.io/name: pk-win2022
+  type: NodePort          

@@ -1,0 +1,46 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: pk-win2022
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: pk-win2022
+    spec:
+      domain:
+        cpu:
+          sockets: 1
+          cores: 2
+          threads: 3
+        memory:
+          guest: 12G
+        machine:
+          type: q35
+        devices:
+          rng: {}
+          disks:
+          - name: c-drive
+            disk:
+              bus: virtio
+          interfaces:
+            - name: default
+              model: e1000
+              masquerade: {}
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            relaxed: {}
+            spinlocks:
+              spinlocks: 8191
+            vapic: {}
+          smm: {}
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+      - name: c-drive
+        persistentVolumeClaim:
+          claimName: winhd
