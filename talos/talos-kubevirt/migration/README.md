@@ -10,6 +10,7 @@ kubectl apply -f https://raw.githubusercontent.com/operator-framework/operator-l
 - Wait for olm operator to start
 
 ```
+sleep 90
 while ! kubectl get deployment -n olm olm-operator; do sleep 10; done
 kubectl wait deployment -n olm olm-operator --for condition=Available=True --timeout=180s
 ```
