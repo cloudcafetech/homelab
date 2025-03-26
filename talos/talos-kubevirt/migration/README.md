@@ -10,7 +10,7 @@ kubectl apply -f https://raw.githubusercontent.com/operator-framework/operator-l
 - Wait for olm operator to start
 
 ```
-sleep 90
+sleep 60
 while ! kubectl get deployment -n olm olm-operator; do sleep 10; done
 kubectl wait deployment -n olm olm-operator --for condition=Available=True --timeout=180s
 ```
@@ -26,6 +26,7 @@ kubectl apply -f forklift-k8s.yaml
 - Wait for forklift operator to start and create a controller instance
 
 ```
+sleep 90
 while ! kubectl get deployment -n konveyor-forklift forklift-operator; do sleep 10; done
 kubectl wait deployment -n konveyor-forklift forklift-operator --for condition=Available=True --timeout=180s
 ```
