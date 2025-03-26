@@ -76,12 +76,12 @@ spec:
             {"services":[
               {
                   "consoleAPIPath":"/api/proxy/plugin/forklift-console-plugin/forklift-inventory/",
-                  "endpoint":"http://forklift-inventory.konveyor-forklift.svc.cluster.local:8080",
+                  "endpoint":"http://forklift-inventory.konveyor-forklift.svc.cluster.local:8443",
                   "authorize":true
               },
               {
                   "consoleAPIPath":"/api/proxy/plugin/forklift-console-plugin/must-gather-api/",
-                  "endpoint":"http://must-gather-api.konveyor-forklift.svc.cluster.local:8080",
+                  "endpoint":"http://must-gather-api.konveyor-forklift.svc.cluster.local:443",
                   "authorize":true
               }]}
 ---
