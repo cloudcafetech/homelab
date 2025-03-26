@@ -41,6 +41,7 @@ metadata:
   name: forklift-controller
   namespace: konveyor-forklift
 spec:
+  controller_container_limits_memory: 2Gi
   feature_must_gather_api: true
   feature_ui: true
   feature_validation: true
