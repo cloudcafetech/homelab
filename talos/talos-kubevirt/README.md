@@ -482,8 +482,6 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 >Deploy VM ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/fedora-vm.yaml``` )
 
-## [Migration](https://github.com/cloudcafetech/homelab/blob/main/talos/talos-kubevirt/migration/README.md)
-
 ## Manage VNc for windows 
 
 - Deploy
