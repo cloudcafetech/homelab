@@ -122,3 +122,7 @@ EOF
 
 kubectl create -f bridge.yaml
 ```
+
+[Ref #1](http://github.com/nmstate/kubernetes-nmstate/releases/latest)
+
+[Ref #2](https://gist.github.com/johnsimcall/439d65fcd6d4ab14538517087e473688)
