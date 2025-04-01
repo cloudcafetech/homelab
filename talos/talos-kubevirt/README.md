@@ -343,6 +343,8 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/04-networkattachmentconfig.yml
 ```
 
+- [NMstate](https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/nmstate.md)
+
 - Monitoring Logging and dashboard
 
 ```
@@ -412,6 +414,7 @@ wget https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/
 sed -i 's/    deployKubeSecondaryDNS: false/    deployKubeSecondaryDNS: true/g' hco.cr.yaml
 # Change Hostpath Storage Class as per environment
 #echo "  scratchSpaceStorageClass: hostpath-csi" >> hco.cr.yaml
+echo "  scratchSpaceStorageClass: ceph-rbd-scratch" >> hco.cr.yaml
 kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f hco.cr.yaml
 ```
 
