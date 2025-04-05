@@ -45,7 +45,7 @@ spec:
     routes:
       config:
         - destination: 0.0.0.0/0
-          next-hop-address: 192.168.0.254
+          next-hop-address: 192.168.0.1
           next-hop-interface: br0
 
     interfaces:
@@ -91,7 +91,7 @@ spec:
     routes:
       config:
         - destination: 0.0.0.0/0
-          next-hop-address: 192.168.0.254
+          next-hop-address: 192.168.0.1
           next-hop-interface: br0
 
     interfaces:
