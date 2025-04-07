@@ -1,15 +1,12 @@
 # MetalLB
 
 
-## howto install
+## Install
 
 ```
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/values.yml
 helm repo add metallb https://metallb.github.io/metallb
 helm install metallb metallb/metallb -f values.yml --namespace kube-system
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/metallb-ippol.yaml
+kubectl create -f metallb-ippol.yaml
 ```
-
-
-## Why do i use MetalLB ?
-
-I use MetalLB to configure a Service of type `LoadBalancer` which i then use to expose my virtual machines to the network. This is another way if you don´t want to use Multus.
-
