@@ -274,17 +274,6 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 ## Next deploy rest of tools
 
-- Deploy VolumeSnapshot CRDs and snapshot controller
-
-```
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
-sleep 10
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml
-```
-
 - CSI NFS Storage
 
 [Setup NFS Server](https://github.com/cloudcafetech/homelab/tree/main/talos/talos-kubevirt/00-nfs-provisioner#nfs-provisioner)
@@ -349,7 +338,7 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/04-networkattachmentconfig.yml
 ```
 
-- [NMstate](https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/nmstate.md)
+- [NMstate Setup](https://github.com/cloudcafetech/homelab/blob/main/nmstate.md)
 
 - Monitoring Logging and dashboard
 
