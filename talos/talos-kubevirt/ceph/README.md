@@ -36,6 +36,25 @@ sleep 30
 kubectl create -f cephfs.yaml -f ceph-rbd-default.yaml -f ceph-rbd-scratch.yaml -f dashboard-external-https.yaml -f snapshotclass.yaml
 ```
 
+### Note: If CSI NFS Storage deployed then DO NOT Deploy VolumeSnapshot CRDs and snapshot controller (Next section)
+
+- Deploy VolumeSnapshot CRDs and snapshot controller
+
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+sleep 10
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml
+```
+
+- Deploy Snapshotclass
+
+```
+kubectl create -f snapshotclass.yaml
+```
+
 - Get Password for Dashboard
 
 ```
