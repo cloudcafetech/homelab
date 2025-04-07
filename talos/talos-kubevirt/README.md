@@ -287,8 +287,14 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snaps
 
 - CSI NFS Storage
 
+[Setup NFS Server](https://github.com/cloudcafetech/homelab/tree/main/talos/talos-kubevirt/00-nfs-provisioner#nfs-provisioner)
+
 ```
+NFSRV=192.168.0.108
+NFSMOUNT=/root/nfs/kubedata
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/00-nfs-provisioner/values.yaml
+sed -i "s/192.168.0.100/$NFSRV/g" values.yaml
+sed -i "s|/root/nfs/kubedata|$NFSMOUNT|g" values.yaml
 helm repo add csi-driver-nfs https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
 helm install csi-driver-nfs csi-driver-nfs/csi-driver-nfs \
   --create-namespace \
@@ -416,6 +422,17 @@ sed -i 's/    deployKubeSecondaryDNS: false/    deployKubeSecondaryDNS: true/g' 
 #echo "  scratchSpaceStorageClass: hostpath-csi" >> hco.cr.yaml
 echo "  scratchSpaceStorageClass: ceph-rbd-scratch" >> hco.cr.yaml
 kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f hco.cr.yaml
+```
+
+- Enable Service for KubeSecondaryDNS
+
+```
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/values.yml
+helm repo add metallb https://metallb.github.io/metallb
+helm install metallb metallb/metallb -f values.yml --namespace kube-system
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/metallb-ippol.yaml
+kubectl create -f metallb-ippol.yaml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/secondary-dns-svc.yaml
 ```
 
 - [ISSUE Hostpath Provisioner CSI not started](https://github.com/kubevirt/hostpath-provisioner-operator/tree/main?tab=readme-ov-file#hostpath-provisioner-operator)
