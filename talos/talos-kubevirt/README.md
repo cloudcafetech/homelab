@@ -406,15 +406,13 @@ kubectl -n $HCONS wait deployment/hyperconverged-cluster-webhook --for=condition
 
 ```
 wget https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
-# Enable KubeSecondaryDNS
-sed -i 's/    deployKubeSecondaryDNS: false/    deployKubeSecondaryDNS: true/g' hco.cr.yaml
 # Change Hostpath Storage Class as per environment
 #echo "  scratchSpaceStorageClass: hostpath-csi" >> hco.cr.yaml
-echo "  scratchSpaceStorageClass: ceph-rbd-scratch" >> hco.cr.yaml
+#echo "  scratchSpaceStorageClass: ceph-rbd-scratch" >> hco.cr.yaml
 kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f hco.cr.yaml
 ```
 
-- Enable Service for KubeSecondaryDNS
+- Enable KubeSecondaryDNS
 
 ```
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/values.yml
@@ -422,7 +420,7 @@ helm repo add metallb https://metallb.github.io/metallb
 helm install metallb metallb/metallb -f values.yml --namespace kube-system
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/metallb-ippol.yaml
 kubectl create -f metallb-ippol.yaml
-kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/secondary-dns-svc.yaml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/secondary-dns.yaml
 ```
 
 - [ISSUE Hostpath Provisioner CSI not started](https://github.com/kubevirt/hostpath-provisioner-operator/tree/main?tab=readme-ov-file#hostpath-provisioner-operator)
