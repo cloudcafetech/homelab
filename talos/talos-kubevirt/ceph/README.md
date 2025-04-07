@@ -16,6 +16,7 @@ wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/
 wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/ceph-rbd-scratch.yaml
 wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/dashboard-external-https.yaml
 wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/csi/cephfs/snapshotclass.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/rook-ceph-system-clusterrole-endpointslices.yaml
 ```
 
 - Install CRDs and Operators 
@@ -23,6 +24,7 @@ wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/exa
 ```
 echo - Installing CRDs and Operators
 kubectl create -f crds.yaml -f common.yaml -f operator.yaml
+kubectl apply -f rook-ceph-system-clusterrole-endpointslices.yaml
 ```
 
 - Install Cluster and StorageClass
