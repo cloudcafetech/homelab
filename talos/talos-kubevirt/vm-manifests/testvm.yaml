@@ -19,6 +19,14 @@ spec:
               }
             ],
           "routes": [
+            {
+              "dst": "0.0.0.0/0",
+              "gw": "192.168.0.1"
+            }
+           ]
+        }
+      }]
+    }
 ---
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
@@ -67,13 +75,3 @@ spec:
                 name: eth0
                 subnets:
                   - type: dhcp
-                  
-            {
-              "dst": "0.0.0.0/0",
-              "gw": "192.168.0.1"
-            }
-           ]
-        }
-      }]
-    }
----
