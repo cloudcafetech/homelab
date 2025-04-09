@@ -1,0 +1,77 @@
+kind: NetworkAttachmentDefinition
+apiVersion: k8s.cni.cncf.io/v1
+metadata:
+  name: static-132
+  namespace: virtualmachines
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.1",
+      "plugins": [{
+        "type": "bridge",
+        "bridge": "br0",
+        "ipam": {
+          "type": "static",
+            "addresses": [
+              {
+                "address": "192.168.0.132/24",
+                "gateway": "192.168.0.1"
+              }
+            ],
+          "routes": [apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: testvm
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/size: small
+        kubevirt.io/domain: testvm
+      annotations:
+        kubevirt.io/allow-pod-bridge-network-live-migration: "true"
+    spec:
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+          - name: external
+            bridge: {}
+        resources:
+          requests:
+            memory: 64M
+      networks:
+      - name: external
+        multus:
+          networkName: virtualmachines/static-132
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/kubevirt/cirros-container-disk-demo
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userDataBase64: SGkuXG4=
+            networkData: |-
+              version: 1
+              config:
+              - type: physical
+                name: eth0
+                subnets:
+                  - type: dhcp
+                  
+            {
+              "dst": "0.0.0.0/0",
+              "gw": "192.168.0.1"
+            }
+           ]
+        }
+      }]
+    }
+---
