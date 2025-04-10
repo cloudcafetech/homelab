@@ -405,7 +405,8 @@ kubectl -n $HCONS wait deployment/hyperconverged-cluster-webhook --for=condition
 - Create an HCO CustomResource, which creates the KubeVirt CR, launching KubeVirt [Ref Config](https://github.com/kubevirt/hyperconverged-cluster-operator/blob/main/docs/cluster-configuration.md)
 
 ```
-wget https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
+#wget https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/hco.cr.yaml
 # Change Hostpath Storage Class as per environment
 #echo "  scratchSpaceStorageClass: hostpath-csi" >> hco.cr.yaml
 #echo "  scratchSpaceStorageClass: ceph-rbd-scratch" >> hco.cr.yaml
