@@ -274,9 +274,31 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 ## Next deploy rest of tools
 
-- CSI NFS Storage
-
 [Setup NFS Server](https://github.com/cloudcafetech/homelab/tree/main/talos/talos-kubevirt/00-nfs-provisioner#nfs-provisioner)
+
+- NFS Storage (Provisioner) 
+
+```
+NFSRV=192.168.0.108
+NFSMOUNT=/root/nfs/kubedata
+
+mkdir nfsstorage
+cd nfsstorage
+
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/nfs-rbac.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/nfs-deployment.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/kubenfs-storage-class.yaml
+
+sed -i "s/10.128.0.9/$NFSRV/g" nfs-deployment.yaml
+sed -i "s|/root/nfs/kubedata|$NFSMOUNT|g" nfs-deployment.yaml
+
+kubectl create ns kubenfs
+kubectl create -f nfs-rbac.yaml -f nfs-deployment.yaml -f kubenfs-storage-class.yaml -n kubenfs
+```
+
+**OR**
+
+- NFS Storage (CSI)
 
 ```
 NFSRV=192.168.0.108
