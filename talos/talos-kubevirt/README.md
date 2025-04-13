@@ -350,7 +350,7 @@ kubectl patch svc longhorn-frontend -n longhorn-system --type='json' -p '[{"op":
 
 [Install](https://github.com/cloudcafetech/homelab/blob/main/talos/talos-kubevirt/ceph/README.md)
 
-- Whereabouts
+- Multus, Whereabouts and NAD
 
 ```
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/00-ns.yaml
@@ -359,6 +359,12 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/03-whereabouts-install.yaml
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/04-networkattachmentconfig.yml
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/nad-4-migration-vm.yaml
+```
+
+- Multi Network Policy
+
+```
+kubectl create -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multi-networkpolicy/refs/heads/master/scheme.yml
 ```
 
 - [NMstate Setup](https://github.com/cloudcafetech/homelab/blob/main/nmstate.md)
