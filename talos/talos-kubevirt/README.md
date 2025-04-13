@@ -365,7 +365,8 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 ```
 kubectl create -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multi-networkpolicy/refs/heads/master/scheme.yml
-kubectl create -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multi-networkpolicy-iptables/refs/heads/master/deploy.yml
+kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/04-multus/deploy.yml
+#kubectl create -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multi-networkpolicy-iptables/refs/heads/master/deploy.yml
 ```
 
 - [NMstate Setup](https://github.com/cloudcafetech/homelab/blob/main/nmstate.md)
