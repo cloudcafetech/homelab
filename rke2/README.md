@@ -409,9 +409,24 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 - Monitoring Logging and dashboard
 
 ```
-kubectl create -f https://raw.githubusercontent.com/cloudcafetech/k8s-terraform/refs/heads/main/addon/metric-server.yaml
-kubectl create ns monitoring
-kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/monitoring/kubemon.yaml -n monitoring
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+cat << EOF > prom-values.yaml
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+  service:
+    type: NodePort
+grafana:
+  service:
+    type: NodePort
+alertmanager:
+  service:
+    type: NodePort
+EOF
+helm install kube-prometheus-stack --create-namespace -n monitoring -f prom-values.yaml prometheus-community/kube-prometheus-stack
+
 kubectl create ns logging
 rm -rf loki.yaml
 wget -q https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/loki.yaml
@@ -419,9 +434,42 @@ kubectl create secret generic loki -n logging --from-file=loki.yaml
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/kubelog.yaml -n logging
 kubectl delete ds loki-fluent-bit-loki -n logging
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/promtail.yaml -n logging
-kubectl delete deployment cost-model -n monitoring
-kubectl delete statefulset kubemon-grafana -n monitoring
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/06-console/ocp-console.yaml
+
+cat << EOF > ocp-console-custom-rule.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: kube-prometheus-stack
+    app.kubernetes.io/instance: kube-prometheus-stack
+    release: kube-prometheus-stack
+  name: ocp-console-custom-rule
+spec:
+    groups: 
+    - name: ForOpenshiftConsole
+      rules:
+      - expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100)
+        record: instance:node_cpu:rate:sum
+      - expr: sum(rate(container_cpu_usage_seconds_total{job="kubelet",container!="",container!="POD"}[2m])) by (namespace,pod)
+        record: pod:container_cpu_usage:sum
+      - expr: sum(container_network_receive_bytes_total{}) by(instance,namespace,pod,interface)
+        record: instance:node_network_receive_bytes:rate:sum
+      - expr: sum(container_network_transmit_bytes_total{}) by(instance,namespace,pod,interface)
+        record: instance:node_network_transmit_bytes:rate:sum
+      - expr: sum(kube_pod_container_resource_requests{container!=""}) by (node,namespace,pod,resource)
+        record: kube_pod_resource_request
+      - expr: sum(kube_pod_container_resource_limits{container!=""}) by (node,namespace,pod,resource)
+        record: kube_pod_resource_limit
+      - expr: sum(container_network_receive_bytes_total{}) by(namespace,pod,interface) * 0
+        record: pod_network_name_info
+      - expr: sum(container_fs_usage_bytes{}) by (namespace, pod)
+        record: pod:container_fs_usage_bytes:sum  
+EOF
+kubectl create -f ocp-console-custom-rule.yaml -n monitoring
+
+# Get Grafana 'admin' user password by running:
+kubectl --namespace monitoring get secrets kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
 ```
 
 ### VM Deploy
