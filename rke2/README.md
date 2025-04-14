@@ -409,22 +409,13 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 - Monitoring Logging and dashboard
 
 ```
+mkdir monitoring
+cd monitoring
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-cat << EOF > prom-values.yaml
-prometheus:
-  prometheusSpec:
-    serviceMonitorSelectorNilUsesHelmValues: false
-    podMonitorSelectorNilUsesHelmValues: false
-  service:
-    type: NodePort
-grafana:
-  service:
-    type: NodePort
-alertmanager:
-  service:
-    type: NodePort
-EOF
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/05-monitoring/prom-values.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/05-monitoring/ocp-console-custom-rule.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/06-console/ocp-console.yaml
 helm install kube-prometheus-stack --create-namespace -n monitoring -f prom-values.yaml prometheus-community/kube-prometheus-stack
 
 kubectl create ns logging
@@ -434,38 +425,8 @@ kubectl create secret generic loki -n logging --from-file=loki.yaml
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/kubelog.yaml -n logging
 kubectl delete ds loki-fluent-bit-loki -n logging
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/promtail.yaml -n logging
-kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/06-console/ocp-console.yaml
-
-cat << EOF > ocp-console-custom-rule.yaml
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    app: kube-prometheus-stack
-    app.kubernetes.io/instance: kube-prometheus-stack
-    release: kube-prometheus-stack
-  name: ocp-console-custom-rule
-spec:
-    groups: 
-    - name: ForOpenshiftConsole
-      rules:
-      - expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100)
-        record: instance:node_cpu:rate:sum
-      - expr: sum(rate(container_cpu_usage_seconds_total{job="kubelet",container!="",container!="POD"}[2m])) by (namespace,pod)
-        record: pod:container_cpu_usage:sum
-      - expr: sum(container_network_receive_bytes_total{}) by(instance,namespace,pod,interface)
-        record: instance:node_network_receive_bytes:rate:sum
-      - expr: sum(container_network_transmit_bytes_total{}) by(instance,namespace,pod,interface)
-        record: instance:node_network_transmit_bytes:rate:sum
-      - expr: sum(kube_pod_container_resource_requests{container!=""}) by (node,namespace,pod,resource)
-        record: kube_pod_resource_request
-      - expr: sum(kube_pod_container_resource_limits{container!=""}) by (node,namespace,pod,resource)
-        record: kube_pod_resource_limit
-      - expr: sum(container_network_receive_bytes_total{}) by(namespace,pod,interface) * 0
-        record: pod_network_name_info
-      - expr: sum(container_fs_usage_bytes{}) by (namespace, pod)
-        record: pod:container_fs_usage_bytes:sum  
-EOF
+sed -i 's/kubemon-/kube-prometheus-stack-/g' ocp-console.yaml
+kubectl create -f ocp-console.yaml
 kubectl create -f ocp-console-custom-rule.yaml -n monitoring
 
 # Get Grafana 'admin' user password by running:
