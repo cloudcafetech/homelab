@@ -27,11 +27,66 @@ sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 ```
 
+- Install KUBECTL
+
+```
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod 755 kubectl
+mv kubectl /usr/local/bin/
+```
+
+- Setup Helm Chart
+
+```
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/misc/helm-setup.sh
+chmod +x ./helm-setup.sh
+./helm-setup.sh
+```
+
+- Install Krew
+
+```
+set -x; cd "$(mktemp -d)" &&
+OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+KREW="krew-${OS}_${ARCH}" &&
+curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+tar zxvf "${KREW}.tar.gz" &&
+./"${KREW}" install krew
+  
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+# Install kubectl plugins using krew
+kubectl krew install modify-secret
+kubectl krew install ctx
+kubectl krew install ns
+kubectl krew install rook-ceph
+kubectl krew install virt
+
+echo 'export PATH="${PATH}:${HOME}/.krew/bin"' >> /root/.bash_profile
+```
+
 ### Cluster (RKE2) Setup 
 
 - Common setup for all hosts
 
 ```
+systemctl stop firewalld
+systemctl disable firewalld
+
+cat << EOF > /etc/NetworkManager/conf.d/rke2-canal.conf
+[keyfile]
+unmanaged-devices=interface-name:cali*;interface-name:flannel*
+EOF
+systemctl reload NetworkManager
+setenforce 0
+sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+
+yum install -y git curl wget nc sshpass jq bind-utils zip unzip nfs-utils telnet dos2unix net-tools
+
+swapoff -a
+sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
 modprobe br_netfilter
 modprobe overlay
 cat <<EOF | tee /etc/modules-load.d/k8s.conf
