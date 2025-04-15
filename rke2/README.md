@@ -1,8 +1,6 @@
 ## RKE2 with Kubevirt on Proxmox & Baremetal
 
-KubeVirt on RKE2. 
-
-This 3 config based on 1 master (VM on Proxmox) 2 worker (Baremetal) with Cilium CNI including Ceph
+KubeVirt on RKE2 based on 1 master (VM on Proxmox) 2 worker (Baremetal) with Cilium CNI including Ceph
 
 ### Jumphost setup
 
@@ -27,7 +25,7 @@ sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 ```
 
-- Install KUBECTL
+- Install Kubectl
 
 ```
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -236,7 +234,7 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 [Setup NFS Server](https://github.com/cloudcafetech/homelab/tree/main/talos/talos-kubevirt/00-nfs-provisioner#nfs-provisioner)
 
-- NFS Storage (Provisioner) Fast but Does NNOT support Snapshot
+- NFS Storage (Provisioner), fast but does NOT support Snapshot
 
 ```
 NFSRV=192.168.0.108
