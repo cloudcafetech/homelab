@@ -232,7 +232,7 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 ## Deploy Eco-system tools
 
-### Storage Setup 
+### Storage
 
 [Setup NFS Server](https://github.com/cloudcafetech/homelab/tree/main/talos/talos-kubevirt/00-nfs-provisioner#nfs-provisioner)
 
@@ -312,8 +312,9 @@ kubectl patch svc longhorn-frontend -n longhorn-system --type='json' -p '[{"op":
 
 [Install](https://github.com/cloudcafetech/homelab/blob/main/talos/talos-kubevirt/ceph/README.md)
 
+### Virtualization
 
-### HCO [Hyperconverged Cluster Operator](https://github.com/kubevirt/hyperconverged-cluster-operator?tab=readme-ov-file#using-the-hco-without-olm-or-marketplace)
+**HCO** [Hyperconverged Cluster Operator](https://github.com/kubevirt/hyperconverged-cluster-operator?tab=readme-ov-file#using-the-hco-without-olm-or-marketplace)
 
 - Create namespaces 
 
@@ -386,6 +387,8 @@ kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/he
 kubectl get po -n kubevirt-hyperconverged | grep hostpath-provisioner-csi
 ```
 
+### Networking
+
 - Whereabouts and NAD
 
 ```
@@ -406,7 +409,9 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 - [NMstate Setup](https://github.com/cloudcafetech/homelab/blob/main/nmstate.md)
 
-- Monitoring Logging and dashboard
+### Observability
+
+- Monitoring
 
 ```
 mkdir monitoring
@@ -416,8 +421,20 @@ helm repo update
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/05-monitoring/prom-values.yaml
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/05-monitoring/ocp-console-custom-rule.yaml
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/06-console/ocp-console.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/05-monitoring/servicemonitor-kubevirt.yaml
 helm install kube-prometheus-stack --create-namespace -n monitoring -f prom-values.yaml prometheus-community/kube-prometheus-stack
+sed -i 's/kubemon-/kube-prometheus-stack-/g' ocp-console.yaml
+kubectl create -f ocp-console.yaml
+kubectl create -f ocp-console-custom-rule.yaml -n monitoring
+kubectl create -f servicemonitor-kubevirt.yam
 
+# Get Grafana 'admin' user password by running:
+kubectl --namespace monitoring get secrets kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echol
+```
+
+- Logging
+
+```
 kubectl create ns logging
 rm -rf loki.yaml
 wget -q https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/loki.yaml
@@ -425,12 +442,6 @@ kubectl create secret generic loki -n logging --from-file=loki.yaml
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/kubelog.yaml -n logging
 kubectl delete ds loki-fluent-bit-loki -n logging
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/promtail.yaml -n logging
-sed -i 's/kubemon-/kube-prometheus-stack-/g' ocp-console.yaml
-kubectl create -f ocp-console.yaml
-kubectl create -f ocp-console-custom-rule.yaml -n monitoring
-
-# Get Grafana 'admin' user password by running:
-kubectl --namespace monitoring get secrets kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
 ```
 
 ### VM Deploy
@@ -467,7 +478,7 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 >Deploy VM ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/fedora-vm.yaml``` )
 
-## Manage VNC for windows 
+### Manage VNC for windows 
 
 - Deploy
   
