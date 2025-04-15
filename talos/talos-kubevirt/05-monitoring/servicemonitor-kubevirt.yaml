@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    prometheus.kubevirt.io: "true"
+  name: kubevirt-metrics
+  namespace: kubevirt-hyperconverged
+spec:
+  endpoints:
+  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    port: metrics
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+  namespaceSelector: {}
+  selector:
+    matchLabels:
+      prometheus.kubevirt.io: "true"
