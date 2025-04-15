@@ -47,9 +47,9 @@ spec:
       - name: console-app
         # OCP K8s version map (https://gist.github.com/jeyaramashok/ebbd25f36338de4422fd584fea841c08)
         # Image (https://quay.io/repository/openshift/origin-console?tab=tags)
-        # In image (origin-console:4.10) Virtualizattion and Observ menu is available
+        # In image (origin-console:4.11) Virtualizattion and Observ menu is available
         # In image (origin-console:4.16) onwards VM Migration enable Virtualizattion and Observ menu is disable        
-        image: quay.io/openshift/origin-console:4.10
+        image: quay.io/openshift/origin-console:4.11
         env:
         - name: BRIDGE_USER_AUTH
           value: disabled # no authentication required
