@@ -453,6 +453,8 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/mast
 
 - Backup & Restore
 
+**MinIO should Install**
+
 ```
 cat << EOF > credentials-velero
 [default]
