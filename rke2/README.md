@@ -44,9 +44,9 @@ chmod +x ./helm-setup.sh
 - Velero 
 
 ```
-curl -L -k -o /tmp/velero.tar.gz https://github.com/vmware-tanzu/velero/releases/download/v1.16.0/velero-v1.16.0-linux-amd64.tar.gz
+curl -L -k -o /tmp/velero.tar.gz https://github.com/vmware-tanzu/velero/releases/download/v1.13.0/velero-v1.13.0-linux-amd64.tar.gz
 tar -C /tmp -xvf /tmp/velero.tar.gz
-mv /tmp/velero-v1.16.0-linux-amd64/velero /usr/local/bin/velero
+mv /tmp/velero-v1.13.0-linux-amd64/velero /usr/local/bin/velero
 chmod +x /usr/local/bin/velero
 ```
 
@@ -465,7 +465,8 @@ EOF
 velero install \
     --features=EnableCSI \
     --provider aws \
-    --plugins velero/velero-plugin-for-aws:v1.10.1,velero/velero-plugin-for-csi:v0.7.0,quay.io/kubevirt/kubevirt-velero-plugin:v0.7.1 \
+    --use-node-agent --privileged-node-agent \
+    --plugins velero/velero-plugin-for-aws:v1.9.2,velero/velero-plugin-for-csi:v0.7.0,quay.io/kubevirt/kubevirt-velero-plugin:v0.6.0 \
     --bucket velero \
     --secret-file credentials-velero \
     --use-volume-snapshots=true \
@@ -473,6 +474,10 @@ velero install \
     --velero-pod-mem-limit 1Gi \
     --backup-location-config region=minio,s3ForcePathStyle="true",insecureSkipTLSVerify=true,s3Url=http://minio.minio-store.svc:9000 \
     --snapshot-location-config region=minio,insecureSkipTLSVerify=true,enableSharedConfig=true
+
+sleep 30
+
+kubectl patch ds node-agent -n velero --patch '{"spec":{"template":{"spec":{"nodeSelector":{"region":"worker"}}}}}'
 ```
 
 ### VM Deploy
