@@ -296,7 +296,7 @@ kubectl label ns local-path-storage pod-security.kubernetes.io/enforce=privilege
 ```
 kubectl create ns minio-store
 kubectl label ns minio-store pod-security.kubernetes.io/enforce=privileged
-wget https://raw.githubusercontent.com/cloudcafetech/k8sdemo/refs/heads/main/minio/snd/minio.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/backup/minio.yaml
 sed -i 's/local-path/kubenfs-storage/g' minio.yaml
 sed -i 's/5Gi/15Gi/g' minio.yaml
 kubectl create -f minio.yaml
@@ -463,8 +463,8 @@ velero install \
     --use-volume-snapshots=true \
     --velero-pod-mem-request 512Mi \
     --velero-pod-mem-limit 1Gi \
-    --backup-location-config region=minio,s3ForcePathStyle="true",s3Url=http://minio.velero.svc:9000 \
-    --snapshot-location-config region=minio,enableSharedConfig=true
+    --backup-location-config region=minio,s3ForcePathStyle="true",insecureSkipTLSVerify=true,s3Url=http://minio.minio-store.svc:9000 \
+    --snapshot-location-config region=minio,insecureSkipTLSVerify=true,enableSharedConfig=true
 ```
 
 ### VM Deploy
