@@ -46,7 +46,7 @@ chmod +x ./helm-setup.sh
 ```
 curl -L -k -o /tmp/velero.tar.gz https://github.com/vmware-tanzu/velero/releases/download/v1.16.0/velero-v1.16.0-linux-amd64.tar.gz
 tar -C /tmp -xvf /tmp/velero.tar.gz
-mv /tmp/velero-v1.11.0-linux-amd64/velero /usr/local/bin/velero
+mv /tmp/velero-v1.16.0-linux-amd64/velero /usr/local/bin/velero
 chmod +x /usr/local/bin/velero
 ```
 
@@ -180,7 +180,7 @@ cp /var/lib/rancher/rke2/agent/etc/crictl.yaml /etc/crictl.yaml
 - Worker Setup on Baremetal
 
 ```
-cat << EOF >  config.yaml
+cat << EOF > config.yaml
 server: https://192.168.0.124:9345
 token: pkar-rke2
 selinux: false
@@ -454,6 +454,12 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/mast
 - Backup & Restore
 
 ```
+cat << EOF > credentials-velero
+[default]
+aws_access_key_id = admin
+aws_secret_access_key = admin2675
+EOF
+
 velero install \
     --features=EnableCSI \
     --provider aws \
