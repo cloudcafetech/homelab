@@ -41,6 +41,15 @@ chmod +x ./helm-setup.sh
 ./helm-setup.sh
 ```
 
+- Velero 
+
+```
+curl -L -k -o /tmp/velero.tar.gz https://github.com/vmware-tanzu/velero/releases/download/v1.16.0/velero-v1.16.0-linux-amd64.tar.gz
+tar -C /tmp -xvf /tmp/velero.tar.gz
+mv /tmp/velero-v1.11.0-linux-amd64/velero /usr/local/bin/velero
+chmod +x /usr/local/bin/velero
+```
+
 - Install Krew
 
 ```
@@ -440,6 +449,22 @@ kubectl create secret generic loki -n logging --from-file=loki.yaml
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/kubelog.yaml -n logging
 kubectl delete ds loki-fluent-bit-loki -n logging
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/promtail.yaml -n logging
+```
+
+- Backup & Restore
+
+```
+velero install \
+    --features=EnableCSI \
+    --provider aws \
+    --plugins velero/velero-plugin-for-aws:v1.10.1,velero/velero-plugin-for-csi:v0.7.0,quay.io/kubevirt/kubevirt-velero-plugin:v0.7.1 \
+    --bucket velero \
+    --secret-file credentials-velero \
+    --use-volume-snapshots=true \
+    --velero-pod-mem-request 512Mi \
+    --velero-pod-mem-limit 1Gi \
+    --backup-location-config region=minio,s3ForcePathStyle="true",s3Url=http://minio.velero.svc:9000 \
+    --snapshot-location-config region=minio,enableSharedConfig=true
 ```
 
 ### VM Deploy
