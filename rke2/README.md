@@ -7,10 +7,19 @@ KubeVirt on RKE2 based on 1 master (VM on Proxmox) 2 worker (Baremetal) with Cil
 - Deploy Ubuntu VM
 
 ```
-qm clone 8000 107 --name ubuntu --full
-qm set 107 --memory 2048 --cores 1 --cpu cputype=host
-qm set 107 --ipconfig0 ip=192.168.0.107/24,gw=192.168.0.1
-qm start 107
+qm clone 8000 110 --name jumphost --full
+qm set 110 --memory 2048 --cores 2 --cpu cputype=host
+qm set 110 --ipconfig0 ip=192.168.0.110/24,gw=192.168.0.1
+qm start 110
+```
+
+- Deploy CentOS Master VM
+
+```
+qm clone 9000 126 --name rke2-centos-m1 --full
+qm set 126 --memory 7168 --cores 4 --cpu cputype=host
+qm set 126 --ipconfig0 ip=192.168.0.126/24,gw=192.168.0.1
+qm start 126
 ```
 
 - Install [Cilium CLI](https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/#install-the-cilium-cli)
@@ -39,6 +48,7 @@ mv kubectl /usr/local/bin/
 wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/misc/helm-setup.sh
 chmod +x ./helm-setup.sh
 ./helm-setup.sh
+rm -rf helm-setup.sh
 ```
 
 - Velero 
