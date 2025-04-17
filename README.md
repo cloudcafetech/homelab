@@ -28,7 +28,9 @@ reboot
 apt install putty-tools wget vim libguestfs-tools p7zip-full -y
 ssh-keygen -t rsa -N '' -f ./gcpkey -C cloudcafe -b 2048
 puttygen gcpkey -O private -o gcpkey.ppk
+puttygen gcpkey.ppk -O private-openssh -o gcpkey.pem  
 ```
+
 - Download the ISO 
 
 ```
@@ -75,7 +77,7 @@ qm set 8000 --ide2 local-lvm:cloudinit
 qm set 8000 --boot c --bootdisk scsi0
 qm set 8000 --serial0 socket --vga serial0
 
-qm create 9000 --name centos-8-template --memory 2048 --core 2 --agent enabled=1 --net0 virtio,bridge=vmbr0
+qm create 9000 --name centos-9-template --memory 2048 --core 2 --agent enabled=1 --net0 virtio,bridge=vmbr0
 #qm importdisk 9000 centos-stream-8.qcow2 local-lvm
 qm importdisk 9000 centos-stream-9.qcow2 local-lvm
 qm set 9000 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-9000-disk-0,discard=on,ssd=1
@@ -138,7 +140,7 @@ qm set 8000 --ipconfig0 ip=dhcp
 qm set 9000 --cicustom "vendor=local:snippets/centos.yaml"
 qm set 9000 --cipassword cloudcafe2675
 qm set 9000 --sshkeys ./sshkey
-qm set 9000 --tags centos8-template,k8s
+qm set 9000 --tags centos9-template,k8s
 qm set 9000 --ciuser cloudcafe
 qm set 9000 --ipconfig0 ip=dhcp
 ```
