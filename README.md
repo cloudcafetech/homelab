@@ -16,7 +16,8 @@ echo "deb http://download.proxmox.com/debian/ceph-quincy bookworm no-subscriptio
 apt-get update -y && apt-get upgrade -y
 # Remove subscription banner
 cp /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js-bkp
-awk -i inplace 'NR==1,/Ext.Msg.show/{sub(/Ext.Msg.show/, "void({ //Ext.Msg.show")} 1' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+sed -Ezi.bak "s/(Ext.Msg.show\(\{\s+title: gettext\('No valid sub)/void\(\{ \/\/\1/g" /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+#awk -i inplace 'NR==1,/Ext.Msg.show/{sub(/Ext.Msg.show/, "void({ //Ext.Msg.show")} 1' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
 systemctl restart pveproxy.service
 reboot
 ```
