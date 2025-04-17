@@ -33,7 +33,8 @@ puttygen gcpkey -O private -o gcpkey.ppk
 
 ```
 wget https://cloud-images.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64.img
-wget https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2
+#wget https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2
+wget https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-20240527.0.x86_64.qcow2
 wget https://cdimage.kali.org/kali-2024.2/kali-linux-2024.2-qemu-amd64.7z
 7z x kali-linux-2024.2-qemu-amd64.7z
 rm -rf kali-linux-2024.2-qemu-amd64.7z
@@ -43,7 +44,8 @@ rm -rf kali-linux-2024.2-qemu-amd64.7z
 
 ```
 mv ubuntu-22.04-minimal-cloudimg-amd64.img ubuntu-22-04.qcow2
-mv CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2 centos-stream-8.qcow2
+#mv CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2 centos-stream-8.qcow2
+mv CentOS-Stream-GenericCloud-9-20240527.0.x86_64.qcow2 centos-stream-9.qcow2
 mv kali-linux-2024.2-qemu-amd64.qcow2 kali-2024.qcow2
 ```
 
@@ -51,7 +53,8 @@ mv kali-linux-2024.2-qemu-amd64.qcow2 kali-2024.qcow2
 
 ```
 qemu-img resize ubuntu-22-04.qcow2 35G
-qemu-img resize centos-stream-8.qcow2 35G
+#qemu-img resize centos-stream-8.qcow2 35G
+qemu-img resize centos-stream-9.qcow2 35G
 qemu-img resize --shrink kali-2024.qcow2 35G
 ```
 
@@ -73,7 +76,8 @@ qm set 8000 --boot c --bootdisk scsi0
 qm set 8000 --serial0 socket --vga serial0
 
 qm create 9000 --name centos-8-template --memory 2048 --core 2 --agent enabled=1 --net0 virtio,bridge=vmbr0
-qm importdisk 9000 centos-stream-8.qcow2 local-lvm
+#qm importdisk 9000 centos-stream-8.qcow2 local-lvm
+qm importdisk 9000 centos-stream-9.qcow2 local-lvm
 qm set 9000 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-9000-disk-0,discard=on,ssd=1
 qm set 9000 --ide2 local-lvm:cloudinit
 qm set 9000 --boot c --bootdisk scsi0
