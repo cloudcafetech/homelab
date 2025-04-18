@@ -446,10 +446,10 @@ helm install kube-prometheus-stack --create-namespace -n monitoring -f prom-valu
 sed -i 's/kubemon-/kube-prometheus-stack-/g' ocp-console.yaml
 kubectl create -f ocp-console.yaml
 kubectl create -f ocp-console-custom-rule.yaml -n monitoring
-kubectl create -f servicemonitor-kubevirt.yam
+kubectl create -f servicemonitor-kubevirt.yaml
 
 # Get Grafana 'admin' user password by running:
-kubectl --namespace monitoring get secrets kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echol
+kubectl --namespace monitoring get secrets kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
 ```
 
 - Logging
