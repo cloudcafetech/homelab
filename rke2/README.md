@@ -240,7 +240,7 @@ cilium install \
   --helm-set=socketLB.hostNamespaceOnly=true \
   --helm-set=k8sServiceHost=localhost \
   --helm-set=k8sServicePort=6443 \
-  --helm-set=devices='{eth0,eth1,eth2,eno1,eno2,br0,enp0s18,ens18}'
+  --helm-set=devices='{eth0,eth1,eth2,eno1,eno2,br0,enp0s18,ens18,ens192}'
 ```
 
 - Cilium LB IP POOL
