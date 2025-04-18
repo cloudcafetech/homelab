@@ -402,6 +402,7 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 ```
 kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/hostpath-provisioner-operator-webhook.yaml
+sleep 20
 kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/hostpath-provisioner-csi.yaml
 kubectl get po -n kubevirt-hyperconverged | grep hostpath-provisioner-csi
 ```
