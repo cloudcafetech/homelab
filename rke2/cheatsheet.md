@@ -19,7 +19,7 @@ NS=`kubectl get ns |grep Terminating | awk 'NR==1 {print $1}'` && kubectl get na
 
 ### Ceph Cluster cleanup
 
-- Step #1 (Do below in K8s Cluster)
+- Step #1 (**Do below in K8s Cluster**)
 
 ```
 crictl rm `crictl ps -a | grep Exited | awk '{ print $1 }'`
@@ -30,7 +30,7 @@ kubectl -n rook-ceph patch cephcluster rook-ceph --type merge -p '{"spec":{"clea
 for CRD in $(kubectl get crd -n rook-ceph | awk '/ceph.rook.io/ {print $1}'); do kubectl get -n rook-ceph "$CRD" -o name | xargs -I {} kubectl patch -n rook-ceph {} --type merge -p '{"metadata":{"finalizers": []}}'; done
 ```
 
-- Step #2 (Do below in ALL Nodes)
+- Step #2 (**Do below in ALL Nodes**)
 
 ```
 crictl rm `crictl ps -a | grep Exited | awk '{ print $1 }'`
