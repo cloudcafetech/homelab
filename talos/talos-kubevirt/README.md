@@ -479,6 +479,8 @@ export TAG=$(curl -s -w %{redirect_url} https://github.com/kubevirt/containerize
 export VERSION=$(echo ${TAG##*/})
 kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator.yaml
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/03-cdi-operator/01-cdi-cr.yaml
+sleep 30
+kubectl patch cdi cdi --patch '{"spec": {"config": {"podResourceRequirements": {"limits": {"memory": "5G"}}}}}' --type merge
 ```
 
 - Multus
