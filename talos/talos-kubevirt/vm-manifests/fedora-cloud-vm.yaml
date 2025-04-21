@@ -1,0 +1,111 @@
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: kv-fedora-static-143
+  namespace: virtualmachines
+  labels:
+    vm: kv-fedora
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.1",
+      "plugins": [{
+        "type": "bridge",
+        "bridge": "br0",
+        "ipam": {
+          "type": "static",
+            "addresses": [
+              {
+                "address": "192.168.0.143/24",
+                "gateway": "192.168.0.1"
+              }
+            ],
+          "routes": [
+            {
+              "dst": "0.0.0.0/0",
+              "gw": "192.168.0.1"
+            }
+           ]
+        }
+      }]
+    }
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: kv-fedora
+  namespace: virtualmachines
+  labels:
+    vm: kv-fedora
+spec:
+  dataVolumeTemplates:
+  - metadata:
+      name: fedora-os-disk
+      labels:
+        vm: kv-fedora
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 5Gi
+        storageClassName: cephfs
+      source:
+        registry:
+          pullMethod: node
+          url: docker://docker.io/kubevirt/fedora-cloud-container-disk-demo
+  runStrategy: Always
+  template:
+    metadata:
+      name: kv-fedora
+      labels:
+        kubevirt.io/domain: kv-fedora
+        vm: kv-fedora
+    spec:
+      domain:
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: containerdisk
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          interfaces:
+          - name: external
+            bridge: {}
+          rng: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 1Gi
+      networks:
+      - name: external
+        multus:
+          networkName: virtualmachines/kv-fedora-static-143
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - name: containerdisk
+        dataVolume:
+          name: fedora-os-disk
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          networkData: |
+            network:
+              version: 2
+              ethernets:
+                eth0:
+                  dhcp4: true
+          userData: |-
+            #cloud-config
+            hostname: kv-fedora
+            user: cloudcafe
+            password: cloudcafe2675
+            chpasswd: { expire: False }
+            ssh_pwauth: True
+            disable_root: false
+            runcmd:
+            - "sudo yum install qemu-guest-agent -y"
+            - "sudo systemctl start qemu-guest-agent"
