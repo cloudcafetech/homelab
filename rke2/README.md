@@ -494,12 +494,28 @@ sleep 30
 
 # If node agent not required in master node
 kubectl patch ds node-agent -n velero --patch '{"spec":{"template":{"spec":{"nodeSelector":{"region":"worker"}}}}}'
+
+cat << EOF > velero-snapclass.yaml
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: velero-snapclass
+  labels:
+    velero.io/csi-volumesnapshot-class: "true"
+deletionPolicy: Delete
+driver: rook-ceph.cephfs.csi.ceph.com
+parameters:
+  force-create: "true"
+EOF
+
+kubectl create -f velero-snapclass.yaml
 ```
 
 - Backup
 
 ```
 alias vel='kubectl -n velero exec deployment/velero -c velero -it -- ./velero'
+vel backup create virtualmachines-vm-backup --include-namespaces virtualmachines --wait
 
 ```
 
@@ -507,7 +523,7 @@ alias vel='kubectl -n velero exec deployment/velero -c velero -it -- ./velero'
 
 ```
 alias vel='kubectl -n velero exec deployment/velero -c velero -it -- ./velero'
-velero restore create --from-backup testvm-backup
+vel restore create --from-backup virtualmachines-vm-backup --restore-volumes=true --exclude-resources=dv --wait
 ```
 
 ### VM Deploy
