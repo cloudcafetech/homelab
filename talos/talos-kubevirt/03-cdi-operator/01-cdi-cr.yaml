@@ -13,7 +13,7 @@ spec:
         memory: "60M"
       limits:
         cpu: "750m"
-        memory: "2Gi"
+        memory: "5Gi"
   imagePullPolicy: IfNotPresent
   infra:
     nodeSelector:
