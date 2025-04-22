@@ -362,7 +362,10 @@ kubectl -n cert-manager wait deployment/cert-manager-webhook --for=condition=Ava
 ```
 export RELEASE=$(curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt)
 kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-operator.yaml
-kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/02-kubevirt-operator/kubevirt-cr.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/02-kubevirt-operator/kubevirt-cr.yaml
+sed -i '/HostDisk/s/^/#/' kubevirt-cr.yaml
+sed -i '/VMExport/s/^/#/' kubevirt-cr.yaml
+kubectl apply -f kubevirt-cr.yaml
 ```
 
 - CDI
