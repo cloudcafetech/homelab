@@ -585,6 +585,12 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 
 >Deploy VM ( ```kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/vm-manifests/fedora-vm.yaml``` )
 
+- [Windows](https://github.com/dockur/windows)
+
+[Windows Host device](https://github.com/kubevirt/kubevirt/issues/10878)
+
+[Ref](https://github.com/dockur/windows/pull/304#discussion_r1637455331)
+
 ### Manage VNC for windows 
 
 - Deploy
