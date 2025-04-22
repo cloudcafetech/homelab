@@ -1,6 +1,6 @@
-## RKE2 with Kubevirt on Proxmox & Baremetal
+## RKE2 with Kubevirt HCO on Proxmox & Baremetal
 
-KubeVirt on RKE2 based on 1 master (VM on Proxmox) 2 worker (Baremetal) with Cilium CNI including Ceph
+KubeVirt HCO on RKE2 based on 1 master (VM on Proxmox) 2 worker (Baremetal) with Cilium CNI including Ceph
 
 [Cheatsheet](https://github.com/cloudcafetech/homelab/blob/main/rke2/cheatsheet.md#cheatsheet)
 
