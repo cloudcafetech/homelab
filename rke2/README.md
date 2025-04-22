@@ -327,9 +327,48 @@ kubectl patch svc longhorn-frontend -n longhorn-system --type='json' -p '[{"op":
 
 **OR**
 
-- Ceph Storage
+- Ceph Storage [Install](https://github.com/cloudcafetech/homelab/blob/main/talos/talos-kubevirt/ceph/README.md)
 
-[Install](https://github.com/cloudcafetech/homelab/blob/main/talos/talos-kubevirt/ceph/README.md)
+```
+echo - Downloading Files
+mkdir $PWD/ceph; cd $PWD/ceph
+kubectl create ns rook-ceph
+kubectl label ns rook-ceph pod-security.kubernetes.io/enforce=privileged
+wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/crds.yaml
+wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/common.yaml
+wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/operator.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/cephcluster.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/cephfs.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/ceph-rbd-default.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/ceph-rbd-scratch.yaml
+wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/dashboard-external-https.yaml
+wget -q https://raw.githubusercontent.com/rook/rook/refs/heads/master/deploy/examples/csi/cephfs/snapshotclass.yaml
+wget -q https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/ceph/rook-ceph-system-clusterrole-endpointslices.yaml
+
+echo - Installing CRDs and Operators
+kubectl create -f crds.yaml -f common.yaml -f operator.yaml
+kubectl apply -f rook-ceph-system-clusterrole-endpointslices.yaml
+sleep 10
+kubectl -n rook-ceph wait deployment/rook-ceph-operator --for=condition=Available --timeout 300s
+
+echo - Installing Cluster
+kubectl create -f cephcluster.yaml
+sleep 30
+kubectl create -f cephfs.yaml -f ceph-rbd-default.yaml -f ceph-rbd-scratch.yaml -f dashboard-external-https.yaml
+
+echo - Installing Snapshot Controller and StorageClass
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+sleep 10
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-8.2/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml
+
+kubectl create -f snapshotclass.yaml
+
+echo - Get Password for Dashboard
+kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['data']['password']}" | base64 --decode
+```
 
 ### Virtualization
 
@@ -391,11 +430,15 @@ kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f hco.cr.yaml
 
 ```
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/values.yml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/metallb-ippol.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/secondary-dns.yaml
 helm repo add metallb https://metallb.github.io/metallb
 helm install metallb metallb/metallb -f values.yml --namespace kube-system
-wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/metallb-ippol.yaml
-kubectl create -f metallb-ippol.yaml
-kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/secondary-dns.yaml
+sleep 30
+kubectl -n kube-system wait deployment/metallb-controller --for=condition=Available --timeout 300s
+kubectl -n kube-system rollout status ds/metallb-speaker --timeout 300s
+kubectl create -f metallb-ippol.yaml 
+kubectl create -f secondary-dns.yaml
 ```
 
 - [ISSUE Hostpath Provisioner CSI not started](https://github.com/kubevirt/hostpath-provisioner-operator/tree/main?tab=readme-ov-file#hostpath-provisioner-operator)
@@ -428,6 +471,26 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/h
 ```
 
 - [NMstate Setup](https://github.com/cloudcafetech/homelab/blob/main/nmstate.md)
+
+```
+kubectl apply -f https://github.com/nmstate/kubernetes-nmstate/releases/download/v0.83.0/nmstate.io_nmstates.yaml
+kubectl apply -f https://github.com/nmstate/kubernetes-nmstate/releases/download/v0.83.0/namespace.yaml
+kubectl apply -f https://github.com/nmstate/kubernetes-nmstate/releases/download/v0.83.0/service_account.yaml
+kubectl apply -f https://github.com/nmstate/kubernetes-nmstate/releases/download/v0.83.0/role.yaml
+kubectl apply -f https://github.com/nmstate/kubernetes-nmstate/releases/download/v0.83.0/role_binding.yaml
+kubectl apply -f https://github.com/nmstate/kubernetes-nmstate/releases/download/v0.83.0/operator.yaml
+sleep 30
+
+cat <<EOF | kubectl create -f -
+apiVersion: nmstate.io/v1
+kind: NMState
+metadata:
+  name: nmstate
+EOF
+
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/nmstate/bridge.yaml
+kubectl create -f bridge.yaml
+```
 
 ### Observability
 
