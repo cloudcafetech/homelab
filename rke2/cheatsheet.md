@@ -17,6 +17,14 @@ reboot
 NS=`kubectl get ns |grep Terminating | awk 'NR==1 {print $1}'` && kubectl get namespace "$NS" -o json   | tr -d "\n" | sed "s/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/"   | kubectl replace --raw /api/v1/namespaces/$NS/finalize -f -
 ```
 
+### Ceph Storage profile patch [Datavolume not creating PVC due to accessMode specified in StorageProfile cephfs reason: ErrClaimNotValid](https://kubevirt.io/monitoring/runbooks/CDIStorageProfilesIncomplete.html#mitigation)
+
+```
+kubectl get storageprofile 
+kubectl patch storageprofile ceph --type=merge -p '{"spec": {"claimPropertySets": [{"accessModes": ["ReadWriteMany"], "volumeMode": "Filesystem"}]}}'
+kubectl patch storageprofile ceph-rbd --type=merge -p '{"spec": {"claimPropertySets": [{"accessModes": ["ReadWriteOnce"], "volumeMode": "Block"}]}}'
+```
+
 ### Ceph Cluster cleanup
 
 - Step #1 (**Do below in K8s Cluster**)
