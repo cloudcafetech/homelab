@@ -333,6 +333,11 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snaps
 
 kubectl create -f snapshotclass.yaml
 
+echo - Patch storageprofile
+kubectl get storageprofile 
+kubectl patch storageprofile ceph --type=merge -p '{"spec": {"claimPropertySets": [{"accessModes": ["ReadWriteMany"], "volumeMode": "Filesystem"}]}}'
+kubectl patch storageprofile ceph-rbd --type=merge -p '{"spec": {"claimPropertySets": [{"accessModes": ["ReadWriteOnce"], "volumeMode": "Block"}]}}'
+
 echo - Get Password for Dashboard
 kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['data']['password']}" | base64 --decode
 ```
