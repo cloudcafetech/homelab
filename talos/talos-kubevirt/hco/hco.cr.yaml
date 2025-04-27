@@ -1,3 +1,4 @@
+---
 apiVersion: hco.kubevirt.io/v1beta1
 kind: HyperConverged
 metadata:
@@ -18,14 +19,15 @@ spec:
     server:
       duration: 24h0m0s
       renewBefore: 12h0m0s
-  deployVmConsoleProxy: false
-  enableCommonBootImageImport: true
   featureGates:
     alignCPUs: false
+    autoResourceLimits: false
     deployKubeSecondaryDNS: false
+    deployVmConsoleProxy: false
     disableMDevConfiguration: false
     downwardMetrics: false
     enableApplicationAwareQuota: false
+    enableCommonBootImageImport: true
     persistentReservation: false
   higherWorkloadDensity:
     memoryOvercommitPercentage: 100
@@ -40,7 +42,7 @@ spec:
   uninstallStrategy: BlockUninstallIfWorkloadsExist
   virtualMachineOptions:
     disableFreePageReporting: false
-    disableSerialConsoleLog: false
+    disableSerialConsoleLog: true
   workloadUpdateStrategy:
     batchEvictionInterval: 1m0s
     batchEvictionSize: 10
