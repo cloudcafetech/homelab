@@ -378,6 +378,7 @@ kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['dat
 
 ```
 HCONS=kubevirt-hyperconverged
+HCOV=v1.14.0
 for ns in $HCONS openshift konveyor-forklift virtualmachines olm; do  kubectl create ns $ns; done
 for ns in $HCONS openshift konveyor-forklift virtualmachines olm; do  kubectl label ns $ns pod-security.kubernetes.io/enforce=privileged ; done
 ```
@@ -386,19 +387,19 @@ for ns in $HCONS openshift konveyor-forklift virtualmachines olm; do  kubectl la
 
 ```
 LABEL_SELECTOR_ARG="-l name!=ssp-operator,name!=hyperconverged-cluster-cli-download"
-kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/cluster-network-addons00.crd.yaml
-kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/containerized-data-importer00.crd.yaml
-kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/hco00.crd.yaml
-kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/kubevirt00.crd.yaml
-kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/hostpath-provisioner00.crd.yaml
-kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/scheduling-scale-performance00.crd.yaml
-kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/application-aware-quota00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/cluster-network-addons00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/containerized-data-importer00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/hco00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/kubevirt00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/hostpath-provisioner00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/scheduling-scale-performance00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/application-aware-quota00.crd.yaml
 ```
 
 - Deploy Cert Manager for webhook certificates
 
 ```
-kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/cert-manager.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/cert-manager.yaml
 kubectl -n cert-manager wait deployment/cert-manager --for=condition=Available --timeout="300s"
 kubectl -n cert-manager wait deployment/cert-manager-webhook --for=condition=Available --timeout="300s"
 ```
@@ -406,11 +407,11 @@ kubectl -n cert-manager wait deployment/cert-manager-webhook --for=condition=Ava
 - Deploy Service Accounts, Cluster Role(Binding)s and Operators
 
 ```
-kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/cluster_role.yaml
-kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/service_account.yaml
-kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/cluster_role_binding.yaml
-kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/webhooks.yaml
-kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/operator.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/cluster_role.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/service_account.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/cluster_role_binding.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/webhooks.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/operator.yaml
 
 kubectl -n $HCONS wait deployment/hyperconverged-cluster-webhook --for=condition=Available --timeout="300s"
 ```
@@ -418,12 +419,15 @@ kubectl -n $HCONS wait deployment/hyperconverged-cluster-webhook --for=condition
 - Create an HCO CustomResource, which creates the KubeVirt CR, launching KubeVirt [Ref Config](https://github.com/kubevirt/hyperconverged-cluster-operator/blob/main/docs/cluster-configuration.md)
 
 ```
-#wget https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
+#wget https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/hco.cr.yaml
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/hco.cr.yaml
 # Change Hostpath Storage Class as per environment
 #echo "  scratchSpaceStorageClass: hostpath-csi" >> hco.cr.yaml
 #echo "  scratchSpaceStorageClass: ceph-rbd-scratch" >> hco.cr.yaml
 kubectl apply ${LABEL_SELECTOR_ARG} -n $HCONS -f hco.cr.yaml
+sleep 10
+kubectl annotate --overwrite -n kubevirt-hyperconverged hco kubevirt-hyperconverged 'networkaddonsconfigs.kubevirt.io/jsonpatch=[{"op": "replace","path": "/spec/multus","value": null}]'
+#kubectl annotate --overwrite -n kubevirt-hyperconverged hco kubevirt-hyperconverged 'networkaddonsconfigs.kubevirt.io/jsonpatch=[{"op": "replace","path": "/spec/kubeMacPool","value": null}]'
 ```
 
 - Enable KubeSecondaryDNS
