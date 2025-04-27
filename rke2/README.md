@@ -150,14 +150,14 @@ tls-san:
   - "192.168.0.126"
 cni:
   - multus
-  - cilium
-#  - canal
-disable-kube-proxy: true
+  - canal
+#  - cilium
+#disable-kube-proxy: true
 disable:
   - rke2-snapshot-controller
   - rke2-snapshot-controller-crd
   - rke2-snapshot-validation-webhook
-  - rke2-ingress-nginx
+#  - rke2-ingress-nginx
 #node-taint:
 #  - "CriticalAddonsOnly=true:NoExecute"
 EOF
@@ -210,7 +210,7 @@ curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL=v1.31 sh -
 mkdir -p /etc/rancher/rke2/
 mkdir -p /var/lib/rancher/rke2/server/manifests
 cp config.yaml /etc/rancher/rke2/
-cp rke2-cilium-config.yaml /var/lib/rancher/rke2/server/manifests/
+#cp rke2-cilium-config.yaml /var/lib/rancher/rke2/server/manifests/
 cp rke2-multus-config.yaml /var/lib/rancher/rke2/server/manifests/
 
 systemctl disable rke2-agent && systemctl mask rke2-agent
