@@ -1,0 +1,15 @@
+apiVersion: networkaddonsoperator.network.kubevirt.io/v1
+kind: NetworkAddonsConfig
+metadata:
+  name: cluster
+spec:
+  imagePullPolicy: IfNotPresent
+  kubevirtIpamController: {}
+  linuxBridge: {}
+  kubeMacPool:
+   rangeStart: "02:00:00:00:00:00"
+   rangeEnd: "FD:FF:FF:FF:FF:FF"
+#  macvtap: {}
+#  multus: {}
+#  multusDynamicNetworks: {}
+#  ovs: {}
