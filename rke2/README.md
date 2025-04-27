@@ -1,6 +1,6 @@
 ## RKE2 with Kubevirt on Proxmox & Baremetal
 
-KubeVirt on RKE2 based on 1 master (VM on Proxmox) 2 worker (Baremetal) with CANAL CNI including Ceph
+KubeVirt on RKE2 based on 1 master (VM on Proxmox) 2 worker (Baremetal) with Canal/Cilium Whereabouts CNI and Ceph Storage
 
 [Cheatsheet](https://github.com/cloudcafetech/homelab/blob/main/rke2/cheatsheet.md#cheatsheet)
 
@@ -150,15 +150,48 @@ tls-san:
   - "192.168.0.126"
 cni:
   - multus
-  - canal
-disable-cloud-controller: true
+  - cilium
+#  - canal
+disable-kube-proxy: true
 disable:
-  - disable-cloud-controller
   - rke2-snapshot-controller
   - rke2-snapshot-controller-crd
   - rke2-snapshot-validation-webhook
+  - rke2-ingress-nginx
 #node-taint:
 #  - "CriticalAddonsOnly=true:NoExecute"
+EOF
+
+cat << EOF > rke2-cilium-config.yaml
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-cilium
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    operator:
+      replicas: 2
+      image:
+        #tag: v1.17.3
+        tag: v1.16.6
+    kubeProxyReplacement: true
+    k8sServiceHost: "localhost"
+    k8sServicePort: "6443"
+    ipam:
+      mode: kubernetes
+    cni:
+      exclusive: false
+    l2announcements:
+      enabled: true
+    externalIPs:
+      enabled: true
+    socketLB:
+      hostNamespaceOnly: true
+    ingressController:
+      enabled: true
+    gatewayAPI:
+      enabled: false
 EOF
 
 cat << EOF > rke2-multus-config.yaml
@@ -175,9 +208,10 @@ EOF
 
 curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL=v1.31 sh -
 mkdir -p /etc/rancher/rke2/
-mkdir -p /var/lib/rancher/rke2/manifests
+mkdir -p /var/lib/rancher/rke2/server/manifests
 cp config.yaml /etc/rancher/rke2/
-cp rke2-multus-config.yaml /var/lib/rancher/rke2/manifests/
+cp rke2-cilium-config.yaml /var/lib/rancher/rke2/server/manifests/
+cp rke2-multus-config.yaml /var/lib/rancher/rke2/server/manifests/
 
 systemctl disable rke2-agent && systemctl mask rke2-agent
 systemctl enable --now rke2-server
