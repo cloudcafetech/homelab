@@ -440,11 +440,12 @@ kubectl create -f secondary-dns.yaml
 kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.98.2/namespace.yaml
 kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.98.2/network-addons-config.crd.yaml
 kubectl apply -f https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.98.2/operator.yaml
-wget https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.98.2/network-addons-config-example.cr.yaml
-sed -i '/kubeSecondaryDNS/s/^/#/' network-addons-config-example.cr.yaml
-sed -i '/macvtap/s/^/#/' network-addons-config-example.cr.yaml
-sed -i '/ovs/s/^/#/' network-addons-config-example.cr.yaml
-sed -i '/multus/s/^/#/' network-addons-config-example.cr.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/network-addons-config-example.cr.yaml
+#wget https://github.com/kubevirt/cluster-network-addons-operator/releases/download/v0.98.2/network-addons-config-example.cr.yaml
+#sed -i '/kubeSecondaryDNS/s/^/#/' network-addons-config-example.cr.yaml
+#sed -i '/macvtap/s/^/#/' network-addons-config-example.cr.yaml
+#sed -i '/ovs/s/^/#/' network-addons-config-example.cr.yaml
+#sed -i '/multus/s/^/#/' network-addons-config-example.cr.yaml
 kubectl apply -f network-addons-config-example.cr.yaml
 kubectl wait networkaddonsconfig cluster --for condition=Available
 kubectl get networkaddonsconfig cluster -o yaml
