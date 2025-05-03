@@ -536,6 +536,8 @@ kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/mast
 ```
 helm repo add netobserv https://netobserv.io/static/helm/ --force-update
 helm install netobserv --create-namespace -n netobserv --set standaloneConsole.enable=true netobserv/netobserv-operator
+sleep 30
+kubectl -n netobserv wait deployment/netobserv-controller-manager --for=condition=Available --timeout 300s
 
 cat <<EOF > netobserv-flow-collector.yaml
 apiVersion: flows.netobserv.io/v1beta2
@@ -563,8 +565,9 @@ spec:
 EOF
 
 kubectl apply -f netobserv-flow-collector.yaml
-#kubectl -n netobserv patch service/netobserv-plugin -p '{"spec": {"type": "NodePort"}}'
-kubectl -n netobserv patch svc netobserv-plugin --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"}, {"op":"replace","path":"/spec/ports/0/nodePort","value":30001}]'
+sleep 30
+kubectl -n netobserv wait deployment/netobserv-plugin --for=condition=Available --timeout 300s
+kubectl -n netobserv patch svc netobserv-plugin --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"},{"op":"replace","path":"/spec/ports/0/nodePort","value":30001}]'
 ```
 
 ### Backup & Restore
