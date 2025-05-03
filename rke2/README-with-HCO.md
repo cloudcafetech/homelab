@@ -531,6 +531,41 @@ kubectl delete ds loki-fluent-bit-loki -n logging
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/logging/promtail.yaml -n logging
 ```
 
+- Netobserv
+
+```
+helm repo add netobserv https://netobserv.io/static/helm/ --force-update
+helm install netobserv --create-namespace -n netobserv --set standaloneConsole.enable=true netobserv/netobserv-operator
+
+cat <<EOF > netobserv-flow-collector.yaml
+apiVersion: flows.netobserv.io/v1beta2
+kind: FlowCollector
+metadata:
+  name: cluster
+spec:
+  namespace: netobserv
+  consolePlugin:
+    advanced:
+      env:
+        TEST_CONSOLE: "true"
+  loki:
+    enable: true
+    mode: Monolithic
+    monolithic:
+      url: http://loki.logging:3100/
+      tls:
+        enable: false
+        insecureSkipVerify: false
+  prometheus:
+    querier:
+      manual:
+        url: http://kube-prometheus-stack-prometheus.monitoring:9090
+EOF
+
+kubectl apply -f netobserv-flow-collector.yaml
+kubectl -n netobserv patch service/netobserv-plugin -p '{"spec": {"type": "NodePort"}}'
+```
+
 ### Backup & Restore
 
 - Velero Setup
