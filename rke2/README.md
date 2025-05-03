@@ -561,7 +561,8 @@ spec:
 EOF
 
 kubectl apply -f netobserv-flow-collector.yaml
-kubectl -n netobserv patch service/netobserv-plugin -p '{"spec": {"type": "NodePort"}}'
+#kubectl -n netobserv patch service/netobserv-plugin -p '{"spec": {"type": "NodePort"}}'
+kubectl -n netobserv patch svc netobserv-plugin --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"}, {"op":"replace","path":"/spec/ports/0/nodePort","value":30001}]'
 ```
 
 ### Backup & Restore
