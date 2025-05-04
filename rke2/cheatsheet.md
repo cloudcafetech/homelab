@@ -7,6 +7,13 @@ dnf install NetworkManager-wifi
 systemctl restart NetworkManager
 reboot
 ```
+
+- Patch with nodeport
+
+```
+kubectl -n kube-system patch svc hubble-ui --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"},{"op":"replace","path":"/spec/ports/0/nodePort","value":32080}]'
+```
+
 - Resource/object delete terminating
 
 ```kubectl patch apps/velero -n argocd --type json --patch='[ { "op": "remove", "path": "/metadata/finalizers" } ]' ```
