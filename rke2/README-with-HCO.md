@@ -158,23 +158,30 @@ cluster-domain: cloudcafe.tech
 node-label:
 - "region=master"
 tls-san:
-  - "rke2-master-01"
-  - "192.168.0.124"
-cni: none
+  - "rke2-centos-m1"
+  - "192.168.0.126"
+cni:
+  - multus
+  - cilium
 disable-kube-proxy: true
-disable-cloud-controller: true
 disable:
-  - disable-cloud-controller
   - rke2-snapshot-controller
   - rke2-snapshot-controller-crd
   - rke2-snapshot-validation-webhook
+  - rke2-ingress-nginx
 #node-taint:
 #  - "CriticalAddonsOnly=true:NoExecute"
 EOF
 
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/rke2/rke2-cilium-config.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/rke2/rke2-multus-config.yaml
+
 curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL=v1.31 sh -
 mkdir -p /etc/rancher/rke2/
+mkdir -p /var/lib/rancher/rke2/server/manifests
 cp config.yaml /etc/rancher/rke2/
+cp rke2-cilium-config.yaml /var/lib/rancher/rke2/server/manifests/
+cp rke2-multus-config.yaml /var/lib/rancher/rke2/server/manifests/
 
 systemctl disable rke2-agent && systemctl mask rke2-agent
 systemctl enable --now rke2-server
@@ -193,7 +200,7 @@ cp /var/lib/rancher/rke2/agent/etc/crictl.yaml /etc/crictl.yaml
 
 ```
 cat << EOF > config.yaml
-server: https://192.168.0.124:9345
+server: https://192.168.0.126:9345
 token: pkar-rke2
 selinux: false
 node-label:
@@ -212,7 +219,7 @@ echo 'export PATH=/var/lib/rancher/rke2/bin:$PATH' >> /root/.bash_profile
 cp /var/lib/rancher/rke2/agent/etc/crictl.yaml /etc/crictl.yaml
 ```
 
-- Deploy CNI
+- Notes CNI (Cilium)
 
 If use multiple hosts with deffierence interfaces, you may face crashloopback error (**level=fatal msg="failed to start: daemon creation failed: failed to detect devices: unable to determine direct routing device. Use --direct-routing-device to specify it" subsys=daemon** ) [FIX](https://github.com/cilium/cilium/issues/33527#issuecomment-2203382474)
 
@@ -226,27 +233,11 @@ Below special helm options (Multus + Kubevirt)
 
 **Cilium as a CNI & L4 LB**  [Ref#1](https://blog.mei-home.net/posts/k8s-migration-2-cilium-lb/)  [Ref#2](https://blog.stonegarden.dev/articles/2023/12/migrating-from-metallb-to-cilium/)
 
-```
-cilium install \
-  --helm-set=ipam.mode=kubernetes \
-  --helm-set=kubeProxyReplacement=true \
-  --helm-set=securityContext.capabilities.ciliumAgent="{CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}" \
-  --helm-set=securityContext.capabilities.cleanCiliumState="{NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}" \
-  --helm-set=cgroup.autoMount.enabled=false \
-  --helm-set=cgroup.hostRoot=/sys/fs/cgroup \
-  --helm-set=cni.exclusive=false \
-  --helm-set=l2announcements.enabled=true \
-  --helm-set=externalIPs.enabled=true \
-  --helm-set=socketLB.hostNamespaceOnly=true \
-  --helm-set=k8sServiceHost=localhost \
-  --helm-set=k8sServicePort=6443 \
-  --helm-set=devices='{eth0,eth1,eth2,eno1,eno2,br0,enp0s18,ens18,ens192}'
-```
-
-- Cilium LB IP POOL
+- Cilium LB IP POOL and Cilium UI
 
 ```
-kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/00-cilium/cilium-lb-pool.yaml
+#kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/00-cilium/cilium-lb-pool.yaml
+kubectl -n kube-system patch svc hubble-ui --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"},{"op":"replace","path":"/spec/ports/0/nodePort","value":32080}]'
 ```
 
 ## Deploy Eco-system tools
