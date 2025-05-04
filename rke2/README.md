@@ -162,55 +162,14 @@ disable:
 #  - "CriticalAddonsOnly=true:NoExecute"
 EOF
 
-cat << EOF > rke2-cilium-config.yaml
-apiVersion: helm.cattle.io/v1
-kind: HelmChartConfig
-metadata:
-  name: rke2-cilium
-  namespace: kube-system
-spec:
-  valuesContent: |-
-    operator:
-      replicas: 2
-      image:
-        #tag: v1.17.3
-        tag: v1.16.6
-    kubeProxyReplacement: true
-    k8sServiceHost: "localhost"
-    k8sServicePort: "6443"
-    ipam:
-      mode: kubernetes
-    cni:
-      exclusive: false
-    l2announcements:
-      enabled: true
-    externalIPs:
-      enabled: true
-    socketLB:
-      hostNamespaceOnly: true
-    ingressController:
-      enabled: true
-    gatewayAPI:
-      enabled: false
-EOF
-
-cat << EOF > rke2-multus-config.yaml
-apiVersion: helm.cattle.io/v1
-kind: HelmChartConfig
-metadata:
-  name: rke2-multus
-  namespace: kube-system
-spec:
-  valuesContent: |-
-    rke2-whereabouts:
-      enabled: true
-EOF
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/rke2/rke2-cilium-config.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/rke2/rke2-multus-config.yaml
 
 curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL=v1.31 sh -
 mkdir -p /etc/rancher/rke2/
 mkdir -p /var/lib/rancher/rke2/server/manifests
 cp config.yaml /etc/rancher/rke2/
-#cp rke2-cilium-config.yaml /var/lib/rancher/rke2/server/manifests/
+cp rke2-cilium-config.yaml /var/lib/rancher/rke2/server/manifests/
 cp rke2-multus-config.yaml /var/lib/rancher/rke2/server/manifests/
 
 systemctl disable rke2-agent && systemctl mask rke2-agent
