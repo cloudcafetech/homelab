@@ -403,3 +403,19 @@ oc adm top pods -n openshift-monitoring --sum
 oc adm top pods -n multicluster-engine --sum
 oc adm top pods -n open-cluster-management --sum
 ```
+
+### Disable CVO (cluster-version-operator)
+
+- Cluster Monitoring Operator (CMO) is managed by the Cluster Version Operator (CVO), disable CVO then scale down the CMO and Prometheus statefulset.
+
+```
+oc get pods -n openshift-cluster-version
+oc get deployments -n openshift-cluster-version
+oc scale --replicas=0 deployment/cluster-version-operator -n openshift-cluster-version
+oc get pods -n openshift-cluster-version
+
+oc get deployment -n openshift-monitoring
+oc scale --replicas=0 deployment prometheus-operator -n openshift-monitoring
+
+```
+
