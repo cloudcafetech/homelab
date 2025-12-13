@@ -6,7 +6,6 @@
 ```ssh-keygen -f ./id_rsa -t rsa -N ''```
 ####ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFoML+fLuVqwcWbtH6TGiq9VxIUi0umNaJAEVixhTLhiAnHEk8OT8p06fFxYAM+1B+oMPfU5u/36+gWIrTPUD+jgzdEZksZ8BoHveDOrrJBEGWD4xsVGj7szV4bXBEHbxgD4WeILIAtYy/QMaH+Nxkdj/eUoD7KYSelNkwKPJpJkbTIzQs6r76VYYxQkeGbraRJ5EnGQWjeAVqXXlCvzssJxGbEagub3cmv99niCa3EfUd6fPS4OjqYI7SkYSdJezRHJ5Q+eLuqTG5oicD8MWbWMsEvPC97n9bmqLsrfh1g+K69eE92a2Gu6kSwZIMcdbktEBeEeUDz/lgVG1+y/z4JFB57dSVxtdYrawxFMvVNVmX1XXydkQzOJU7WQ3Wm55qS8Zv9vCEmu9hEdZ0AC3+5pFktprNj861ETiKs969HG/xIZxUqvmWVJQI9c9eIo1KF7wxEav5VvCxV4yZq7ulUjkuMOZIPvqyWIbjz1kwFmXU9k1Ihi4gUsnKA94eKpU= root@lenevo-ts-w2
 
-
 ### kubeadmin user password change
 
 ```
@@ -53,10 +52,11 @@ EOF
 
 dnsmasq --test
 systemctl restart dnsmasq
-
 ```
 
 ### Create Bridge network on CentOS host
+
+- Create Bridge Interface
 
 ```
 nmcli connection add type bridge autoconnect yes con-name br0 ifname br0
@@ -66,9 +66,11 @@ nmcli connection down eno2 && nmcli connection up br0
 
 ip addr show br0
 ping google.com
+```
 
-## Add Bridge network on KVM
+- Add Bridge network on KVM
 
+```
 cat << "EOF" > host-bridge.xml
 <network>
   <name>host-bridge</name>
