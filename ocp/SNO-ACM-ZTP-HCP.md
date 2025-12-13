@@ -5,15 +5,6 @@
 
 ```ssh-keygen -f ./id_rsa -t rsa -N ''```
 
-### kubeadmin user password change
-
-```
-PASS=463yz-I2tzq-DZe9f-7GfuK
-ASD=`htpasswd -bnBC 10 "" $PASS | tr -d ':\n'`
-EPASS=`echo "$ASD" | base64 -w0`
-oc patch secret/kubeadmin -n kube-system -p '{"data":{"kubeadmin": "'$EPASS'"}}'
-```
-
 ### DNS setup using DNSMASQ
 
 ```
@@ -53,7 +44,7 @@ dnsmasq --test
 systemctl restart dnsmasq
 ```
 
-### Create Bridge network on CentOS host
+### Setup Bridge network on CentOS host
 
 - Create Bridge Interface
 
@@ -82,31 +73,6 @@ virsh net-start host-bridge
 virsh net-autostart host-bridge
 ```
 
-### Install XRDP
-
-```
-dnf install epel-release -y
-dnf -y install xrdp
-systemctl enable xrdp --now
-
-# How to allow RDP through Firewalld
-#firewall-cmd --add-port=3389/tcp
-#firewall-cmd --runtime-to-permanent
-```
-
-### Download oc tools
-
-```
-mkdir ocp-tools
-cd ocp-tools
-wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.19/openshift-client-linux.tar.gz
-wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.19/openshift-install-linux.tar.gz
-chmod 777 *
-tar xvf openshift-install-linux.tar.gz openshift-install
-tar xvf openshift-client-linux.tar.gz oc kubectl
-cp oc kubectl /usr/local/bin
-```
-
 ### KVM VM create for SNO
 
 ```
@@ -127,36 +93,6 @@ virt-install \
   --disk path=/home/sno/ocp-acm/sno-acm-ts.qcow2,size=120 \
   --network network=host-bridge \
   --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
-```
-
-### KVM Commands
-
-```
-virsh net-list
-virsh list --all
-virsh shutdown sno-acm-ts
-virsh destroy sno-acm-ts
-virsh domifaddr sno-acm-ts
-virsh dominfo sno-acm-ts
-virsh setmem sno-acm-ts 27G --config
-virsh undefine sno-acm-ts --remove-all-storage
-virsh domifaddr sno-acm-ts --source arp
-```
-
-### NFS setup
-
-```
-yum install -y nfs-utils
-systemctl enable rpcbind
-systemctl enable nfs-server
-systemctl start rpcbind
-systemctl start nfs-server
-mkdir /home/sno/ocp-acm/nfsshare
-chmod -R 755 /home/sno/ocp-acm/nfsshare
-
-echo "/home/sno/ocp-acm/nfsshare *(rw,sync,no_root_squash,no_subtree_check,insecure)" >> /etc/exports
-
-systemctl restart nfs-server
 ```
 
 ### NFS Storage Setup for OCP
@@ -393,6 +329,70 @@ oc get ConsoleCLIDownload hcp-cli-download -o json | jq -r ".spec" | grep amd64 
 wget --no-check-certificat `oc get ConsoleCLIDownload hcp-cli-download -o json | jq -r ".spec" | grep amd64 | grep linux | cut -d '"' -f4`
 tar -zxvf hcp.tar.gz
 mv hcp /usr/local/bin/
+```
+
+### Kubeadmin user password change
+
+```
+PASS=463yz-I2tzq-DZe9f-7GfuK
+ASD=`htpasswd -bnBC 10 "" $PASS | tr -d ':\n'`
+EPASS=`echo "$ASD" | base64 -w0`
+oc patch secret/kubeadmin -n kube-system -p '{"data":{"kubeadmin": "'$EPASS'"}}'
+```
+
+### Install XRDP
+
+```
+dnf install epel-release -y
+dnf -y install xrdp
+systemctl enable xrdp --now
+
+# How to allow RDP through Firewalld
+#firewall-cmd --add-port=3389/tcp
+#firewall-cmd --runtime-to-permanent
+```
+
+### Download oc tools
+
+```
+mkdir ocp-tools
+cd ocp-tools
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.19/openshift-client-linux.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.19/openshift-install-linux.tar.gz
+chmod 777 *
+tar xvf openshift-install-linux.tar.gz openshift-install
+tar xvf openshift-client-linux.tar.gz oc kubectl
+cp oc kubectl /usr/local/bin
+```
+
+### KVM Commands
+
+```
+virsh net-list
+virsh list --all
+virsh shutdown sno-acm-ts
+virsh destroy sno-acm-ts
+virsh domifaddr sno-acm-ts
+virsh dominfo sno-acm-ts
+virsh setmem sno-acm-ts 27G --config
+virsh undefine sno-acm-ts --remove-all-storage
+virsh domifaddr sno-acm-ts --source arp
+```
+
+### NFS setup
+
+```
+yum install -y nfs-utils
+systemctl enable rpcbind
+systemctl enable nfs-server
+systemctl start rpcbind
+systemctl start nfs-server
+mkdir /home/sno/ocp-acm/nfsshare
+chmod -R 755 /home/sno/ocp-acm/nfsshare
+
+echo "/home/sno/ocp-acm/nfsshare *(rw,sync,no_root_squash,no_subtree_check,insecure)" >> /etc/exports
+
+systemctl restart nfs-server
 ```
 
 ### Check Utilizations
