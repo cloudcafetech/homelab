@@ -7,7 +7,7 @@
 
 ### DNS Setup
 
-```
+
 - Install BIND and tools
 
 ```yum install bind bind-utils -y```
