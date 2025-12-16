@@ -261,7 +261,7 @@ sudo systemctl status sushy-emulator.service
 
 ```
 
-### Create KVM VM for new Cluster
+### Create KVM VM for new Cluster (ZTP)
 
 ```
 qemu-img create -f qcow2 /home/sno/sno-ztp.qcow2 120G
@@ -375,7 +375,9 @@ oc get clusterinstance sno-ztp -n sno-ztp
 
 ```
 
-### Verify Hypershift enable 
+## HCP (Hosted Control Plane) using Hypershift
+
+- Verify Hypershift enable 
 
 ```
 oc get mce multiclusterengine -oyaml | grep hypershift -B2 -A2
@@ -494,7 +496,9 @@ tar -zxvf hcp.tar.gz
 mv hcp /usr/local/bin/
 ```
 
-### Install XRDP
+## Tools setup
+
+- Install XRDP
 
 ```
 dnf install epel-release -y
@@ -506,45 +510,7 @@ systemctl enable xrdp --now
 #firewall-cmd --runtime-to-permanent
 ```
 
-### Download oc tools
-
-```
-mkdir ocp-tools
-cd ocp-tools
-wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.19/openshift-client-linux.tar.gz
-wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.19/openshift-install-linux.tar.gz
-chmod 777 *
-tar xvf openshift-install-linux.tar.gz openshift-install
-tar xvf openshift-client-linux.tar.gz oc kubectl
-cp oc kubectl /usr/local/bin
-```
-
-### KVM Install
-
-```
-yum update -y
-dnf groupinstall "Virtualization Host" -y
-systemctl enable --now libvirtd
-yum -y install virt-top libguestfs-tools virt-install virt-manager
-```
-
-### KVM Commands
-
-```
-virsh net-list
-virsh list --all
-virsh shutdown sno-acm-ts
-virsh destroy sno-acm-ts
-virsh domifaddr sno-acm-ts
-virsh dominfo sno-acm-ts
-virsh setmem sno-acm-ts 27G --config
-virsh setmaxmem sno-ztp 24G --config
-virsh undefine sno-acm-ts --remove-all-storage
-virsh undefine sno-ztp --remove-all-storage --nvram
-virsh domifaddr sno-acm-ts --source arp
-```
-
-### NFS setup
+- NFS setup
 
 ```
 yum install -y nfs-utils
@@ -560,7 +526,47 @@ echo "/home/sno/ocp-acm/nfsshare *(rw,sync,no_root_squash,no_subtree_check,insec
 systemctl restart nfs-server
 ```
 
-### Check Utilizations
+- Download oc tools
+
+```
+mkdir ocp-tools
+cd ocp-tools
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.19/openshift-client-linux.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.19/openshift-install-linux.tar.gz
+chmod 777 *
+tar xvf openshift-install-linux.tar.gz openshift-install
+tar xvf openshift-client-linux.tar.gz oc kubectl
+cp oc kubectl /usr/local/bin
+```
+
+- KVM Install
+
+```
+yum update -y
+dnf groupinstall "Virtualization Host" -y
+systemctl enable --now libvirtd
+yum -y install virt-top libguestfs-tools virt-install virt-manager
+```
+
+- KVM Commands
+
+```
+virsh net-list
+virsh list --all
+virsh shutdown sno-acm-ts
+virsh destroy sno-acm-ts
+virsh domifaddr sno-acm-ts
+virsh dominfo sno-acm-ts
+virsh setmem sno-acm-ts 27G --config
+virsh setmaxmem sno-ztp 24G --config
+virsh undefine sno-acm-ts --remove-all-storage
+virsh undefine sno-ztp --remove-all-storage --nvram
+virsh domifaddr sno-acm-ts --source arp
+```
+
+## Troubleshooting
+
+- Check Utilizations
 
 ```
 kubectl top pods -n metallb-system --sum
@@ -569,7 +575,7 @@ oc adm top pods -n multicluster-engine --sum
 oc adm top pods -n open-cluster-management --sum
 ```
 
-### Disable CVO (cluster-version-operator)
+- Disable CVO (cluster-version-operator)
 
 > Cluster Monitoring Operator (CMO) is managed by the Cluster Version Operator (CVO), disable CVO then scale down the CMO and Prometheus statefulset.
 
@@ -584,7 +590,7 @@ oc scale --replicas=0 deployment prometheus-operator -n openshift-monitoring
 
 ```
 
-### Kubeadmin user password change
+- Kubeadmin user password change
 
 ```
 PASS=g9GVb-I92co-kU379-IHjB5
@@ -593,15 +599,15 @@ EPASS=`echo "$ASD" | base64 -w0`
 oc patch secret/kubeadmin -n kube-system -p '{"data":{"kubeadmin": "'$EPASS'"}}'
 ```
 
-### Remove Exited containers
+- Remove Exited containers
 
-```crictl rm `crictl ps -a | grep Exited | awk '{ print $1}'````
+```crictl rm `crictl ps -a | grep Exited | awk '{ print $1}'```
 
-### Remove stuck resource
+- Remove stuck resource
 
 ```oc patch <object> <resource name> -p '{"metadata":{"finalizers":null}}'```
 
-### Lesson learned
+## Lesson learned
 
 #### default Storage Pool issue from KVM [libvirt](https://serverfault.com/questions/840519/how-to-change-the-default-storage-pool-from-libvirt/840520#840520)
 
