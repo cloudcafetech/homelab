@@ -446,7 +446,7 @@ EOF
 
 - Verify
 
-``oc get po -n metallb-system```
+```oc get po -n metallb-system```
 
 - Configuring MetalLB address pools 
 
@@ -548,6 +548,8 @@ systemctl enable --now libvirtd
 yum -y install virt-top libguestfs-tools virt-install virt-manager
 ```
 
+## Troubleshooting
+
 - KVM Commands
 
 ```
@@ -563,8 +565,6 @@ virsh undefine sno-acm-ts --remove-all-storage
 virsh undefine sno-ztp --remove-all-storage --nvram
 virsh domifaddr sno-acm-ts --source arp
 ```
-
-## Troubleshooting
 
 - Check Utilizations
 
