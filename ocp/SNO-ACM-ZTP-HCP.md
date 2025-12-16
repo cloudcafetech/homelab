@@ -5,44 +5,55 @@
 
 ```ssh-keygen -f ./id_rsa -t rsa -N ''```
 
-### DNS setup using DNSMASQ
+### DNS Setup
 
 ```
-yum install dnsmasq -y
-cp /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
+- Install BIND and tools
 
-systemctl start dnsmasq
-systemctl enable dnsmasq
-systemctl status dnsmasq
+```yum install bind bind-utils -y```
 
-cat << "EOF" > /etc/dnsmasq.conf
-listen-address=127.0.0.1,192.168.1.2
-interface=eth0
+- Verify nslookup should resolve from network 
 
-# Google nameservers
-server=8.8.8.8
-server=8.8.4.4
+>         allow-query     { localhost; 192.168.1.0/24;};  section in /etc/named.conf file.
 
-# Airtel nameservers
-server=192.168.1.1
+- Create a new zone file
 
-# DOMAIN
-domain=pkar.tech
+```
+cat << "EOF" > /var/named/pkar.tech.zone
 
-# Cluster SNO ACM (sno-acm-ts) records
-address=/*.apps.sno-acm-ts.pkar.tech/192.168.1.14
-host-record=api.sno-acm-ts.pkar.tech,192.168.1.14
-host-record=api-int.sno-acm-ts.pkar.tech,192.168.1.14
+$TTL 86400
+@   IN  SOA ns1.pkar.tech. admin.pkar.tech. (
+        2025040301 3600 1800 1209600 86400 )
 
-# Cluster SNO ZTP (sno-ztp-tc) records
-address=/*.apps.sno-ztp-tc.pkar.tech/192.168.1.15
-host-record=api.sno-ztp-tc.pkar.tech,192.168.1.15
-host-record=api-int.sno-ztp-tc.pkar.tech,192.168.1.15
+    IN NS ns1.pkar.tech.
+
+; DNS Server
+ns1.pkar.tech.           	IN A 192.168.1.161
+
+; ACM cluster entries
+api.sno-acm-ts.pkar.tech.    	IN A 192.168.1.18
+api-int.sno-acm-ts.pkar.tech.	IN A 192.168.1.18
+*.apps.sno-acm-ts.pkar.tech. 	IN A 192.168.1.18
+
+; SNO ZTP cluster entries
+api.sno-ztp.pkar.tech.    	IN A 192.168.1.21
+api-int.sno-ztp.pkar.tech.	IN A 192.168.1.21
+*.apps.sno-ztp.pkar.tech. 	IN A 192.168.1.21
 EOF
-
-dnsmasq --test
-systemctl restart dnsmasq
 ```
+
+- Update (add below text) /etc/named.conf to load new zone
+
+```
+zone "pkar.tech" IN {
+    type master;
+    file "pkar.tech.zone";
+};
+```
+
+- Restart DNS
+
+```systemctl restart named```
 
 ### Setup Bridge network on CentOS host
 
@@ -124,7 +135,7 @@ oc create -f nfs-deployment.yaml -f kubenfs-storage-class.yaml -n kubenfs
 - Enable SiteConfig Operator
 
 ```
-oc get multiclusterhubs.operator.open-cluster-management.io multiclusterhub -n open-cluster-management -o yaml | grep siteconfig -B2 -A2```
+oc get multiclusterhubs.operator.open-cluster-management.io multiclusterhub -n open-cluster-management -o yaml | grep siteconfig -B2 -A2
 oc patch multiclusterhubs.operator.open-cluster-management.io multiclusterhub -n open-cluster-management --type json --patch '[{"op": "add", "path":"/spec/overrides/components/-", "value": {"name":"siteconfig","enabled": true}}]'
 ```
 
@@ -211,6 +222,158 @@ oc apply -f agentserviceconfig.yaml
 - Verify pod running
 
 ```oc get po -n multicluster-engine | grep assisted```
+
+### Setup Sushy Emulator
+
+```
+sudo mkdir -p /etc/sushy/
+cat << "EOF" | sudo tee /etc/sushy/sushy-emulator.conf
+SUSHY_EMULATOR_LISTEN_IP = u'0.0.0.0'
+SUSHY_EMULATOR_LISTEN_PORT = 8000
+SUSHY_EMULATOR_SSL_CERT = None
+SUSHY_EMULATOR_SSL_KEY = None
+SUSHY_EMULATOR_OS_CLOUD = None
+SUSHY_EMULATOR_LIBVIRT_URI = u'qemu:///system'
+SUSHY_EMULATOR_IGNORE_BOOT_DEVICE = True
+SUSHY_EMULATOR_BOOT_LOADER_MAP = {
+    u'UEFI': {
+        u'x86_64': u'/usr/share/OVMF/OVMF_CODE.secboot.fd'
+    },
+    u'Legacy': {
+        u'x86_64': None
+    }
+}
+EOF
+
+export SUSHY_TOOLS_IMAGE=${SUSHY_TOOLS_IMAGE:-"quay.io/metal3-io/sushy-tools"}
+sudo podman create --net host --privileged --name sushy-emulator -v "/etc/sushy":/etc/sushy -v "/var/run/libvirt":/var/run/libvirt "${SUSHY_TOOLS_IMAGE}" sushy-emulator -i :: -p 8000 --config /etc/sushy/sushy-emulator.conf
+sudo podman start sushy-emulator
+sudo firewall-cmd --add-port=8000/tcp
+
+# First, use Podman to create a systemd unit
+sudo sh -c 'podman generate systemd --restart-policy=always -t 1 sushy-emulator > /etc/systemd/system/sushy-emulator.service'
+sudo systemctl daemon-reload
+
+# Next, use systemd to start and enable the Sushy-Emulator
+sudo systemctl restart sushy-emulator.service
+sudo systemctl enable sushy-emulator.service
+sudo systemctl status sushy-emulator.service
+
+```
+
+### Create KVM VM for new Cluster
+
+```
+qemu-img create -f qcow2 /home/sno/sno-ztp.qcow2 120G
+
+virt-install \
+  --name=sno-ztp \
+  --uuid=d54f3990-12c9-4749-8b89-a1242e6af101 \
+  --ram=16536 \
+  --vcpus=12 \
+  --cpu host-passthrough \
+  --os-type linux \
+  --os-variant rhel8.0 \
+  --noreboot \
+  --events on_reboot=restart \
+  --noautoconsole \
+  --boot hd,cdrom \
+  --import \
+  --disk path=/home/sno/sno-ztp.qcow2,size=20 \
+  --network type=direct,source=br0,mac=52:54:00:42:a4:10,source_mode=bridge,model=virtio \
+  --graphics vnc,listen=0.0.0.0,port=5976,password=pkar2675
+```
+
+### Create Clusterinstance 
+
+- Create Namespace
+
+```oc create ns sno-ztp```
+
+- Create Pull Secret (First login Redhat console url then download section)
+
+```oc create secret generic pull-secret -n sno-ztp --from-file=.dockerconfigjson=pull-secret.json --type=kubernetes.io/dockerconfigjson```
+
+- Create BMC Credentials Secret
+
+```oc create secret generic bmc-secret -n sno-ztp --from-literal=username=admin --from-literal=password=password```
+
+- Create Cluster Instance
+
+```
+cat << "EOF" > sno-ztp-clusterinstance.yaml
+apiVersion: siteconfig.open-cluster-management.io/v1alpha1
+kind: ClusterInstance
+metadata:
+  name: sno-ztp
+  namespace: sno-ztp
+spec:
+  clusterName: sno-ztp
+  clusterImageSetNameRef: img4.18.5-x86-64-appsub
+  baseDomain: pkar.tech
+  cpuArchitecture: x86_64
+  holdInstallation: false
+  cpuPartitioningMode: None
+  networkType: OVNKubernetes
+  machineNetwork:
+    - cidr: 192.168.1.0/24
+  pullSecretRef:
+    name: pull-secret
+  templateRefs:
+    - name: ai-cluster-templates-v1
+      namespace: open-cluster-management
+  sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFoML+fLuVqwcWbtH6TGiq9VxIUi0umNaJAEVixhTLhiAnHEk8OT8p06fFxYAM+1B+oMPfU5u/36+gWIrTPUD+jgzdEZksZ8BoHveDOrrJBEGWD4xsVGj7szV4bXBEHbxgD4WeILIAtYy/QMaH+Nxkdj/eUoD7KYSelNkwKPJpJkbTIzQs6r76VYYxQkeGbraRJ5EnGQWjeAVqXXlCvzssJxGbEagub3cmv99niCa3EfUd6fPS4OjqYI7SkYSdJezRHJ5Q+eLuqTG5oicD8MWbWMsEvPC97n9bmqLsrfh1g+K69eE92a2Gu6kSwZIMcdbktEBeEeUDz/lgVG1+y/z4JFB57dSVxtdYrawxFMvVNVmX1XXydkQzOJU7WQ3Wm55qS8Zv9vCEmu9hEdZ0AC3+5pFktprNj861ETiKs969HG/xIZxUqvmWVJQI9c9eIo1KF7wxEav5VvCxV4yZq7ulUjkuMOZIPvqyWIbjz1kwFmXU9k1Ihi4gUsnKA94eKpU= root@lenevo-ts-w2
+  nodes:
+    - role: master
+      hostName: sno-ztp
+      ironicInspect: ''
+      bootMACAddress: '52:54:00:42:a4:10'
+      bootMode: UEFI
+      automatedCleaningMode: disabled
+      cpuArchitecture: x86_64
+      templateRefs:
+        - name: ai-node-templates-v1
+          namespace: open-cluster-management
+      bmcAddress: 'redfish-virtualmedia+http://192.168.1.161:8000/redfish/v1/Systems/d54f3990-12c9-4749-8b89-a1242e6af101'
+      bmcCredentialsName:
+        name: bmc-secret
+      nodeNetwork:
+        interfaces:
+          - macAddress: '52:54:00:42:a4:10'
+            name: enp1s0
+        config:
+          interfaces:
+            - name: enp1s0
+              type: ethernet
+              state: up
+              ipv4:
+                enabled: true
+                dhcp: false
+                address:
+                  - ip: 192.168.1.21
+                    prefix-length: 24
+              ipv6:
+                enabled: false
+          dns-resolver:
+            config:
+              search:
+                - pkar.tech
+              server:
+                - 192.168.1.18
+                - 192.168.1.21
+                - 192.168.1.1
+          routes:
+            config:
+              - destination: 0.0.0.0/0
+                next-hop-address: 192.168.1.1
+                next-hop-interface: enp1s0
+EOF
+
+oc apply -f sno-ztp-clusterinstance.yaml
+sleep 20
+oc get clusterinstance sno-ztp -n sno-ztp
+
+```
 
 ### Verify Hypershift enable 
 
@@ -331,15 +494,6 @@ tar -zxvf hcp.tar.gz
 mv hcp /usr/local/bin/
 ```
 
-### Kubeadmin user password change
-
-```
-PASS=463yz-I2tzq-DZe9f-7GfuK
-ASD=`htpasswd -bnBC 10 "" $PASS | tr -d ':\n'`
-EPASS=`echo "$ASD" | base64 -w0`
-oc patch secret/kubeadmin -n kube-system -p '{"data":{"kubeadmin": "'$EPASS'"}}'
-```
-
 ### Install XRDP
 
 ```
@@ -365,6 +519,15 @@ tar xvf openshift-client-linux.tar.gz oc kubectl
 cp oc kubectl /usr/local/bin
 ```
 
+### KVM Install
+
+```
+yum update -y
+dnf groupinstall "Virtualization Host" -y
+systemctl enable --now libvirtd
+yum -y install virt-top libguestfs-tools virt-install virt-manager
+```
+
 ### KVM Commands
 
 ```
@@ -375,7 +538,9 @@ virsh destroy sno-acm-ts
 virsh domifaddr sno-acm-ts
 virsh dominfo sno-acm-ts
 virsh setmem sno-acm-ts 27G --config
+virsh setmaxmem sno-ztp 24G --config
 virsh undefine sno-acm-ts --remove-all-storage
+virsh undefine sno-ztp --remove-all-storage --nvram
 virsh domifaddr sno-acm-ts --source arp
 ```
 
@@ -419,3 +584,107 @@ oc scale --replicas=0 deployment prometheus-operator -n openshift-monitoring
 
 ```
 
+### Kubeadmin user password change
+
+```
+PASS=g9GVb-I92co-kU379-IHjB5
+ASD=`htpasswd -bnBC 10 "" $PASS | tr -d ':\n'`
+EPASS=`echo "$ASD" | base64 -w0`
+oc patch secret/kubeadmin -n kube-system -p '{"data":{"kubeadmin": "'$EPASS'"}}'
+```
+
+### Remove Exited containers
+
+```crictl rm `crictl ps -a | grep Exited | awk '{ print $1}'````
+
+### Remove stuck resource
+
+```oc patch <object> <resource name> -p '{"metadata":{"finalizers":null}}'```
+
+### Lesson learned
+
+#### default Storage Pool issue from KVM [libvirt](https://serverfault.com/questions/840519/how-to-change-the-default-storage-pool-from-libvirt/840520#840520)
+
+> error: Storage pool not found: no storage pool with matching name 'default'
+
+- Listing current pools
+
+```virsh pool-list```
+
+- Remove existing storage pool
+
+```
+virsh pool-destroy sno
+virsh pool-destroy images
+```
+
+- Undefine pool
+
+```virsh pool-undefine default```
+
+- Defining a new pool with name default
+
+```virsh pool-define-as --name default --type dir --target /home/sno```
+
+- Set pool to be started when libvirt daemons starts
+
+```virsh pool-autostart default```
+
+- Start pool
+
+```virsh pool-start default```
+
+- Checking pool state
+
+```virsh pool-list```
+
+
+### DNS resolve issue (Not able to pull intrim images from ACM Cluster)
+
+- Modify clusterinstance dns-resolver section and put both SNO cluster host IPs and router GW
+
+```
+          dns-resolver:
+            config:
+              search:
+                - pkar.tech
+              server:
+                - 192.168.1.18
+                - 192.168.1.21
+                - 192.168.1.1
+```
+
+### Cluster Image not found
+
+- Find proper image based on AgentServiceConfig download version
+
+```oc get clusterimagesets```
+
+- Modify clusterinstance below section
+
+> clusterImageSetNameRef: img4.18.5-x86-64-appsub
+
+
+### Test VM Creation
+
+> Download images (wget https://releases.ubuntu.com/jammy/ubuntu-22.04.5-desktop-amd64.iso) and rename ubuntu-2204.iso
+
+```
+qemu-img create -f qcow2 /home/sno/ubuntu-2204.qcow2 30G
+
+virt-install \
+  --name ubuntu-2204 \
+  --memory 2048 \
+  --vcpus=12 \
+  --cpu host-passthrough \
+  --os-type linux \
+  --os-variant ubuntu22.04 \
+  --noreboot \
+  --events on_reboot=restart \
+  --noautoconsole \
+  --import \
+  --cdrom /home/kvm/images/ubuntu-2204.iso \
+  --disk path=/home/sno/ubuntu-2204.qcow2,size=20 \
+  --network network=host-bridge \
+  --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
+```
