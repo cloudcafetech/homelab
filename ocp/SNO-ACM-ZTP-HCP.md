@@ -565,6 +565,7 @@ oc create -f kvm-infra.yaml
 
 - Create baremetahost yaml file for first worker
 
+```
 cat << EOF > hcp-ztp-worker1.yaml
 apiVersion: metal3.io/v1alpha1
 kind: BareMetalHost
@@ -654,7 +655,7 @@ spec:
 apiVersion: hypershift.openshift.io/v1beta1
 kind: NodePool
 metadata:
-  name: 'nodepool-hcp-ztp-1'
+  name: nodepool-hcp-ztp-1
   namespace: hcp-ztp
 spec:
   clusterName: hcp-ztp
@@ -688,11 +689,11 @@ spec:
 apiVersion: agent.open-cluster-management.io/v1
 kind: KlusterletAddonConfig
 metadata:
-  name: 'hcp-ztp'
-  namespace: 'hcp-ztp'
+  name: hcp-ztp
+  namespace: hcp-ztp
 spec:
-  clusterName: 'hcp-ztp'
-  clusterNamespace: 'hcp-ztp'
+  clusterName: hcp-ztp
+  clusterNamespace: hcp-ztp
   clusterLabels:
     cloud: BareMetal
     vendor: OpenShift
