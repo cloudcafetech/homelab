@@ -583,7 +583,7 @@ spec:
     disableCertificateVerification: True
     address: 'redfish-virtualmedia+http://192.168.1.161:8000/redfish/v1/Systems/d54f3990-12c9-4749-8b89-a1242e6af111'
     credentialsName: bmc-secret
-  bootMACAddress: 52:54:00:42:a4:11
+  bootMACAddress: 52:54:00:42:a4:12
   online: true
 ---
 apiVersion: rbac.authorization.k8s.io/v1
