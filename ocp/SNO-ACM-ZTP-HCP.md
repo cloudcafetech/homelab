@@ -922,6 +922,39 @@ virsh pool-destroy images
 
 > clusterImageSetNameRef: img4.18.5-x86-64-appsub
 
+### If POD not start in HCP due to memory issue (preemption: not eligible due to preemptionPolicy=Never)
+
+> Not recommended for production
+
+- Check priorityclasses
+
+```oc get priorityclasses```
+
+- Save below priorityclasses then delete and edit save file (modify Never to PreemptLowerPriority) and deploy again
+
+> hypershift-api-critical    100001000    false            133m    Never
+> hypershift-control-plane   100000000    false            133m    Never
+> hypershift-etcd            100002000    false            139m    Never
+> hypershift-operator        100003000    false            6d8h    Never
+
+- Verify
+
+```oc get priorityclasses```
+
+> Should be as below
+
+```
+oc get priorityclasses
+NAME                       VALUE        GLOBAL-DEFAULT   AGE     PREEMPTIONPOLICY
+hypershift-api-critical    100001000    false            133m    PreemptLowerPriority
+hypershift-control-plane   100000000    false            133m    PreemptLowerPriority
+hypershift-etcd            100002000    false            139m    PreemptLowerPriority
+hypershift-operator        100003000    false            6d8h    PreemptLowerPriority
+klusterlet-critical        1000000      false            6d9h    PreemptLowerPriority
+openshift-user-critical    1000000000   false            6d15h   PreemptLowerPriority
+system-cluster-critical    2000000000   false            6d15h   PreemptLowerPriority
+system-node-critical       2000001000   false            6d15h   PreemptLowerPriority
+```
 
 ### Test VM Creation
 
