@@ -724,26 +724,6 @@ metadata:
     name: hcp-ztp
 spec:
   hubAcceptsClient: true
----
-apiVersion: agent.open-cluster-management.io/v1
-kind: KlusterletAddonConfig
-metadata:
-  name: hcp-ztp
-  namespace: hcp-ztp
-spec:
-  clusterName: hcp-ztp
-  clusterNamespace: hcp-ztp
-  clusterLabels:
-    cloud: BareMetal
-    vendor: OpenShift
-  applicationManager:
-    enabled: true
-  policyController:
-    enabled: true
-  searchCollector:
-    enabled: true
-  certPolicyController:
-    enabled: true
 EOF
 
 oc create -f hcp-ztp-hosted.yaml
