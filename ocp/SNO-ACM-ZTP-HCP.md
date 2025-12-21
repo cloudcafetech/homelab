@@ -548,11 +548,48 @@ oc create -f sshkey-hcp-ztp.yaml
 export SSH_PUB_KEY=`cat id_rsa.pub`
 cat << EOF > kvm-infra.yaml
 apiVersion: agent-install.openshift.io/v1beta1
+kind: NMStateConfig
+metadata:
+  name: hcp-ztp-nmstate-config
+  namespace: hcp-ztp
+  labels:
+    cluster: hcp-ztp
+spec:
+  interfaces:
+    - name: enp1s0
+      macAddress: '52:54:00:42:a4:12'
+  config:
+    interfaces:
+      - name: enp1s0
+        type: ethernet
+        state: up
+        ipv4:
+          enabled: true
+          dhcp: true
+        ipv6:
+          enabled: false
+    dns-resolver:
+      config:
+        search:
+          - pkar.tech
+        server:
+          - 192.168.1.18
+          - 192.168.1.1
+    routes:
+      config:
+        - destination: 0.0.0.0/0
+          next-hop-address: 192.168.1.1
+          next-hop-interface: enp1s0
+---
+apiVersion: agent-install.openshift.io/v1beta1
 kind: InfraEnv
 metadata:
   name: hcp-ztp
   namespace: hcp-ztp
 spec:
+  nmStateConfigLabelSelector:
+    matchLabels:
+      cluster: hcp-ztp
   additionalNTPSources:
   - 192.168.1.1
   pullSecretRef:
