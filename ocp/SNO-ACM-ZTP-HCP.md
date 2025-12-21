@@ -598,6 +598,7 @@ rules:
   verbs:
   - '*'
 EOF
+```
 
 - Create the baremetalhost for the first worker on the hub cluster SNO-ACM:
 
