@@ -375,7 +375,7 @@ oc get clusterinstance sno-ztp -n sno-ztp
 
 ```
 
-## HCP (Hosted Control Plane) using Hypershift
+# HCP (Hosted Control Plane) using Hypershift
 
 - Verify Hypershift enable 
 
@@ -487,7 +487,7 @@ oc get ingresscontroller default -n openshift-ingress-operator | grep wildcardPo
 oc patch ingresscontroller -n openshift-ingress-operator default --type=json -p '[{ "op": "add", "path": "/spec/routeAdmission", "value": {wildcardPolicy: "WildcardsAllowed"}}]'
 ```
 
-## HCP 
+## Hosted Control Plane (HCP) Cluster setup
 
 - Create Worker VM for HCP Cluster (hcp-ztp)
 
@@ -576,6 +576,7 @@ metadata:
     infraenvs.agent-install.openshift.io: hcp-ztp
   annotations:
     inspect.metal3.io: disabled
+    bmac.agent-install.openshift.io/hostname: hcp-ztp-worker1
 spec:
   automatedCleaningMode: disabled
   bmc:
@@ -739,15 +740,6 @@ echo $?
 
 ```oc get agent -n hcp-ztp ${UUID}```
 
-- Download HCP CLI
-
-```
-oc get ConsoleCLIDownload hcp-cli-download -o json | jq -r ".spec" | grep amd64 | grep linux
-wget --no-check-certificat `oc get ConsoleCLIDownload hcp-cli-download -o json | jq -r ".spec" | grep amd64 | grep linux | cut -d '"' -f4`
-tar -zxvf hcp.tar.gz
-mv hcp /usr/local/bin/
-```
-
 ## Tools setup
 
 - Install XRDP
@@ -789,6 +781,15 @@ chmod 777 *
 tar xvf openshift-install-linux.tar.gz openshift-install
 tar xvf openshift-client-linux.tar.gz oc kubectl
 cp oc kubectl /usr/local/bin
+```
+
+- Download HCP CLI
+
+```
+oc get ConsoleCLIDownload hcp-cli-download -o json | jq -r ".spec" | grep amd64 | grep linux
+wget --no-check-certificat `oc get ConsoleCLIDownload hcp-cli-download -o json | jq -r ".spec" | grep amd64 | grep linux | cut -d '"' -f4`
+tar -zxvf hcp.tar.gz
+mv hcp /usr/local/bin/
 ```
 
 - KVM Install
