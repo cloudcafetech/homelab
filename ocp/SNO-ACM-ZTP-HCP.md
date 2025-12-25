@@ -1,6 +1,5 @@
 # Setup SNO ACM ZTP HCP
 
-
 ### SSH KEYGEN Setup
 
 ```ssh-keygen -f ./id_rsa -t rsa -N ''```
@@ -115,6 +114,14 @@ virsh list --all
 ```
 
 - Download Kubeconfig from Redhat Portal (https://console.redhat.com/)
+
+- Verify Cluster
+
+```
+oc get no
+oc get co
+oc get po -A | grep -Ev "Running|Completed"
+```
 
 - NFS Storage Setup Cluster
 
