@@ -30,12 +30,12 @@ $TTL 86400
 ; DNS Server
 ns1.pkar.tech.           	IN A 192.168.1.161
 
-; ACM cluster entries
-api.sno-acm-ts.pkar.tech.    	IN A 192.168.1.18
-api-int.sno-acm-ts.pkar.tech.	IN A 192.168.1.18
-*.apps.sno-acm-ts.pkar.tech. 	IN A 192.168.1.18
+; SNO ACM cluster
+api.sno-acm.pkar.tech.    	IN A 192.168.1.18
+api-int.sno-acm.pkar.tech.	IN A 192.168.1.18
+*.apps.sno-acm.pkar.tech. 	IN A 192.168.1.18
 
-; SNO ZTP cluster entries
+; SNO ZTP cluster
 api.sno-ztp.pkar.tech.    	IN A 192.168.1.21
 api-int.sno-ztp.pkar.tech.	IN A 192.168.1.21
 *.apps.sno-ztp.pkar.tech. 	IN A 192.168.1.21
@@ -99,7 +99,7 @@ virt-install \
   --events on_reboot=restart \
   --noautoconsole \
   --import \
-  --cdrom /home/sno/ocp-acm/sno-acm-ts.iso \
+  --cdrom /home/sno/ocp-acm/sno-acm.iso \
   --disk path=/home/sno/ocp-acm/sno-acm.qcow2,size=120 \
   --network network=host-bridge \
   --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
