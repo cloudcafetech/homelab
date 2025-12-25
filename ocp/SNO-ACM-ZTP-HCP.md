@@ -84,9 +84,15 @@ virsh net-start host-bridge
 virsh net-autostart host-bridge
 ```
 
-### KVM VM create for SNO
+## Setup SNO ACM Cluster
+
+- Create SNO Cluster in RedHAt portal (https://console.redhat.com/)
+
+- Create VM for SNO ACM Cluster
 
 ```
+mkdir -p /home/sno/ocp-acm
+cd /home/sno/ocp-acm/
 qemu-img create -f qcow2 /home/sno/ocp-acm/sno-acm.qcow2 120G
 
 virt-install \
@@ -108,7 +114,9 @@ sleep 10
 virsh list --all
 ```
 
-### NFS Storage Setup for OCP
+- Download Kubeconfig from Redhat Portal (https://console.redhat.com/)
+
+- NFS Storage Setup Cluster
 
 ```
 NFSRV=192.168.1.160
