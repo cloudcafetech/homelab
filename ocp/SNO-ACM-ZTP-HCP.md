@@ -6,7 +6,6 @@
 
 ### DNS Setup
 
-
 - Install BIND and tools
 
 ```yum install bind bind-utils -y```
@@ -123,7 +122,65 @@ oc get co
 oc get po -A | grep -Ev "Running|Completed"
 ```
 
-- NFS Storage Setup Cluster
+### Setup ACM
+
+- Install ACM Operator
+
+```
+cat << EOF > acm-operator.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: open-cluster-management
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: open-cluster-management
+  namespace: open-cluster-management
+spec:
+  targetNamespaces:
+  - open-cluster-management  
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: advanced-cluster-management
+  namespace: open-cluster-management
+spec:
+  channel: release-2.15
+  installPlanApproval: Automatic
+  name: advanced-cluster-management
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+
+oc create -f  acm-operator.yaml
+sleep 20
+```
+
+- Install ACM Multi Cluster Hub
+
+```
+cat << EOF > acm-mch.yaml
+apiVersion: operator.open-cluster-management.io/v1
+kind: MultiClusterHub
+metadata:
+  name: multiclusterhub
+  namespace: open-cluster-management
+spec: {}
+EOF
+
+oc create -f acm-mch.yaml
+```
+- Check ACM Deployment
+
+```
+oc get po -n open-cluster-management
+oc get po -n multicluster-engine
+```
+
+### NFS Storage Setup In ACM Cluster
 
 ```
 NFSRV=192.168.1.160
@@ -147,7 +204,9 @@ oc create -f nfs-deployment.yaml -f kubenfs-storage-class.yaml -n kubenfs
 
 ```
 
-### Setup ZTP in OCP ACM
+### Setup ZTP in ACM
+
+> Without Storage Setup DO NOT run following steps
 
 - Enable SiteConfig Operator
 
