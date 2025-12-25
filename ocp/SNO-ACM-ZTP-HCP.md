@@ -87,21 +87,20 @@ virsh net-autostart host-bridge
 ### KVM VM create for SNO
 
 ```
-qemu-img create -f qcow2 /home/sno/ocp-acm/sno-acm-ts.qcow2 120G
+qemu-img create -f qcow2 /home/sno/ocp-acm/sno-acm.qcow2 120G
 
 virt-install \
-  --name=sno-acm-ts \
+  --name=sno-acm \
   --ram=28384 \
   --vcpus=12 \
   --cpu host-passthrough \
-  --os-type linux \
   --os-variant=rhel8.0 \
   --noreboot \
   --events on_reboot=restart \
   --noautoconsole \
   --import \
   --cdrom /home/sno/ocp-acm/sno-acm-ts.iso \
-  --disk path=/home/sno/ocp-acm/sno-acm-ts.qcow2,size=120 \
+  --disk path=/home/sno/ocp-acm/sno-acm.qcow2,size=120 \
   --network network=host-bridge \
   --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
 ```
