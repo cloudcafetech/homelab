@@ -103,6 +103,9 @@ virt-install \
   --disk path=/home/sno/ocp-acm/sno-acm.qcow2,size=120 \
   --network network=host-bridge \
   --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
+
+sleep 10
+virsh list --all
 ```
 
 ### NFS Storage Setup for OCP
