@@ -204,6 +204,45 @@ oc create -f nfs-deployment.yaml -f kubenfs-storage-class.yaml -n kubenfs
 
 ```
 
+### Setup OCP GitOps
+
+- Install GitOps Operator
+
+```
+oc create ns openshift-gitops-operator
+
+cat << EOF > gitops-operator.yaml
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-gitops-operator
+  namespace: openshift-gitops-operator
+spec:
+  upgradeStrategy: Default
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: openshift-gitops-operator
+  namespace: openshift-gitops-operator
+spec:
+  channel: latest
+  installPlanApproval: Automatic
+  name: openshift-gitops-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+
+oc create -f  gitops-operator.yaml
+sleep 40
+```
+- Check GitOps Deployment
+
+```
+oc get pods -n openshift-gitops-operator
+oc get pods -n openshift-gitops
+```
+
 ### Setup ZTP in ACM
 
 > Without Storage Setup DO NOT run following steps
@@ -337,7 +376,7 @@ sudo systemctl status sushy-emulator.service
 
 ```
 
-### Create KVM VM for new Cluster (ZTP)
+### Create VM for new Cluster (ZTP)
 
 ```
 qemu-img create -f qcow2 /home/sno/sno-ztp.qcow2 120G
@@ -348,7 +387,6 @@ virt-install \
   --ram=16536 \
   --vcpus=12 \
   --cpu host-passthrough \
-  --os-type linux \
   --os-variant rhel8.0 \
   --noreboot \
   --events on_reboot=restart \
@@ -576,7 +614,6 @@ virt-install \
   --ram=8192 \
   --vcpus=8 \
   --cpu host-passthrough \
-  --os-type linux \
   --os-variant rhel8.0 \
   --noreboot \
   --events on_reboot=restart \
