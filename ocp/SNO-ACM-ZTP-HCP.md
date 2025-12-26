@@ -243,6 +243,96 @@ oc get pods -n openshift-gitops-operator
 oc get pods -n openshift-gitops
 ```
 
+### Setup MetalLB
+
+- Install MetalLB Operator
+
+```
+cat << EOF > metallb-operator.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metallb-system
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: metallb-operator
+  namespace: metallb-system
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: metallb-operator-sub
+  namespace: metallb-system
+spec:
+  channel: stable
+  name: metallb-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+
+oc create -f  metallb-operator.yaml
+sleep 40
+```
+- Confirm install plan
+
+```oc get installplan -n metallb-system```
+
+- Verify Operator is installed
+
+```oc get clusterserviceversion -n metallb-system -o custom-columns=Name:.metadata.name,Phase:.status.phase```
+
+- Create MetalLB instance
+
+```
+cat << EOF > metallb-system.yaml
+apiVersion: metallb.io/v1beta1
+kind: MetalLB
+metadata:
+  name: metallb
+  namespace: metallb-system
+EOF
+
+oc create -f metallb-system.yaml
+```
+
+- Check Metallb Deployment
+
+```oc get pods -n metallb-system```
+
+- Define IP Pool
+
+```
+cat << EOF > metallb-ip-pool.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: ocp-hcp-ip-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.1.170-192.168.1.180
+  autoAssign: true
+  avoidBuggyIPs: false
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: ocp-hcp-l2-adv
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - ocp-hcp-ip-pool
+EOF
+
+oc create -f metallb-ip-pool.yaml
+```
+
+- Verify
+
+```oc get ipaddresspool -n metallb-system```
+
 ### Setup ZTP in ACM
 
 > Without Storage Setup DO NOT run following steps
@@ -497,111 +587,13 @@ oc get clusterinstance sno-ztp -n sno-ztp
 oc get mce multiclusterengine -oyaml | grep hypershift -B2 -A2
 oc get po -A | grep hypershift
 ```
-
-### Setup MetalLB using yamls
-
-- Download yamls
-
-```
-wget https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
-wget https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
-```
-
-- Edit file metallb.yaml and remove spec.template.spec.securityContext from controller Deployment and the speaker DaemonSet.
-
-```
-Lines to be deleted:
-
-securityContext:
-  runAsNonRoot: true
-  runAsUser: 65534
-```
-
-- Deploy MetalLB
-
-```
-oc create -f namespace.yaml
-oc create -f metallb.yaml
-
-oc adm policy add-scc-to-user privileged -n metallb-system -z speaker 
-
-cat << "EOF" > metallb-config.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: metallb-system
-  name: config
-data:
-  config: |
-    address-pools:
-    - name: default
-      protocol: layer2
-      addresses:
-      - 192.168.1.170-192.168.1.180
-EOF
-oc create -f metallb-config.yaml
-```
-
-### Using MetalLB operator
-
-- First Install MetalLB Operator from Operator HUB
-
-- Create a single instance of a MetalLB custom resource
-
-```
-cat << EOF | oc apply -f -
-apiVersion: metallb.io/v1beta1
-kind: MetalLB
-metadata:
-  name: metallb
-  namespace: metallb-system
-EOF
-```
-
-- Verify
-
-```oc get po -n metallb-system```
-
-- Configuring MetalLB address pools 
-
-```
-cat << "EOF" > metallb-ip-pool.yaml
-apiVersion: metallb.io/v1beta1
-kind: IPAddressPool
-metadata:
-  name: ocp-hcp-ip-pool
-  namespace: metallb-system
-spec:
-  addresses:
-  - 192.168.1.170-192.168.1.180
-  autoAssign: true
-  avoidBuggyIPs: false
----
-apiVersion: metallb.io/v1beta1
-kind: L2Advertisement
-metadata:
-  name: ocp-hcp-l2-adv
-  namespace: metallb-system
-spec:
-  ipAddressPools:
-    - ocp-hcp-ip-pool
-EOF
-
-oc create -f metallb-ip-pool.yaml
-```
-
-- Verify address pool
-
-```oc get ipaddresspool -A```
-
 - Patch the RHACM Hub Application ingress controller to allow wildcard DNS routes
 
 ```
 oc get ingresscontroller default -n openshift-ingress-operator | grep wildcardPolicy
 oc patch ingresscontroller -n openshift-ingress-operator default --type=json -p '[{ "op": "add", "path": "/spec/routeAdmission", "value": {wildcardPolicy: "WildcardsAllowed"}}]'
 ```
-
-## Hosted Control Plane (HCP) Cluster setup
+## HCP Cluster setup
 
 - Create Worker VM for HCP Cluster (hcp-ztp)
 
@@ -929,6 +921,50 @@ yum update -y
 dnf groupinstall "Virtualization Host" -y
 systemctl enable --now libvirtd
 yum -y install virt-top libguestfs-tools virt-install virt-manager
+```
+
+### Setup MetalLB using yamls
+
+- Download yamls
+
+```
+wget https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
+wget https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
+```
+
+- Edit file metallb.yaml and remove spec.template.spec.securityContext from controller Deployment and the speaker DaemonSet.
+
+```
+Lines to be deleted:
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+```
+
+- Deploy MetalLB
+
+```
+oc create -f namespace.yaml
+oc create -f metallb.yaml
+
+oc adm policy add-scc-to-user privileged -n metallb-system -z speaker 
+
+cat << "EOF" > metallb-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 192.168.1.170-192.168.1.180
+EOF
+oc create -f metallb-config.yaml
 ```
 
 ## Troubleshooting
