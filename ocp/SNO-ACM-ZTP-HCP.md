@@ -180,7 +180,7 @@ oc get po -n open-cluster-management
 oc get po -n multicluster-engine
 ```
 
-### NFS Storage Setup In ACM Cluster
+### Setup NFS Storage in ACM cluster
 
 ```
 NFSRV=192.168.1.160
@@ -956,6 +956,7 @@ kubectl top pods -n metallb-system --sum
 oc adm top pods -n openshift-monitoring --sum
 oc adm top pods -n multicluster-engine --sum
 oc adm top pods -n open-cluster-management --sum
+for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do echo "Namespace: $ns"; kubectl top po -n $ns --sum ; sleep 3; done
 ```
 
 - Disable CVO (cluster-version-operator)
