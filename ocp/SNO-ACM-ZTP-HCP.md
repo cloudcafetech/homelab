@@ -243,6 +243,36 @@ oc get pods -n openshift-gitops-operator
 oc get pods -n openshift-gitops
 ```
 
+- RBAC for clusterinstance
+
+```
+cat << EOF > openshift-gitops-clusterinstances-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: openshift-gitops-clusterinstances-manager
+rules:
+- apiGroups: ["siteconfig.open-cluster-management.io"]
+  resources: ["clusterinstances"]
+  verbs: ["create", "get", "list", "update", "delete", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: openshift-gitops-clusterinstances-manager-binding
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-application-controller
+  namespace: openshift-gitops
+roleRef:
+  kind: ClusterRole
+  name: openshift-gitops-clusterinstances-manager
+  apiGroup: rbac.authorization.k8s.io
+EOF
+
+oc create -f openshift-gitops-clusterinstances-rbac.yaml
+```
+
 ### Setup MetalLB
 
 - Install MetalLB Operator
