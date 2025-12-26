@@ -3,19 +3,47 @@ kind: PolicyGenerator
 metadata:
   name: "common"
 policyDefaults:
-    namespace: ocp-ztp-gitops-policies
+    namespace: open-cluster-management-policies
     remediationAction: enforce
     severity: high
     evaluationInterval:
         compliant: 10m
         noncompliant: 10s
-    placement:
-      placementPath: input/placement.yaml
-policies:
-    - name: ocp-ztp-gitops
-      policyAnnotations:
-        ran.openshift.io/ztp-deploy-wave: "4"
-      disabled: false
-      manifests:
-        - path: input/policy-manifests/
 
+policySets:
+  - name: sno-ztp
+    description: "Configure on SNO cluster"
+    placement:
+      name: "sno-placement"
+      labelSelector:
+        matchExpressions:
+          - key: cluster-name
+            operator: NotIn
+            values:
+              - sno-ztp
+    policies:
+      - metallb-operator
+
+  - name: hcp-ztp
+    description: "Configure on Hosted Control Plane cluster"
+    placement:
+      name: "hcp-placement"
+      labelSelector:
+        matchExpressions:
+          - key: cluster-name
+            operator: NotIn
+            values:
+              - hcp-ztp
+    policies:
+      - compliance-operator
+
+policies:
+    - name: metallb-operator
+      description: "Install Metallb Operator"
+      manifests:
+        - path: input/policy-manifests/metallb-operator.yaml
+
+    - name: compliance-operator
+      description: "Install Compliance Operator"
+      manifests:
+        - path: input/policy-manifests/compliance-operator.yaml
