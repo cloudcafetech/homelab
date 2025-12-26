@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 00-namespace.yaml	
+  - 01-bmc-secret.yaml
+  #- 02-pull-secret.yaml
+  - 03-ssh-secret.yaml
+  - 04-kvm-infa.yaml
+  - 05-hcp-ztp-worker1.yaml

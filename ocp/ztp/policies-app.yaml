@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ocp-ztp-gitops-policies-apps
+  namespace: openshift-gitops
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: policies-sub
+  project: default
+  source:
+    path: ocp/ztp/gitops/resources/acmpolicygenerator
+    repoURL: https://github.com/cloudcafetech/homelab
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
