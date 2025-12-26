@@ -6,7 +6,6 @@ metadata:
 spec:
   destination:
     server: https://kubernetes.default.svc
-    namespace: policies-sub
   project: default
   source:
     path: ocp/ztp/gitops/resources/acmpolicygenerator
@@ -16,5 +15,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
