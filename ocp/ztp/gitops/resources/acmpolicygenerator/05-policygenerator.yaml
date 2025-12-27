@@ -4,6 +4,7 @@ metadata:
   name: common
 placementBindingDefaults:
   name: placementbinding
+
 policyDefaults:
   namespace: open-cluster-management-policies
   remediationAction: enforce
@@ -11,22 +12,54 @@ policyDefaults:
   evaluationInterval:
     compliant: 10m
     noncompliant: 10s
+
 policySets:
+  - name: local
+    description: "Configure on ACM cluster"
+    placement:
+      name: local-placement
+      labelSelector:
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - local
+    policies:
+      - compliance-operator
+
   - name: sno-ztp
+    description: "Configure on SNO cluster"
     placement:
       name: sno-placement
       labelSelector:
         matchExpressions:
-          - key: cluster-name
-            operator: NotIn
+          - key: name
+            operator: In
             values:
               - sno-ztp
     policies:
       - metallb-operator
+
+  - name: hcp-ztp
+    description: "Configure on Hosted Control Plane cluster"
+    placement:
+      name: hcp-placement
+      labelSelector:
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - hcp-ztp
+    policies:
+      - compliance-operator
+
 policies:
   - name: metallb-operator
+    description: "Install Metallb Operator"
     manifests:
       - path: input/policy-manifests/metallb-operator.yaml
+
   - name: compliance-operator
+    description: "Install Compliance Operator"
     manifests:
       - path: input/policy-manifests/compliance-operator.yaml
