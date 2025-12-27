@@ -1,19 +1,23 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: PolicyGenerator
 metadata:
-  name: "common"
+  name: common
+placementBindingDefaults:
+  name: placementbinding
+
 policyDefaults:
-    namespace: open-cluster-management-policies
-    remediationAction: enforce
-    severity: high
-    evaluationInterval:
-        compliant: 10m
-        noncompliant: 10s
+  namespace: open-cluster-management-policies
+  remediationAction: enforce
+  severity: high
+  evaluationInterval:
+    compliant: 10m
+    noncompliant: 10s
+
 policySets:
   - name: sno-ztp
     description: "Configure on SNO cluster"
     placement:
-      name: "sno-placement"
+      name: sno-placement
       labelSelector:
         matchExpressions:
           - key: cluster-name
@@ -22,10 +26,11 @@ policySets:
               - sno-ztp
     policies:
       - metallb-operator
+
   - name: hcp-ztp
     description: "Configure on Hosted Control Plane cluster"
     placement:
-      name: "hcp-placement"
+      name: hcp-placement
       labelSelector:
         matchExpressions:
           - key: cluster-name
@@ -34,12 +39,14 @@ policySets:
               - hcp-ztp
     policies:
       - compliance-operator
+
 policies:
-    - name: metallb-operator
-      description: "Install Metallb Operator"
-      manifests:
-        - path: input/policy-manifests/metallb-operator.yaml
-    - name: compliance-operator
-      description: "Install Compliance Operator"
-      manifests:
-        - path: input/policy-manifests/compliance-operator.yaml
+  - name: metallb-operator
+    description: "Install Metallb Operator"
+    manifests:
+      - path: input/policy-manifests/metallb-operator.yaml
+
+  - name: compliance-operator
+    description: "Install Compliance Operator"
+    manifests:
+      - path: input/policy-manifests/compliance-operator.yaml
