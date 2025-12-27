@@ -7,4 +7,4 @@ generators:
 resources:
 - 00-managedclusterset.yaml
 - 01-managedclustersetbinding.yaml
-- 02-argocd-placement.yaml
+#- 02-argocd-placement.yaml
