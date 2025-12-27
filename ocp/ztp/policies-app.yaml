@@ -9,8 +9,8 @@ spec:
     namespace: ocp-ztp-gitops-policies
   project: default
   source:
-    path: demos/ztp/demo-manifests/01-gitops/resources/acmpolicygenerator
-    repoURL: https://github.com/luisarizmendi/openshift-edge-demos
+    path: ocp/ztp/gitops/resources/acmpolicygenerator
+    repoURL: https://github.com/cloudcafetech/homelab
     targetRevision: main
   syncPolicy:
     automated:
