@@ -1072,19 +1072,58 @@ oc adm top pods -n open-cluster-management --sum
 for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do echo "Namespace: $ns"; kubectl top po -n $ns --sum ; sleep 3; done
 ```
 
-- Disable CVO (cluster-version-operator)
+- Disable Openshift Monitoring using CVO (cluster-version-operator)
 
 > Cluster Monitoring Operator (CMO) is managed by the Cluster Version Operator (CVO), disable CVO then scale down the CMO and Prometheus statefulset.
 
 ```
 oc get pods -n openshift-cluster-version
-oc get deployments -n openshift-cluster-version
 oc scale --replicas=0 deployment/cluster-version-operator -n openshift-cluster-version
 oc get pods -n openshift-cluster-version
-
 oc get deployment -n openshift-monitoring
-oc scale --replicas=0 deployment prometheus-operator -n openshift-monitoring
+oc scale deployment cluster-monitoring-operator --replicas=0 -n openshift-monitoring
+oc scale deployment prometheus-operator --replicas=0 -n openshift-monitoring
 
+cat << EOF > cluster-monitoring-config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    enableUserWorkload: false
+    alertmanagerMain:
+      enabled: false
+    kubeStateMetrics:
+      enabled: false
+    nodeExporter:
+      enabled: false
+    prometheusK8s:
+      enabled: false
+EOF
+
+oc apply -f cluster-monitoring-config
+
+oc scale deployment cluster-monitoring-operator --replicas=0 -n openshift-monitoring
+oc scale deployment prometheus-operator --replicas=0 -n openshift-monitoring
+oc scale deployment thanos-querier --replicas=0 -n openshift-monitoring
+oc scale deployment telemeter-client --replicas=0 -n openshift-monitoring
+oc scale deployment openshift-state-metrics --replicas=0 -n openshift-monitoring
+oc scale deployment kube-state-metrics --replicas=0 -n openshift-monitoring
+oc scale deployment monitoring-plugin --replicas=0 -n openshift-monitoring
+oc scale statefulset.apps/prometheus-k8s --replicas=0 -n openshift-monitoring
+oc scale statefulset.apps/alertmanager-main --replicas=0 -n openshift-monitoring
+oc patch ds node-exporter -p '{"spec": {"template": {"spec": {"nodeSelector": {"non-existing": "true"}}}}}' -n openshift-monitoring
+oc get po -n openshift-monitoring
+```
+
+- Disable community-operators and certified-operators
+
+```
+oc patch operatorhubs/cluster --type merge --patch '{"spec":{"sources":[{"disabled": true,"name": "community-operators"},{"disabled": true,"name": "certified-operators"}]}}'
+
+oc get catsrc -n openshift-marketplace
 ```
 
 - Kubeadmin user password change
