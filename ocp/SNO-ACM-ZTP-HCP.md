@@ -1104,6 +1104,13 @@ oc patch secret/kubeadmin -n kube-system -p '{"data":{"kubeadmin": "'$EPASS'"}}'
 
 ```oc patch <object> <resource name> -p '{"metadata":{"finalizers":null}}'```
 
+- Remove Terminating namespace
+
+```
+NS=sno-ztp
+kubectl get ns $NS -o json | tr -d "\\n" | sed "s/\"finalizers\": \[[^]]\+]/\"finalizers\": []/" | kubectl replace --raw /api/v1/namespaces/$NS/finalize -f -
+```
+
 ## Lesson learned
 
 #### default Storage Pool issue from KVM [libvirt](https://serverfault.com/questions/840519/how-to-change-the-default-storage-pool-from-libvirt/840520#840520)
