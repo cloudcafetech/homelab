@@ -1118,10 +1118,10 @@ oc patch ds node-exporter -p '{"spec": {"template": {"spec": {"nodeSelector": {"
 oc get po -n openshift-monitoring
 ```
 
-- Disable community-operators and certified-operators
+- Disable community-operators redhat-marketplace and certified-operators
 
 ```
-oc patch operatorhubs/cluster --type merge --patch '{"spec":{"sources":[{"disabled": true,"name": "community-operators"},{"disabled": true,"name": "certified-operators"}]}}'
+oc patch operatorhubs/cluster --type merge --patch '{"spec":{"sources":[{"disabled": true,"name": "community-operators"},{"disabled": true,"name": "certified-operators"},{"disabled": true,"name": "redhat-marketplace"}]}}'
 
 oc get catsrc -n openshift-marketplace
 ```
