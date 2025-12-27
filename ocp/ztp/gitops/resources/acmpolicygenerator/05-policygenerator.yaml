@@ -1,36 +1,33 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: PolicyGenerator
 metadata:
-  name: common
+  name: policies
 placementBindingDefaults:
-  name: placementbinding
+  # Set an explicit placement binding name to use rather than rely on the default.
+  name: "placementbinding"
 
 policyDefaults:
+  categories:
+    - "CM Configuration Management"
+  controls:
+    - "CM-2 Baseline Configuration"
+  standards:
+    - "NIST SP 800-53"
+  namespaceSelector:
+    include: ["*"]
+    exclude: []
   namespace: open-cluster-management-policies
-  remediationAction: enforce
-  severity: high
-  evaluationInterval:
-    compliant: 10m
-    noncompliant: 10s
+  remediationAction: inform
+  complianceType: "musthave"
+  severity: low
+  pruneObjectBehavior: "None"
+  metadataComplianceType: "musthave"
 
 policySets:
-  - name: local
-    description: "Configure on ACM cluster"
+  - name: hub
+    description: "Configurazioni dedicate al cluster hub"
     placement:
-      name: local-placement
-      labelSelector:
-        matchExpressions:
-          - key: name
-            operator: In
-            values:
-              - local
-    policies:
-      - compliance-operator
-
-  - name: sno-ztp
-    description: "Configure on SNO cluster"
-    placement:
-      name: sno-placement
+      name: "hub-placement"
       labelSelector:
         matchExpressions:
           - key: name
@@ -38,28 +35,44 @@ policySets:
             values:
               - sno-ztp
     policies:
-      - metallb-operator
+      - compliance-operator
 
-  - name: hcp-ztp
-    description: "Configure on Hosted Control Plane cluster"
+  - name: sno
+    description: "Configurazioni dedicate ai managed clusters di tipo sno"
     placement:
-      name: hcp-placement
+      name: "sno-placement"
       labelSelector:
         matchExpressions:
           - key: name
-            operator: In
+            operator: NotIn
             values:
               - hcp-ztp
     policies:
-      - compliance-operator
+      - metallb-operator
 
 policies:
   - name: metallb-operator
     description: "Install Metallb Operator"
     manifests:
       - path: input/policy-manifests/metallb-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: low
 
   - name: compliance-operator
     description: "Install Compliance Operator"
     manifests:
       - path: input/policy-manifests/compliance-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: low
