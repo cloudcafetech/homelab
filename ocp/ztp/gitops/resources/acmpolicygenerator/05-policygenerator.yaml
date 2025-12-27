@@ -13,7 +13,6 @@ policyDefaults:
     noncompliant: 10s
 policySets:
   - name: sno-ztp
-    description: "Configure on SNO cluster"
     placement:
       name: sno-placement
       labelSelector:
@@ -25,7 +24,6 @@ policySets:
     policies:
       - metallb-operator
   - name: hcp-ztp
-    description: "Configure on Hosted Control Plane cluster"
     placement:
       name: hcp-placement
       labelSelector:
@@ -38,10 +36,8 @@ policySets:
       - compliance-operator
 policies:
   - name: metallb-operator
-    description: "Install Metallb Operator"
     manifests:
       - path: input/policy-manifests/metallb-operator.yaml
   - name: compliance-operator
-    description: "Install Compliance Operator"
     manifests:
       - path: input/policy-manifests/compliance-operator.yaml
