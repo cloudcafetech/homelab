@@ -6,5 +6,7 @@ generators:
 
 resources:
 - 00-managedclusterset.yaml
+#- 00-sno-ztp-ns.yaml
+#- 00-hcp-ztp-ns.yaml
 - 01-managedclustersetbinding.yaml
 #- 02-argocd-placement.yaml
