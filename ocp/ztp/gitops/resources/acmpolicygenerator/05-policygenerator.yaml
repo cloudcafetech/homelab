@@ -23,17 +23,6 @@ policySets:
               - sno-ztp
     policies:
       - metallb-operator
-  - name: hcp-ztp
-    placement:
-      name: hcp-placement
-      labelSelector:
-        matchExpressions:
-          - key: cluster-name
-            operator: NotIn
-            values:
-              - hcp-ztp
-    policies:
-      - compliance-operator
 policies:
   - name: metallb-operator
     manifests:
