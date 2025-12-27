@@ -1078,7 +1078,7 @@ for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do echo "Na
 
 ```
 oc get pods -n openshift-cluster-version
-oc scale --replicas=0 deployment/cluster-version-operator -n openshift-cluster-version
+oc scale deployment/cluster-version-operator --replicas=0 -n openshift-cluster-version
 oc get pods -n openshift-cluster-version
 oc get deployment -n openshift-monitoring
 oc scale deployment cluster-monitoring-operator --replicas=0 -n openshift-monitoring
