@@ -242,35 +242,82 @@ sleep 40
 oc get pods -n openshift-gitops-operator
 oc get pods -n openshift-gitops
 ```
-
-- RBAC for clusterinstance
+- Openshift Gitops RBAC for clusterinstance and policy
 
 ```
-cat << EOF > openshift-gitops-clusterinstances-rbac.yaml
+cat << EOF > openshift-gitops-acm-rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: openshift-gitops-clusterinstances-manager
+  name: openshift-gitops-acm-clusterrole
 rules:
 - apiGroups: ["siteconfig.open-cluster-management.io"]
   resources: ["clusterinstances"]
   verbs: ["create", "get", "list", "update", "delete", "watch"]
+- apiGroups: ["policy.open-cluster-management.io"]
+  resources: ["policies", "placementbindings"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+- apiGroups: ["apps.open-cluster-management.io"]
+  resources: ["placementrules"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+- apiGroups: ["cluster.open-cluster-management.io"]
+  resources: ["placements", "placements/status", "placementdecisions", "placementdecisions/status"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: openshift-gitops-clusterinstances-manager-binding
+  name: openshift-gitops-acm-clusterrolebinding
 subjects:
 - kind: ServiceAccount
   name: openshift-gitops-argocd-application-controller
   namespace: openshift-gitops
 roleRef:
   kind: ClusterRole
-  name: openshift-gitops-clusterinstances-manager
+  name: openshift-gitops-acm-clusterrole
   apiGroup: rbac.authorization.k8s.io
 EOF
 
-oc create -f openshift-gitops-clusterinstances-rbac.yaml
+oc create -f openshift-gitops-acm-rbac.yaml
+```
+
+- Integrate Kustomize plugin with OpenShift GitOps
+
+```
+cat << EOF > argocd-patch.yaml
+apiVersion: argoproj.io/v1beta1
+kind: ArgoCD
+metadata:
+  name: openshift-gitops
+  namespace: openshift-gitops
+spec:
+  repo:
+    env:
+    - name: KUSTOMIZE_PLUGIN_HOME
+      value: /etc/kustomize/plugin
+    initContainers:
+    - args:
+      - -c
+      - cp /etc/kustomize/plugin/policy.open-cluster-management.io/v1/policygenerator/PolicyGenerator
+        /policy-generator/PolicyGenerator
+      command:
+      - /bin/bash
+      image: registry.redhat.io/rhacm2/multicluster-operators-subscription-rhel9:v2.11.7-13
+      #image: registry.redhat.io/rhacm2/multicluster-operators-subscription-rhel8:v2.5
+      name: policy-generator-install
+      volumeMounts:
+      - mountPath: /policy-generator
+        name: policy-generator
+    volumeMounts:
+    - mountPath: /etc/kustomize/plugin/policy.open-cluster-management.io/v1/policygenerator
+      name: policy-generator
+    volumes:
+    - emptyDir: {}
+      name: policy-generator
+  kustomizeBuildOptions: --enable-alpha-plugins
+EOF
+
+oc -n openshift-gitops patch argocd openshift-gitops --type merge --patch -f argocd-patch.yaml
 ```
 
 ### Setup MetalLB
