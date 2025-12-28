@@ -79,6 +79,7 @@ policySets:
               - hcp-ztp
     policies:
       - install-smb-operator
+      - install-compliance-operator
 
 policies:
   - name: disable-operator
