@@ -52,7 +52,7 @@ policies:
   - name: disable-operator
     description: "Disable community-operators redhat-marketplace and certified-operators"
     manifests:
-      path: ../policies/global/common/disable-operator.yaml
+      - path: ../policies/global/common/disable-operator.yaml
     remediationAction: enforce
     categories:
       - "CM Configuration Management"
