@@ -41,8 +41,10 @@ policySets:
 
   - name: ztp-sno
     description: "Configurations ztp-sno cluster"
-    placement:
+    placement:  
       name: "ztp-sno-placement"
+      clusterSets:
+        - global      
       labelSelector:
         matchExpressions:
           - key: name
