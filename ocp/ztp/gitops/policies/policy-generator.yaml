@@ -27,7 +27,7 @@ policySets:
   - name: global
     description: "Global configuration for all managed clusters"
     placement:
-      name: "global-placement"
+      name: global-placement
       labelSelector:
         matchExpressions:
           - key: vendor
@@ -42,9 +42,7 @@ policySets:
   - name: ztp-sno
     description: "Configurations ztp-sno cluster"
     placement:  
-      name: "ztp-sno-placement"
-      clusterSets:
-        - global      
+      name: ztp-sno-placement
       labelSelector:
         matchExpressions:
           - key: name
