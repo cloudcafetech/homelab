@@ -37,7 +37,6 @@ policySets:
 
     policies:
       - disable-operator
-      - oauth-configuration
 
   - name: ztp-sno
     description: "Configurations ztp-sno cluster"
@@ -51,7 +50,6 @@ policySets:
               - ztp-sno
     policies:
       - install-metallb-operator
-      - install-cert-manager
 
   - name: sno-ztp
     description: "Configurations for sno-ztp cluster"
@@ -65,7 +63,6 @@ policySets:
               - sno-ztp
     policies:
       - install-nmstate-operator
-      - remove-kubeadmin
 
   - name: hcp-ztp
     description: "Configurations for hcp-ztp cluster"
@@ -79,7 +76,6 @@ policySets:
               - hcp-ztp
     policies:
       - install-smb-operator
-      - install-compliance-operator
 
 policies:
   - name: disable-operator
