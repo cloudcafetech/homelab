@@ -7,6 +7,7 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     #namespace: ocp-ztp-gitops-policies
+    namespace: open-cluster-management-policies
   project: default
   source:
     #path: ocp/ztp/gitops/resources/acmpolicygenerator
@@ -17,5 +18,7 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    #syncOptions:
-    #- CreateNamespace=true
+    syncOptions:
+      - CreateNamespace=true
+      - Validate=true
+      - RespectIgnoreDifferences=true
