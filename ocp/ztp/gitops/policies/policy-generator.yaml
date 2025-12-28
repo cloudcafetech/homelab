@@ -215,7 +215,7 @@ policies:
   - name: ocp-tools
     description: "Configure SA, roles and cronjobs useful for openshift"
     manifests:
-      - path: ../policies/global/common/ocp-tools.yml
+      - path: ../policies/global/common/ocp-tools.yaml
     remediationAction: enforce
     severity: medium
     categories:
