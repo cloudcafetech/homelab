@@ -34,10 +34,8 @@ policySets:
             operator: In
             values:
               - OpenShift
-
     policies:
       - disable-operator
-
   - name: ztp-sno
     description: "Configurations ztp-sno cluster"
     placement:
@@ -50,7 +48,6 @@ policySets:
               - ztp-sno
     policies:
       - install-metallb-operator
-
   - name: sno-ztp
     description: "Configurations for sno-ztp cluster"
     placement:
@@ -63,7 +60,6 @@ policySets:
               - sno-ztp
     policies:
       - install-nmstate-operator
-
   - name: hcp-ztp
     description: "Configurations for hcp-ztp cluster"
     placement:
@@ -76,7 +72,6 @@ policySets:
               - hcp-ztp
     policies:
       - install-smb-operator
-
 policies:
   - name: disable-operator
     description: "Disable community-operators redhat-marketplace and certified-operators"
