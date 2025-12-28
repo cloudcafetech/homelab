@@ -48,30 +48,6 @@ policySets:
               - ztp-sno
     policies:
       - install-metallb-operator
-  - name: sno-ztp
-    description: "Configurations for sno-ztp cluster"
-    placement:
-      name: "sno-ztp-placement"
-      labelSelector:
-        matchExpressions:
-          - key: name
-            operator: NotIn
-            values:
-              - sno-ztp
-    policies:
-      - install-nmstate-operator
-  - name: hcp-ztp
-    description: "Configurations for hcp-ztp cluster"
-    placement:
-      name: "hcp-ztp-placement"
-      labelSelector:
-        matchExpressions:
-          - key: name
-            operator: In
-            values:
-              - hcp-ztp
-    policies:
-      - install-smb-operator
 policies:
   - name: disable-operator
     description: "Disable community-operators redhat-marketplace and certified-operators"
@@ -85,3 +61,15 @@ policies:
     standards:
       - "NIST SP 800-53"
     severity: low
+  - name: install-metallb-operator
+    description: "Install MetalLB Operator for Loadbalancer"
+    manifests:
+      - path: ../policies/global/operators/metallb-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: medium    
