@@ -1,0 +1,226 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: policies
+placementBindingDefaults:
+  # Set an explicit placement binding name to use rather than rely on the default.
+  name: "placementbinding"
+
+policyDefaults:
+  categories:
+    - "CM Configuration Management"
+  controls:
+    - "CM-2 Baseline Configuration"
+  standards:
+    - "NIST SP 800-53"
+  namespaceSelector:
+    include: ["*"]
+    exclude: []
+  namespace: open-cluster-management-policies
+  remediationAction: inform
+  complianceType: "musthave"
+  severity: low
+  pruneObjectBehavior: "None"
+  metadataComplianceType: "musthave"
+
+policySets:
+  - name: global
+    description: "Global configuration for all managed clusters"
+    placement:
+      name: "global-placement"
+      labelSelector:
+        matchExpressions:
+          - key: vendor
+            operator: In
+            values:
+              - OpenShift
+
+    policies:
+      - disable-operator
+      - oauth-configuration
+
+  - name: ztp-sno
+    description: "Configurations ztp-sno cluster"
+    placement:
+      name: "ztp-sno-placement"
+      labelSelector:
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - ztp-sno
+    policies:
+      - install-metallb-operator
+      - install-cert-manager
+
+  - name: sno-ztp
+    description: "Configurations for sno-ztp cluster"
+    placement:
+      name: "sno-ztp-placement"
+      labelSelector:
+        matchExpressions:
+          - key: name
+            operator: NotIn
+            values:
+              - sno-ztp
+    policies:
+      - install-nmstate-operator
+      - remove-kubeadmin
+
+  - name: hcp-ztp
+    description: "Configurations for hcp-ztp cluster"
+    placement:
+      name: "hcp-ztp-placement"
+      labelSelector:
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - hcp-ztp
+    policies:
+      - install-smb-operator
+
+policies:
+  - name: disable-operator
+    description: "Disable community-operators redhat-marketplace and certified-operators"
+    manifests:
+      - path: ../policies/global/common/disable-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: low
+
+  - name: install-cert-manager
+    description: "Install and configure Cert Manager for certificate management"
+    manifests:
+      - path: ../policies/global/certificate/cert-manager.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: low
+
+  - name: install-lvm-operator
+    description: "Installa LVM Storage Operator"
+    manifests:
+      - path: ../policies/global/operators/lvm-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: medium
+
+  - name: install-smb-operator
+    description: "Install SMB CSI Operator for SMB storage access"
+    manifests:
+      - path: ../policies/global/operators/smb-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: medium
+
+  - name: install-metallb-operator
+    description: "Install MetalLB Operator for Loadbalancer"
+    manifests:
+      - path: ../policies/global/operators/metallb-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: medium
+
+  - name: install-nmstate-operator
+    description: "Install NMState Operator for Networking"
+    manifests:
+      - path: ../policies/global/operators/nmstate-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: medium
+
+  - name: install-compliance-operator
+    description: "Install Compliance Operator"
+    manifests:
+      - path: ../policies/global/operators/compliance-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: medium
+
+  - name: oauth-configuration
+    description: "Configure HTTPaswd authentication and associated roles"
+    manifests:
+      - path: ../policies/global/security-auth/htpasswd.yaml
+    remediationAction: enforce
+    categories:
+      - "SC System and Communications Protection"
+    controls:
+      - "SC-1 SYSTEM AND COMMUNICATIONS PROTECTION POLICY AND PROCEDURES"
+    standards:
+      - "NIST SP 800-53"
+    severity: high
+
+  - name: remove-kubeadmin
+    description: "Remove the kubeadmin user for security reasons"
+    manifests:
+      - path: ../policies/global/security-auth/remove-kubeadmin.yaml
+    remediationAction: enforce
+    complianceType: "mustnothave"
+    categories:
+      - "SC System and Communications Protection"
+    controls:
+      - "SC-1 SYSTEM AND COMMUNICATIONS PROTECTION POLICY AND PROCEDURES"
+    standards:
+      - "NIST SP 800-53"
+    severity: high
+
+  - name: service-account-aap
+    description: "Configuration Service Account for Ansible Automation Platform"
+    manifests:
+      - path: ../policies/global/security-auth/service-account-aap.yaml
+    remediationAction: enforce
+    severity: medium
+    categories:
+      - "SC System and Communications Protection"
+    controls:
+      - "SC-1 SYSTEM AND COMMUNICATIONS PROTECTION POLICY AND PROCEDURES"
+    standards:
+      - "NIST SP 800-53"
+
+  - name: ocp-tools
+    description: "Configure SA, roles and cronjobs useful for openshift"
+    manifests:
+      - path: ../policies/global/common/ocp-tools.yml
+    remediationAction: enforce
+    severity: medium
+    categories:
+      - "SC System and Communications Protection"
+    controls:
+      - "SC-1 SYSTEM AND COMMUNICATIONS PROTECTION POLICY AND PROCEDURES"
+    standards:
+      - "NIST SP 800-53"

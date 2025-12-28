@@ -1,0 +1,93 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: cert-manager-operator
+  namespace: open-cluster-management-policies
+spec:
+  complianceType: musthave
+  remediationAction: enforce
+  severity: critical
+  subscription:
+    channel: stable-v1
+    name: openshift-cert-manager-operator
+    namespace: cert-manager-operator
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace
+  upgradeApproval: Automatic
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cloudflare-lets-encrypt-prod
+spec:
+  acme:
+    email: '{{hub fromSecret "open-cluster-management-policies" "acme-info" "email" hub}}'
+    privateKeySecretRef:
+      name: cloudflare-issuer-account-key
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+      - dns01:
+          cloudflare:
+            apiKeySecretRef:
+              key: api-key
+              name: cloudflare-api-key
+            email: '{{hub fromSecret "open-cluster-management-policies" "acme-info" "email" hub}}'
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    email: '{{hub fromSecret "open-cluster-management-policies" "acme-info" "email" hub}}'
+    preferredChain: ""
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+      - http01:
+          ingress:
+            class: openshift-default
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterExternalSecret
+metadata:
+  name: cloudflare-api-key
+spec:
+  externalSecretName: cloudflare-api-key
+  externalSecretSpec:
+    dataFrom:
+      - extract:
+          conversionStrategy: Default
+          decodingStrategy: None
+          key: secret/data/cloudflare-api-key
+          metadataPolicy: None
+        rewrite:
+          - regexp:
+              source: cloudflare-api-key
+              target: api-key
+    refreshInterval: 1h
+    secretStoreRef:
+      kind: ClusterSecretStore
+      name: vault-backend
+    target:
+      creationPolicy: Owner
+      deletionPolicy: Retain
+      name: cloudflare-api-key
+  namespaces:
+    - cert-manager
+  refreshTime: 1m
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: CertManager
+metadata:
+  name: cluster
+spec:
+  controllerConfig:
+    overrideArgs:
+      - --dns01-recursive-nameservers=8.8.8.8:53
+      - --acme-http01-solver-nameservers=8.8.8.8:53
+      - --enable-certificate-owner-ref
+  logLevel: Normal
+  managementState: Managed
+  operatorLogLevel: Normal

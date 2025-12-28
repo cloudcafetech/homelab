@@ -1,0 +1,221 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/description: Openshift Tool and Script
+    openshift.io/display-name: Openshift Tool and Script
+  labels:
+    kubernetes.io/metadata.name: ocp-tools
+  name: ocp-tools
+--- 
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: openshift-tools
+  namespace: ocp-tools
+  labels:
+    app: openshift-tools 
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-tools
+rules:
+- apiGroups: [""]
+  resources:
+     - "nodes"
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources:
+     - "pods"
+     - "pods/log"
+     - "pods/attach"
+     - "pods/exec"
+  verbs: ["get", "list", "create", "delete", "watch"]
+- apiGroups: [""]
+  resources:
+     - "namespaces"
+  verbs: ["get", "list", "create"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ocp-tools
+  labels:
+    app: ocp-tools
+subjects:
+  - kind: ServiceAccount
+    name: openshift-tools
+    namespace: ocp-tools
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-tools
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: 'system:openshift:scc:privileged'
+subjects:
+  - kind: ServiceAccount
+    name: openshift-tools
+    namespace: ocp-tools
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: 'system:openshift:scc:privileged'
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: thinpool-check-script
+  namespace: ocp-tools
+data:
+  check_storage.sh: |
+    #!/bin/bash
+
+    VG_NAME="vg1"
+    THIN_POOL="thin-pool-1"
+
+    TOTAL_SIZE=$(lvs --units g --noheadings -o size $VG_NAME/$THIN_POOL | awk '{print $1}' | sed 's/g//')
+    DATA_PERCENT=$(lvs --noheadings -o data_percent $VG_NAME/$THIN_POOL | awk '{print $1}' | sed 's/%//')
+
+    USED_SIZE=$(echo $((${TOTAL_SIZE%.*} * ${DATA_PERCENT%.*} / 100)))
+    FREE_SIZE=$(echo $((${TOTAL_SIZE%.*} - ${USED_SIZE%.*})))
+
+    VG_FREE=$(vgs --units g --noheadings -o vg_free $VG_NAME | awk '{print $1}' | sed 's/g//')
+
+    echo "Spazio disponibile nel Thin Pool ($THIN_POOL) del VG ($VG_NAME):"
+    echo "Totale:  ${TOTAL_SIZE}GB"
+    echo " Usato: ~${USED_SIZE}GB ($DATA_PERCENT%)"
+    echo "Libero: ~${FREE_SIZE}GB"
+    echo ""
+    echo "Spazio disponibile nel Volume Group ($VG_NAME):"
+    echo "VFree:   ${VG_FREE}GB"
+---
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: thinpool-check
+  namespace: ocp-tools
+spec:
+  schedule: 0 * * * *
+  concurrencyPolicy: Allow
+  suspend: false
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          restartPolicy: Never
+          serviceAccountName: openshift-tools
+          hostPID: true
+          schedulerName: default-scheduler
+          hostNetwork: true
+          terminationGracePeriodSeconds: 30
+          securityContext: {}
+          containers:
+            - resources: {}
+              terminationMessagePath: /dev/termination-log
+              name: thinpool-check
+              command:
+                - /bin/bash
+                - '-c'
+                - chroot /host /tmp/scripts/check_storage.sh
+              securityContext:
+                privileged: true
+                runAsUser: 0
+              imagePullPolicy: Always
+              volumeMounts:
+                - name: host
+                  mountPath: /host
+                - name: script-volume
+                  mountPath: /host/tmp/scripts
+              terminationMessagePolicy: File
+              image: 'registry.redhat.io/openshift4/ose-cli:latest'
+          hostIPC: true
+          serviceAccount: openshift-tools
+          volumes:
+            - name: script-volume
+              configMap:
+                name: thinpool-check-script
+                defaultMode: 493
+            - name: host
+              hostPath:
+                path: /
+                type: Directory
+          dnsPolicy: ClusterFirst
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+--- 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: etcd-defrag-script
+  namespace: ocp-tools
+data:
+  etcd-defrag.sh: |
+    #!/bin/bash
+    
+    POD_ETCD=$(oc -n openshift-etcd get pods -l k8s-app=etcd -o name | sed 's/pod\///g')
+
+    oc exec -n openshift-etcd $POD_ETCD -i -t -- etcdctl endpoint status -w table --cluster
+
+    oc exec -n openshift-etcd $POD_ETCD -i -t -- bash -c 'unset ETCDCTL_ENDPOINTS && etcdctl --command-timeout=30s --endpoints=https://localhost:2379 defrag'
+
+    oc exec -n openshift-etcd $POD_ETCD -i -t -- etcdctl endpoint status -w table --cluster
+---    
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: etcd-defrag
+  namespace: ocp-tools
+spec:
+  schedule: 0 * * * *
+  concurrencyPolicy: Allow
+  suspend: false
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          restartPolicy: Never
+          serviceAccountName: openshift-tools
+          hostPID: true
+          schedulerName: default-scheduler
+          hostNetwork: true
+          terminationGracePeriodSeconds: 30
+          securityContext: {}
+          containers:
+            - resources: {}
+              terminationMessagePath: /dev/termination-log
+              name: etcd-defrag
+              command:
+                - /bin/bash
+                - '-c'
+                - /tmp/scripts/etcd-defrag.sh
+              securityContext:
+                privileged: true
+                runAsUser: 0
+              imagePullPolicy: Always
+              terminationMessagePolicy: File
+              image: 'registry.redhat.io/openshift4/ose-cli:latest'
+              volumeMounts:
+                - name: script-volume
+                  mountPath: /tmp/scripts              
+          volumes:
+            - name: script-volume
+              configMap:
+                name: etcd-defrag-script
+                defaultMode: 493          
+          hostIPC: true
+          serviceAccount: openshift-tools
+          dnsPolicy: ClusterFirst
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1 

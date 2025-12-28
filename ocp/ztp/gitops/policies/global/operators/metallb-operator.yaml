@@ -1,0 +1,26 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: metallb-operator
+spec:
+  operatorGroup:
+    name: default
+  complianceType: musthave
+  remediationAction: enforce
+  severity: critical
+  subscription:
+    channel: 'stable'
+    name: metallb-operator
+    namespace: metallb-system
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace
+  upgradeApproval: Automatic
+  versions: null
+---
+apiVersion: metallb.io/v1beta1
+kind: MetalLB
+metadata:
+  name: metallb
+  namespace: metallb-system
+
+

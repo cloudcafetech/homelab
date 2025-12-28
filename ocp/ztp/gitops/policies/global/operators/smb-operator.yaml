@@ -1,0 +1,25 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: smb-csi-driver-operator
+spec:
+  operatorGroup:
+    name: default
+  complianceType: musthave
+  remediationAction: enforce
+  severity: critical
+  subscription:
+    channel: 'stable'
+    name: smb-csi-driver-operator
+    namespace: openshift-cluster-csi-drivers
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace
+  upgradeApproval: Automatic
+  versions: null
+---
+apiVersion: operator.openshift.io/v1
+kind: ClusterCSIDriver
+metadata:
+  name: smb.csi.k8s.io
+spec:
+  managementState: Managed

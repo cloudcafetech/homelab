@@ -1,0 +1,38 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: install-operator-lvm
+  namespace: open-cluster-management-policies
+spec:
+  complianceType: musthave
+  operatorGroup:
+    name: default
+    targetNamespaces:
+      - openshift-storage
+  remediationAction: enforce
+  severity: critical
+  subscription:
+    channel: stable-4.18
+    name: lvms-operator
+    namespace: openshift-storage
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace
+  upgradeApproval: Automatic
+  versions: null
+---
+apiVersion: lvm.topolvm.io/v1alpha1
+kind: LVMCluster
+metadata:
+  name: lvmcluster
+  namespace: openshift-storage
+spec:
+  storage:
+    deviceClasses:
+      - default: true
+        fstype: xfs
+        name: vg1
+        thinPoolConfig:
+          chunkSizeCalculationPolicy: Static
+          name: thin-pool-1
+          overprovisionRatio: 10
+          sizePercent: 90
