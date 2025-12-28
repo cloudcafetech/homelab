@@ -4,7 +4,7 @@ metadata:
   name: hcp-ztp-cluster-app
   namespace: openshift-gitops
   #labels:
-    #app.kubernetes.io/managed-by: ocp-ztp-gitops
+    #app.kubernetes.io/managed-by: hcp-ztp
 spec:
   project: default
   source:
