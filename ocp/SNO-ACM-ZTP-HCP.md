@@ -291,6 +291,7 @@ metadata:
   name: openshift-gitops
   namespace: openshift-gitops
 spec:
+  kustomizeBuildOptions: --enable-alpha-plugins
   repo:
     env:
     - name: KUSTOMIZE_PLUGIN_HOME
@@ -298,15 +299,13 @@ spec:
     initContainers:
     - args:
       - -c
-      - cp /etc/kustomize/plugin/policy.open-cluster-management.io/v1/policygenerator/PolicyGenerator
-        /policy-generator/PolicyGenerator
+      - cp /policy-generator/PolicyGenerator-not-fips-compliant /policy-generator-tmp/PolicyGenerator
       command:
       - /bin/bash
       image: registry.redhat.io/rhacm2/multicluster-operators-subscription-rhel9:v2.11.7-13
-      #image: registry.redhat.io/rhacm2/multicluster-operators-subscription-rhel8:v2.5
       name: policy-generator-install
       volumeMounts:
-      - mountPath: /policy-generator
+      - mountPath: /policy-generator-tmp
         name: policy-generator
     volumeMounts:
     - mountPath: /etc/kustomize/plugin/policy.open-cluster-management.io/v1/policygenerator
@@ -314,10 +313,9 @@ spec:
     volumes:
     - emptyDir: {}
       name: policy-generator
-  kustomizeBuildOptions: --enable-alpha-plugins
 EOF
 
-oc -n openshift-gitops patch argocd openshift-gitops --type merge --patch -f argocd-patch.yaml
+oc patch argocd openshift-gitops -n openshift-gitops --type merge --patch-file argocd-patch.yaml
 ```
 
 ### Setup MetalLB
