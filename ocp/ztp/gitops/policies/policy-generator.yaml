@@ -46,7 +46,7 @@ policySets:
       labelSelector:
         matchExpressions:
           - key: name
-            operator: In
+            operator: NotIn
             values:
               - ztp-sno
     policies:
