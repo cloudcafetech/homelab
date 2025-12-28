@@ -1042,6 +1042,37 @@ EOF
 oc create -f metallb-config.yaml
 ```
 
+- Setup Oauth using htpasswd
+
+```
+yum install httpd-tools -y
+
+htpasswd -c -B -b ./htpasswd pkar pkar2675
+htpasswd -B -b ./htpasswd dkar dkar2675
+
+oc create secret generic htpasswd-secret --from-file=htpasswd=./htpasswd -n openshift-config
+
+cat << EOF > oauth.yaml
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+  - name: htpasswd
+    mappingMethod: claim
+    type: HTPasswd
+    htpasswd:
+      fileData:
+        name: htpasswd-secret
+EOF
+
+oc replace -f oauth.yaml
+
+oc adm policy add-cluster-role-to-user cluster-admin pkar 
+oc adm policy add-cluster-role-to-user cluster-admin dkar
+```
+
 ## Troubleshooting
 
 - KVM Commands
