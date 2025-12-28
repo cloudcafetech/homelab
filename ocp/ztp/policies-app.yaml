@@ -6,15 +6,16 @@ metadata:
 spec:
   destination:
     server: https://kubernetes.default.svc
-    namespace: ocp-ztp-gitops-policies
+    #namespace: ocp-ztp-gitops-policies
   project: default
   source:
-    path: ocp/ztp/gitops/resources/acmpolicygenerator
+    #path: ocp/ztp/gitops/resources/acmpolicygenerator
+    path: ocp/ztp/gitops/policies    
     repoURL: https://github.com/cloudcafetech/homelab
     targetRevision: main
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
+    #syncOptions:
+    #- CreateNamespace=true
