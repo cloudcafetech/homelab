@@ -45,8 +45,8 @@ policySets:
       name: "ztp-sno-placement"
       labelSelector:
         matchExpressions:
-          - key: cluster-name
-            operator: NotIn
+          - key: name
+            operator: In
             values:
               - ztp-sno
     policies:
@@ -59,8 +59,8 @@ policySets:
       name: "sno-ztp-placement"
       labelSelector:
         matchExpressions:
-          - key: cluster-name
-            operator: NotIn
+          - key: name
+            operator: In
             values:
               - sno-ztp
     policies:
@@ -73,7 +73,7 @@ policySets:
       name: "hcp-ztp-placement"
       labelSelector:
         matchExpressions:
-          - key: cluster-name
+          - key: name
             operator: In
             values:
               - hcp-ztp
