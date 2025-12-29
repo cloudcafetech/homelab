@@ -16,8 +16,7 @@ policyDefaults:
   namespaceSelector:
     include: ["*"]
     exclude: []
-  #namespace: open-cluster-management-policies
-  namespace: openshift-gitops
+  namespace: open-cluster-management-policies
   remediationAction: inform
   complianceType: "musthave"
   severity: low
