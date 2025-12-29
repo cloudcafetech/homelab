@@ -97,7 +97,7 @@ policies:
   - name: install-cert-manager
     description: "Install and configure Cert Manager for certificate management"
     manifests:
-      - path: ../policies/global/operator/certmanager-operator.yaml
+      - path: ../policies/global/operators/certmanager-operator.yaml
     remediationAction: enforce
     categories:
       - "CM Configuration Management"
