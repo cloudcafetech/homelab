@@ -6,7 +6,7 @@ metadata:
 spec:
   destination:
     server: https://kubernetes.default.svc
-    namespace: open-cluster-management-policies
+    #namespace: open-cluster-management-policies
   project: default
   source:   
     repoURL: https://github.com/cloudcafetech/homelab
@@ -17,6 +17,6 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+      #- CreateNamespace=true
       - Validate=true
       - RespectIgnoreDifferences=true
