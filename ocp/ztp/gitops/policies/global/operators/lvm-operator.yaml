@@ -2,7 +2,6 @@ apiVersion: policy.open-cluster-management.io/v1beta1
 kind: OperatorPolicy
 metadata:
   name: install-operator-lvm
-  namespace: open-cluster-management-policies
 spec:
   complianceType: musthave
   operatorGroup:
