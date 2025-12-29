@@ -5,9 +5,9 @@ metadata:
 spec:
   operatorGroup:
     name: default
-  complianceType: musthave
-  remediationAction: enforce
-  severity: critical
+  #complianceType: musthave
+  #remediationAction: enforce
+  #severity: critical
   subscription:
     channel: 'stable'
     name: smb-csi-driver-operator
