@@ -10,7 +10,7 @@ spec:
     - requiredClusterSelector:
         labelSelector:
           matchExpressions:
-            - key: vendor
+            - key: name
               operator: In
               values:
                 - ztp-sno
