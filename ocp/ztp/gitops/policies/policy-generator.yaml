@@ -34,7 +34,6 @@ policySets:
             operator: In
             values:
               - OpenShift
-
     policies:
       - disable-operator
       - oauth-configuration
