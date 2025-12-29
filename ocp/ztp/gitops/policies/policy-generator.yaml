@@ -7,35 +7,40 @@ placementBindingDefaults:
   name: "placementbinding"
 
 policyDefaults:
-  categories:
-    - "CM Configuration Management"
-  controls:
-    - "CM-2 Baseline Configuration"
-  standards:
-    - "NIST SP 800-53"
   namespaceSelector:
     include: ["*"]
     exclude: []
   namespace: open-cluster-management-policies
   remediationAction: inform
-  complianceType: "musthave"
+  #complianceType: musthave
   severity: low
-  pruneObjectBehavior: "None"
-  metadataComplianceType: "musthave"
 
 policySets:
   - name: global
     description: "Global configuration for all managed clusters"
     placement:
-      placementPath: ../policies/placement/global-placement.yaml           
+      name: "global-placement"
+      labelSelector:
+        matchExpressions:
+          - key: vendor
+            operator: In
+            values:
+              - OpenShift
+
     policies:
       - disable-operator
       - oauth-configuration
 
   - name: ztp-sno
     description: "Configurations ztp-sno cluster"
-    placement:  
-      placementPath: ../policies/placement/ztp-sno-placement.yaml   
+    placement:
+      name: "ztp-sno-placement"
+      labelSelector:
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - ztp-sno
     policies:
       - install-metallb-operator
       - install-cert-manager
@@ -43,7 +48,13 @@ policySets:
   - name: sno-ztp
     description: "Configurations for sno-ztp cluster"
     placement:
-      placementPath: ../policies/placement/sno-ztp-placement.yaml
+      name: "sno-ztp-placement"
+      labelSelector:
+        matchExpressions:
+          - key: name
+            operator: NotIn
+            values:
+              - sno-ztp
     policies:
       - install-nmstate-operator
       - remove-kubeadmin
@@ -51,7 +62,13 @@ policySets:
   - name: hcp-ztp
     description: "Configurations for hcp-ztp cluster"
     placement:
-      placementPath: ../policies/placement/hcp-ztp-placement.yaml
+      name: "hcp-ztp-placement"
+      labelSelector:
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - hcp-ztp
     policies:
       - install-smb-operator
 
@@ -61,12 +78,6 @@ policies:
     manifests:
       - path: ../policies/global/common/disable-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: low
 
   - name: install-cert-manager
@@ -74,25 +85,13 @@ policies:
     manifests:
       - path: ../policies/global/certificate/cert-manager.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
-    severity: low
+    severity: medium
 
   - name: install-lvm-operator
     description: "Installa LVM Storage Operator"
     manifests:
       - path: ../policies/global/operators/lvm-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: install-smb-operator
@@ -100,12 +99,6 @@ policies:
     manifests:
       - path: ../policies/global/operators/smb-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: install-metallb-operator
@@ -113,12 +106,6 @@ policies:
     manifests:
       - path: ../policies/global/operators/metallb-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: install-nmstate-operator
@@ -126,12 +113,6 @@ policies:
     manifests:
       - path: ../policies/global/operators/nmstate-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: install-compliance-operator
@@ -139,12 +120,6 @@ policies:
     manifests:
       - path: ../policies/global/operators/compliance-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: oauth-configuration
@@ -152,12 +127,6 @@ policies:
     manifests:
       - path: ../policies/global/security-auth/htpasswd.yaml
     remediationAction: enforce
-    categories:
-      - "SC System and Communications Protection"
-    controls:
-      - "SC-1 SYSTEM AND COMMUNICATIONS PROTECTION POLICY AND PROCEDURES"
-    standards:
-      - "NIST SP 800-53"
     severity: high
 
   - name: remove-kubeadmin
@@ -165,13 +134,7 @@ policies:
     manifests:
       - path: ../policies/global/security-auth/remove-kubeadmin.yaml
     remediationAction: enforce
-    complianceType: "mustnothave"
-    categories:
-      - "SC System and Communications Protection"
-    controls:
-      - "SC-1 SYSTEM AND COMMUNICATIONS PROTECTION POLICY AND PROCEDURES"
-    standards:
-      - "NIST SP 800-53"
+    complianceType: mustnothave
     severity: high
 
   - name: service-account-aap
@@ -180,12 +143,6 @@ policies:
       - path: ../policies/global/security-auth/service-account-aap.yaml
     remediationAction: enforce
     severity: medium
-    categories:
-      - "SC System and Communications Protection"
-    controls:
-      - "SC-1 SYSTEM AND COMMUNICATIONS PROTECTION POLICY AND PROCEDURES"
-    standards:
-      - "NIST SP 800-53"
 
   - name: ocp-tools
     description: "Configure SA, roles and cronjobs useful for openshift"
@@ -193,9 +150,3 @@ policies:
       - path: ../policies/global/common/ocp-tools.yaml
     remediationAction: enforce
     severity: medium
-    categories:
-      - "SC System and Communications Protection"
-    controls:
-      - "SC-1 SYSTEM AND COMMUNICATIONS PROTECTION POLICY AND PROCEDURES"
-    standards:
-      - "NIST SP 800-53"
