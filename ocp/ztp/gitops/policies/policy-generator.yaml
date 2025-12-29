@@ -17,8 +17,6 @@ policyDefaults:
     include: ["*"]
     exclude: []
   namespace: open-cluster-management-policies
-  policySets:
-    - global  
   remediationAction: inform
   complianceType: "musthave"
   severity: low
@@ -36,6 +34,7 @@ policySets:
             operator: In
             values:
               - OpenShift
+              
     policies:
       - disable-operator
       - oauth-configuration
