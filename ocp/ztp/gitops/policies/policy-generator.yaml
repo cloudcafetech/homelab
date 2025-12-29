@@ -27,14 +27,7 @@ policySets:
   - name: global
     description: "Global configuration for all managed clusters"
     placement:
-      name: global-placement
-      labelSelector:
-        matchExpressions:
-          - key: vendor
-            operator: In
-            values:
-              - OpenShift
-              
+      placementPath: ../policies/placement/global-placement.yaml           
     policies:
       - disable-operator
       - oauth-configuration
@@ -42,13 +35,7 @@ policySets:
   - name: ztp-sno
     description: "Configurations ztp-sno cluster"
     placement:  
-      name: ztp-sno-placement
-      labelSelector:
-        matchExpressions:
-          - key: name
-            operator: In
-            values:
-              - ztp-sno
+      placementPath: ../policies/placement/ztp-sno-placement.yaml   
     policies:
       - install-metallb-operator
       - install-cert-manager
@@ -56,13 +43,7 @@ policySets:
   - name: sno-ztp
     description: "Configurations for sno-ztp cluster"
     placement:
-      name: "sno-ztp-placement"
-      labelSelector:
-        matchExpressions:
-          - key: name
-            operator: In
-            values:
-              - sno-ztp
+      placementPath: ../policies/placement/sno-ztp-placement.yaml
     policies:
       - install-nmstate-operator
       - remove-kubeadmin
@@ -70,13 +51,7 @@ policySets:
   - name: hcp-ztp
     description: "Configurations for hcp-ztp cluster"
     placement:
-      name: "hcp-ztp-placement"
-      labelSelector:
-        matchExpressions:
-          - key: name
-            operator: In
-            values:
-              - hcp-ztp
+      placementPath: ../policies/placement/hcp-ztp-placement.yaml
     policies:
       - install-smb-operator
 
