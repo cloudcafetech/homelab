@@ -13,4 +13,4 @@ spec:
             - key: vendor
               operator: In
               values:
-                - Openshift
+                - OpenShift
