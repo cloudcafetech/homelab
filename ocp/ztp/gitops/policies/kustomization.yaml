@@ -4,4 +4,4 @@ kind: Kustomization
 generators:
   - policy-generator.yaml
 resources:
-  - 00-managed-clusterset.yaml
+  #- 00-managed-clusterset.yaml
