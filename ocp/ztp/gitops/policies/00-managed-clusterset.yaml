@@ -8,6 +8,42 @@ apiVersion: cluster.open-cluster-management.io/v1beta2
 kind: ManagedClusterSetBinding
 metadata:
   name: ocp-ztp-gitops
+  namespace: openshift-gitops
+spec:
+  clusterSet: ocp-ztp-gitops
+---
+apiVersion: cluster.open-cluster-management.io/v1beta2
+kind: ManagedClusterSetBinding
+metadata:
+  annotations:
+  name: ocp-ztp-gitops
   namespace: open-cluster-management-policies
+spec:
+  clusterSet: ocp-ztp-gitops
+---
+apiVersion: cluster.open-cluster-management.io/v1beta2
+kind: ManagedClusterSetBinding
+metadata:
+  annotations:
+  name: ocp-ztp-gitops
+  namespace: ztp-sno
+spec:
+  clusterSet: ocp-ztp-gitops
+---
+apiVersion: cluster.open-cluster-management.io/v1beta2
+kind: ManagedClusterSetBinding
+metadata:
+  annotations:
+  name: ocp-ztp-gitops
+  namespace: hcp-ztp
+spec:
+  clusterSet: ocp-ztp-gitops
+---
+apiVersion: cluster.open-cluster-management.io/v1beta2
+kind: ManagedClusterSetBinding
+metadata:
+  annotations:
+  name: ocp-ztp-gitops
+  namespace: sno-ztp
 spec:
   clusterSet: ocp-ztp-gitops
