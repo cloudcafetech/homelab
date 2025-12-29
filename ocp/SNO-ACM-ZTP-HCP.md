@@ -1187,6 +1187,17 @@ kubectl config view --flatten > all-clusters-kubeconfig
 cp all-clusters-kubeconfig ~/.kube/config
 ```
 
+- Labeling Managed Clusters
+
+```
+oc label managedcluster ztp-sno cluster.open-cluster-management.io/clusterset=ocp-ztp-gitops  --overwrite
+oc label managedcluster local-cluster cluster.open-cluster-management.io/clusterset=ocp-ztp-gitops  --overwrite
+```
+
+- Unlabeled
+
+```oc label managedcluster local-cluster cluster.open-cluster-management.io/clusterset-```
+
 ## Lesson learned
 
 #### default Storage Pool issue from KVM [libvirt](https://serverfault.com/questions/840519/how-to-change-the-default-storage-pool-from-libvirt/840520#840520)
