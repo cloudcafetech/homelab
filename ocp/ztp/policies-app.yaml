@@ -6,13 +6,11 @@ metadata:
 spec:
   destination:
     server: https://kubernetes.default.svc
-    #namespace: ocp-ztp-gitops-policies
     namespace: open-cluster-management-policies
   project: default
-  source:
-    #path: ocp/ztp/gitops/resources/acmpolicygenerator
-    path: ocp/ztp/gitops/policies    
+  source:   
     repoURL: https://github.com/cloudcafetech/homelab
+    path: ocp/ztp/gitops/policies    
     targetRevision: main
   syncPolicy:
     automated:
