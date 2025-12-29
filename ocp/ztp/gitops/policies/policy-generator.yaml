@@ -17,6 +17,8 @@ policyDefaults:
     include: ["*"]
     exclude: []
   namespace: open-cluster-management-policies
+  policySets:
+    - global  
   remediationAction: inform
   complianceType: "musthave"
   severity: low
