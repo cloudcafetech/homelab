@@ -7,6 +7,12 @@ placementBindingDefaults:
   name: "placementbinding"
 
 policyDefaults:
+  categories:
+    - "CM Configuration Management"
+  controls:
+    - "CM-2 Baseline Configuration"
+  standards:
+    - "NIST SP 800-53"
   namespaceSelector:
     include: ["*"]
     exclude: []
@@ -93,12 +99,6 @@ policies:
     manifests:
       - path: ../policies/global/certificate/cert-manager.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: install-lvm-operator
@@ -106,12 +106,6 @@ policies:
     manifests:
       - path: ../policies/global/operators/lvm-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: install-smb-operator
@@ -119,12 +113,6 @@ policies:
     manifests:
       - path: ../policies/global/operators/smb-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: install-metallb-operator
@@ -132,12 +120,6 @@ policies:
     manifests:
       - path: ../policies/global/operators/metallb-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: install-nmstate-operator
@@ -145,12 +127,6 @@ policies:
     manifests:
       - path: ../policies/global/operators/nmstate-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: install-compliance-operator
@@ -158,12 +134,6 @@ policies:
     manifests:
       - path: ../policies/global/operators/compliance-operator.yaml
     remediationAction: enforce
-    categories:
-      - "CM Configuration Management"
-    controls:
-      - "CM-2 Baseline Configuration"
-    standards:
-      - "NIST SP 800-53"
     severity: medium
 
   - name: oauth-configuration
