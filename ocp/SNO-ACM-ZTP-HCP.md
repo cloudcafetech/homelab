@@ -1052,6 +1052,9 @@ htpasswd -B -b ./htpasswd dkar dkar2675
 
 oc create secret generic htpasswd-secret --from-file=htpasswd=./htpasswd -n openshift-config
 
+oc extract secret/htpasswd-secret -n openshift-config  --to /tmp/ --confirm
+more /tmp/htpasswd
+
 cat << EOF > oauth.yaml
 apiVersion: config.openshift.io/v1
 kind: OAuth
@@ -1199,6 +1202,27 @@ oc label managedcluster local-cluster cluster.open-cluster-management.io/cluster
 ```oc label managedcluster local-cluster cluster.open-cluster-management.io/clusterset-```
 
 ## Lesson learned
+
+#### openshift argocd "user" as cluster-admin not able to create apps or view
+
+> Even with cluster-admin privileges in OpenShift, a user might not have automatic permissions within the Argo CD application itself because Argo CD manages its own internal Role-Based Access Control (RBAC)
+
+- Edit the ArgoCD CR in the openshift-gitops namespace
+
+```oc edit argocd openshift-gitops -n openshift-gitops```
+
+- Add or modify the following lines to the spec section
+
+```
+spec:
+  rbac:
+    defaultPolicy: ""
+    policy: |
+      g, system:cluster-admins, role:admin
+      g, cluster-admins, role:admin
+      g, cluster-admin, role:admin
+    scopes: '[groups]'
+```
 
 #### default Storage Pool issue from KVM [libvirt](https://serverfault.com/questions/840519/how-to-change-the-default-storage-pool-from-libvirt/840520#840520)
 
