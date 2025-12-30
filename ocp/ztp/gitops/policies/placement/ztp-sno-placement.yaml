@@ -2,8 +2,7 @@ apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
 metadata:
   name: ztp-sno-placement
-  #namespace: open-cluster-management-policies
-  namespace: ztp-sno
+  namespace: open-cluster-management-policies
 spec:
   #clusterSets:
     #- ocp-ztp-gitops
