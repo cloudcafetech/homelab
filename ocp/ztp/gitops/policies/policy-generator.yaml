@@ -18,7 +18,7 @@ policyDefaults:
     exclude: []
   namespace: open-cluster-management-policies
   remediationAction: inform
-  #complianceType: "musthave"
+  complianceType: "musthave"
   severity: low
   pruneObjectBehavior: "None"
   metadataComplianceType: "musthave"
