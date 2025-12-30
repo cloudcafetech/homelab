@@ -5,7 +5,7 @@ metadata:
   #namespace: open-cluster-management-policies
   namespace: ztp-sno
 spec:
-  i#clusterSets:
+  #clusterSets:
     #- ocp-ztp-gitops
   predicates:
     - requiredClusterSelector:
