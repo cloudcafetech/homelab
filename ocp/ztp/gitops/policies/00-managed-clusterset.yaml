@@ -9,6 +9,6 @@ kind: ManagedClusterSetBinding
 metadata:
   annotations:
   name: ocp-ztp-gitops
-  namespace: ztp-sno
+  namespace: open-cluster-management-policies
 spec:
   clusterSet: ocp-ztp-gitops
