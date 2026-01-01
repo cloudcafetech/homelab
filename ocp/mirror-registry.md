@@ -114,6 +114,7 @@ podman login -u admin -p Admin2675 mirror-registry.pkar.tech:8443
 
 - Create ImageSetConfiguration and start mirror 4.18 base images
 
+```
 cat << EOF > imageset.yaml
 apiVersion: mirror.openshift.io/v1alpha2
 kind: ImageSetConfiguration
@@ -136,15 +137,16 @@ mirror:
    - name: multicluster-engine
    - name: kubevirt-hyperconverged
    - name: local-storage-operator
-   - name: openshift-cert-manager-operator
    - name: lvms-operator
-   - name: kubernetes-nmstate-operator
    - name: smb-csi-driver-operator
-   - name: compliance-operator
-   - name: metallb-operator
-   - name: openshift-gitops-operator
-   - name: rhacs-operator
    - name: file-integrity-operator
+   - name: openshift-gitops-operator
+   - name: ansible-automation-platform-operator
+   - name: openshift-cert-manager-operator
+   - name: kubernetes-nmstate-operator
+   - name: metallb-operator
+   - name: compliance-operator
+   - name: rhacs-operator
    - name: cluster-logging
  additionalImages:
  - name: registry.redhat.io/ubi8/ubi:latest
@@ -161,5 +163,3 @@ EOF
 ./oc-mirror --config imageset.yaml docker://mirror-registry.pkar.tech:8443/ocp --v1
 
 ```
-
-
