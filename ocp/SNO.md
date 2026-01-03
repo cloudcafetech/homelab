@@ -7,6 +7,8 @@ mkdir -p /root/sno
 cd /root/sno
 VER=4.18.9
 PULLSECRET='cat pull-secret'
+CLUSTER_NAME=sno-acm
+DOMAIN=pkar.tech
 
 ssh-keygen -t rsa -N '' -f pkar
 
@@ -41,7 +43,7 @@ curl -L $ISO_URL > rhcos-live-$VER-x86_64.iso
 ```
 cat <<EOF > install-config.yaml
 apiVersion: v1
-baseDomain: pkar.tech
+baseDomain: $DOMAIN
 compute:
   - name: worker
     replicas: 0
@@ -49,7 +51,7 @@ controlPlane:
   name: master
   replicas: 1
 metadata:
-  name: sno-414
+  name: $CLUSTER_NAME
 networking:
   networkType: OVNKubernetes
   clusterNetworks:
