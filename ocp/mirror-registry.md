@@ -114,14 +114,12 @@ podman login -u admin -p Admin2675 mirror-registry.pkar.tech:8443
 
 - Create ImageSetConfiguration and start mirror 4.18 base images
 
+> Take reference Operators & channel version (https://myopenshiftblog.com/disconnected-registry-mirroring/) search "Disconnected Operators"
+
 ```
 cat << EOF > imageset.yaml
-apiVersion: mirror.openshift.io/v1alpha2
+apiVersion: mirror.openshift.io/v2alpha2
 kind: ImageSetConfiguration
-storageConfig:
-  registry:
-    imageURL: mirror-registry.pkar.tech:8443/ocp
-    skipTLS: false
 mirror:
  platform:
    channels:
@@ -134,32 +132,27 @@ mirror:
  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
    packages:
    - name: advanced-cluster-management
+     channels:
+     - name: release-2.15
    - name: multicluster-engine
-   #- name: kubevirt-hyperconverged
-   - name: local-storage-operator
    - name: lvms-operator
-   - name: smb-csi-driver-operator
-   #- name: file-integrity-operator
-   - name: openshift-gitops-operator
-   #- name: ansible-automation-platform-operator
-   - name: openshift-cert-manager-operator
-   - name: kubernetes-nmstate-operator
+     channels:
+     - name: stable-4.18
    - name: metallb-operator
-   - name: compliance-operator
-   #- name: rhacs-operator
-   #- name: cluster-logging
+     channels:
+     - name: stable
+   - name: openshift-gitops-operator
+     channels:
+     - name: latest
  additionalImages:
- #- name: registry.redhat.io/ubi8/ubi:latest
  - name: registry.redhat.io/ubi9/ubi:latest
- #- name: registry.redhat.io/rhel8/support-tools
+ - name: registry.redhat.io/ubi8/ubi:latest
+ - name: registry.redhat.io/rhel8/support-tools
  - name: registry.redhat.io/rhel9/support-tools
- #- name: registry.redhat.io/rhel8/rhel-guest-image:latest
+ - name: registry.redhat.io/rhel8/rhel-guest-image:latest
  - name: registry.redhat.io/rhel9/rhel-guest-image:latest
- #- name: registry.redhat.io/openshift4/ose-must-gather:latest
- #- name: quay.io/jcall/vddk:8.0.3
- #- name: quay.io/openshifttest/hello-openshift@sha256:4200f438cf2e9446f6bcff9d67ceea1f69ed07a2f83363b7fb52529f7ddd8a83
 EOF
 
-./oc-mirror --config imageset.yaml docker://mirror-registry.pkar.tech:8443/ocp --v1
+nohup ./oc-mirror --config imageset.yaml --workspace file:///root/mirror-registry/base-images-418 docker://mirror-registry.pkar.tech:8443/ocp --v2 &
 
 ```
