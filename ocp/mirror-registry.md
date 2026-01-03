@@ -153,6 +153,6 @@ mirror:
  - name: registry.redhat.io/rhel9/rhel-guest-image:latest
 EOF
 
-nohup ./oc-mirror --config imageset.yaml --workspace file:///root/mirror-registry/base-images-418 docker://mirror-registry.pkar.tech:8443/ocp --v2 &
+nohup ./oc-mirror --config imageset.yaml --workspace file://root/mirror-registry/base-images-418 docker://mirror-registry.pkar.tech:8443/ocp --v2 &
 
 ```
