@@ -5,22 +5,24 @@
 ```
 mkdir -p /root/sno
 cd /root/sno
-VERSION=4.14.34
-PULLSECRET='copy-and-paste-secret-file'
+VER=4.18.9
+PULLSECRET='cat pull-secret'
 
-ssh-keygen -t rsa -N '' -f cloudcafe
+ssh-keygen -t rsa -N '' -f pkar
 
-SSHKEY=`cat cloudcafe.pub`
+SSHKEY=`cat pkar.pub`
 
-yum install podman -y
-curl -k https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/openshift-client-linux.tar.gz > oc-$VERSION.tar.gz
-tar zxf oc-$VERSION.tar.gz
+yum install podman jq -y
+dnf install /usr/bin/nmstatectl -y
+
+curl -k https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VER/openshift-client-linux.tar.gz > oc-$VER.tar.gz
+tar zxf oc-$VER.tar.gz
 chmod +x oc
 mv oc /usr/local/bin/
 mv kubectl /usr/local/bin/
 
-curl -k https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/openshift-install-linux.tar.gz > openshift-install-linux-$VERSION.tar.gz
-tar zxvf openshift-install-linux-$VERSION.tar.gz
+curl -k https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VER/openshift-install-linux.tar.gz > openshift-install-linux-$VER.tar.gz
+tar zxvf openshift-install-linux-$VER.tar.gz
 chmod +x openshift-install
 mv openshift-install /usr/local/bin/
 ```
@@ -28,9 +30,9 @@ mv openshift-install /usr/local/bin/
 - Check the ISO_URL
 
 ```
-ISO_URL=$(openshift-install coreos print-stream-json | grep location | grep x86_64 | grep iso | cut -d\" -f4)
+ISO_URL=$(./openshift-install coreos print-stream-json | jq -r '.architectures.x86_64.artifacts' | grep location | grep iso | cut -d\" -f4)
 echo $ISO_URL
-curl -L $ISO_URL > rhcos-live-414.x86_64.iso
+curl -L $ISO_URL > rhcos-live-$VER-x86_64.iso
 ```
 
 - Create the install config file
@@ -38,7 +40,7 @@ curl -L $ISO_URL > rhcos-live-414.x86_64.iso
 ```
 cat <<EOF > install-config.yaml
 apiVersion: v1
-baseDomain: cloudcafe.tech
+baseDomain: pkar.tech
 compute:
   - name: worker
     replicas: 0
@@ -55,7 +57,7 @@ networking:
   serviceNetwork:
     - 172.30.0.0/16
 BootstrapInPlace:
-  InstallationDisk: /dev/sda
+  InstallationDisk: /dev/vda
 platform:
   none: {}
 pullSecret: $PULLSECRET
@@ -66,13 +68,18 @@ EOF
 - Create single node ignition file
 
 ```
-mkdir ocp && cp install-config.yaml ocp/
-openshift-install --dir=ocp create single-node-ignition-config
+mkdir ocp-$VER && cp install-config.yaml ocp-$VER/
+openshift-install --dir=ocp-$VER create single-node-ignition-config
 ```
 
 - Prepare coreos-installer command
 
 ```alias coreos-installer='podman run --privileged --rm -v /dev:/dev -v /run/udev:/run/udev -v $PWD:/data -w /data quay.io/coreos/coreos-installer:release'```
+
+```
+alias coreos-installer='podman run --privileged --pull always --rm -v /dev:/dev -v /run/udev:/run/udev -v $PWD:/data -w /data quay.io/coreos/coreos-installer:release'
+cp ocp-$VER/bootstrap-in-place-for-live-iso.ign iso.ign
+coreos-installer iso ignition embed -fi iso.ign rhcos-live.x86_64.iso
 
 - Create a script which will be used to replace the bootstrap ignition content.
 
