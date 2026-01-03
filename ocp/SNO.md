@@ -25,6 +25,7 @@ curl -k https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VER/openshift
 tar zxvf openshift-install-linux-$VER.tar.gz
 chmod +x openshift-install
 mv openshift-install /usr/local/bin/
+rm -rf *.tar.gz README.md
 ```
 
 - Check the ISO_URL
