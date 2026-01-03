@@ -74,12 +74,11 @@ openshift-install --dir=ocp-$VER create single-node-ignition-config
 
 - Prepare coreos-installer command
 
-```alias coreos-installer='podman run --privileged --rm -v /dev:/dev -v /run/udev:/run/udev -v $PWD:/data -w /data quay.io/coreos/coreos-installer:release'```
-
 ```
 alias coreos-installer='podman run --privileged --pull always --rm -v /dev:/dev -v /run/udev:/run/udev -v $PWD:/data -w /data quay.io/coreos/coreos-installer:release'
 cp ocp-$VER/bootstrap-in-place-for-live-iso.ign iso.ign
-coreos-installer iso ignition embed -fi iso.ign rhcos-live.x86_64.iso
+coreos-installer iso ignition embed -fi iso.ign rhcos-live-$VER-x86_64.iso
+```
 
 - Create a script which will be used to replace the bootstrap ignition content.
 
