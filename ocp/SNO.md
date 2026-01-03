@@ -6,7 +6,7 @@
 mkdir -p /root/sno
 cd /root/sno
 VER=4.18.9
-PULLSECRET='cat pull-secret'
+PULLSEC=`cat pull-secret`
 CLUSTER_NAME=sno-acm
 DOMAIN=pkar.tech
 
@@ -63,7 +63,7 @@ BootstrapInPlace:
   InstallationDisk: /dev/vda
 platform:
   none: {}
-pullSecret: $PULLSECRET
+pullSecret: $PULLSEC
 sshKey: $SSHKEY
 EOF
 ```
