@@ -63,7 +63,7 @@ BootstrapInPlace:
   InstallationDisk: /dev/vda
 platform:
   none: {}
-pullSecret: $PULLSEC
+pullSecret: '$PULLSEC'
 sshKey: $SSHKEY
 EOF
 ```
