@@ -674,6 +674,41 @@ oc label managedcluster local-cluster cluster.open-cluster-management.io/cluster
 
 ```oc label managedcluster local-cluster cluster.open-cluster-management.io/clusterset-```
 
+- Restart process (command) if killed
+
+> Modify PROCESS_COMMAND as per requirement 
+
+```
+cat << EOF > download-restart.sh
+#!/bin/bash
+
+PROCESS_COMMAND="/root/mirror-registry/tools/oc-mirror --config /root/mirror-registry/tools/imageset.yaml --workspace file://root/mirror-registry/base-images-418 docker://mirror-registry.pkar.tech:8443/ocp --v2 &"
+
+echo "Starting background process monitor..."
+
+while :
+do
+  $PROCESS_COMMAND
+  echo "$PROCESS_COMMAND was killed. Restarting..."
+  # Optional: add a short sleep to prevent a rapid respawn loop if the process crashes instantly
+  sleep 2
+done &
+
+# Store the PID of the monitoring loop (the parent process of your_process_executable)
+MONITOR_PID=$!
+echo "Monitor running with PID: $MONITOR_PID"
+
+# Wait for user input to stop the monitor (optional)
+read -p "Press Enter to stop the monitor and exit..."
+
+# Kill the monitor process to stop everything
+kill "$MONITOR_PID"
+echo "Monitor stopped."
+EOF
+
+chmod 755 download-restart.sh
+```
+
 ## Lesson learned
 
 #### openshift argocd "user" as cluster-admin not able to create apps or view
