@@ -1,8 +1,12 @@
-### Setup Zero Touch Provisioning (ZTP) on SNO 
+### Setup Zero Touch Provisioning (ZTP) on Single Node Openshift (SNO) 
 
-> Setup ZTP on SNO from ACM
+Setup Zero Touch Provisioning (ZTP) on Single Node Openshift (SNO) from Advance Cluster Management (ACM)
 
 > Without Storage Setup DO NOT run following steps
+
+- Verify Storage Class
+
+```oc get sc```
 
 - Enable SiteConfig Operator
 
