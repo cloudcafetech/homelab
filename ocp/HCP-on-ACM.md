@@ -1,5 +1,102 @@
 # HCP (Hosted Control Plane) using Hypershift managed from ACM
 
+> Without Storage Setup in ACM DO NOT run following steps
+
+- Verify Storage Class
+
+```oc get sc```
+
+- Enable SiteConfig Operator
+
+```
+oc get multiclusterhubs.operator.open-cluster-management.io multiclusterhub -n open-cluster-management -o yaml | grep siteconfig -B2 -A2
+oc patch multiclusterhubs.operator.open-cluster-management.io multiclusterhub -n open-cluster-management --type json --patch '[{"op": "add", "path":"/spec/overrides/components/-", "value": {"name":"siteconfig","enabled": true}}]'
+```
+
+- Verify the operator pod is running
+
+```oc get po -n open-cluster-management | grep siteconfig```
+
+- Check for default install template
+
+```oc get cm -n open-cluster-management | grep templates```
+
+- Check for the baremetalhost CRD
+
+```oc get crd | grep baremetalhost```
+
+- Check for the Provisioning Resource
+
+```oc get provisioning```
+
+- If it exists then patch it with
+
+```oc patch provisioning provisioning-configuration --type merge -p '{"spec":{"watchAllNamespaces": true }}'```
+
+- If it does not exist then create
+
+```
+cat << EOF > provisioning.yaml
+apiVersion: metal3.io/v1alpha1
+kind: Provisioning
+metadata:
+  name: provisioning-configuration
+spec:
+  provisioningNetwork: "Disabled"
+  watchAllNamespaces: true
+EOF
+
+oc create -f provisioning.yaml
+oc get provisioning
+```
+
+- Create AgentServiceConfig
+
+```
+cat << EOF > agentserviceconfig.yaml
+apiVersion: agent-install.openshift.io/v1beta1
+kind: AgentServiceConfig
+metadata:
+  name: agent
+spec:
+  databaseStorage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+  filesystemStorage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 30Gi
+  imageStorage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 30Gi
+  osImages:
+    - cpuArchitecture: x86_64
+      openshiftVersion: '4.17'
+      rootFSUrl: 'https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/pre-release/latest-4.17/rhcos-4.17.0-ec.3-x86_64-live-rootfs.x86_64.img'
+      url: 'https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/pre-release/latest-4.17/rhcos-4.17.0-ec.3-x86_64-live.x86_64.iso'
+      version: 417.94.202410090854-0
+    - cpuArchitecture: x86_64
+      openshiftVersion: '4.18'
+      rootFSUrl: 'https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/pre-release/4.18.0-rc.2/rhcos-4.18.0-rc.2-x86_64-live-rootfs.x86_64.img'
+      url: 'https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/pre-release/4.18.0-rc.2/rhcos-4.18.0-rc.2-x86_64-live.x86_64.iso'
+      version: 418.94.202411221729-0
+EOF
+
+oc apply -f agentserviceconfig.yaml
+```
+
+- Verify pod running
+
+```oc get po -n multicluster-engine | grep assisted```
+
 - Verify Hypershift enable in ACM
 
 ```
