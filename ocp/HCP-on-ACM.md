@@ -261,6 +261,8 @@ oc create -f kvm-infra.yaml
 
 - Create baremetahost yaml file for first worker
 
+> Verify BMC address IP should match with where Sushy Emulator deployed
+
 ```
 cat << EOF > hcp-ztp-worker1.yaml
 apiVersion: metal3.io/v1alpha1
