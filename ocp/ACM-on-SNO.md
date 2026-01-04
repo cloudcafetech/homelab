@@ -794,7 +794,16 @@ system-node-critical       2000001000   false            6d15h   PreemptLowerPri
 
 ### Test VM Creation
 
-> Download images (wget https://releases.ubuntu.com/jammy/ubuntu-22.04.5-desktop-amd64.iso) and rename ubuntu-2204.iso
+- Ubuntu VM
+
+> Download images and rename
+
+```
+wget wget https://releases.ubuntu.com/jammy/ubuntu-22.04.5-desktop-amd64.iso
+mv ubuntu-22.04.5-desktop-amd64.iso ubuntu-2204.iso
+```
+
+- After create VM Configure OS from VNC (Install RealVNC in Laptop/Desktop)
 
 ```
 qemu-img create -f qcow2 /home/sno/ubuntu-2204.qcow2 30G
@@ -812,6 +821,36 @@ virt-install \
   --import \
   --cdrom /home/kvm/images/ubuntu-2204.iso \
   --disk path=/home/sno/ubuntu-2204.qcow2,size=20 \
+  --network network=host-bridge \
+  --graphics vnc,listen=0.0.0.0,port=5977,password=pkar2675
+```
+
+- CentOS VM
+
+> Download images and rename
+
+```
+wget https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/iso/CentOS-Stream-9-latest-x86_64-dvd1.iso
+mv CentOS-Stream-9-latest-x86_64-dvd1.iso centos-9.iso
+```
+
+- After create VM Configure OS from VNC (Install RealVNC in Laptop/Desktop)
+
+```
+qemu-img create -f qcow2 /home/sno/centos-9.qcow2 130G
+
+virt-install \
+  --name centos9 \
+  --memory 8192 \
+  --vcpus=6 \
+  --cpu host-passthrough \
+  --os-variant centos-stream9 \
+  --noreboot \
+  --events on_reboot=restart \
+  --noautoconsole \
+  --import \
+  --cdrom /home/sno/centos-9.iso \
+  --disk path=/home/sno/centos-9.qcow2,size=20 \
   --network network=host-bridge \
   --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
 ```
