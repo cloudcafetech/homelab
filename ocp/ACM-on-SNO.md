@@ -1,0 +1,817 @@
+# Setup Advance Cluster Management on SNO
+
+### SSH KEYGEN Setup
+
+```ssh-keygen -f ./id_rsa -t rsa -N ''```
+
+### DNS Setup
+
+- Install BIND and tools
+
+```yum install bind bind-utils -y```
+
+- Verify nslookup should resolve from network 
+
+>         allow-query     { localhost; 192.168.1.0/24;};  section in /etc/named.conf file.
+
+- Create a new zone file
+
+```
+cat << EOF > /var/named/pkar.tech.zone
+
+$TTL 86400
+@   IN  SOA ns1.pkar.tech. admin.pkar.tech. (
+        2025040301 3600 1800 1209600 86400 )
+
+    IN NS ns1.pkar.tech.
+
+; DNS Server
+ns1.pkar.tech.           	IN A 192.168.1.161
+
+; SNO ACM cluster
+api.sno-acm.pkar.tech.    	IN A 192.168.1.18
+api-int.sno-acm.pkar.tech.	IN A 192.168.1.18
+*.apps.sno-acm.pkar.tech. 	IN A 192.168.1.18
+
+; SNO ZTP cluster
+api.sno-ztp.pkar.tech.    	IN A 192.168.1.21
+api-int.sno-ztp.pkar.tech.	IN A 192.168.1.21
+*.apps.sno-ztp.pkar.tech. 	IN A 192.168.1.21
+EOF
+```
+
+- Update (add below text) /etc/named.conf to load new zone
+
+```
+zone "pkar.tech" IN {
+    type master;
+    file "pkar.tech.zone";
+};
+```
+
+- Restart DNS
+
+```systemctl restart named```
+
+### Setup Bridge network on CentOS host
+
+- Create Bridge Interface
+
+```
+nmcli connection add type bridge autoconnect yes con-name br0 ifname br0
+nmcli connection modify br0 ipv4.addresses 192.168.1.160/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8 ipv4.method manual
+nmcli connection add type ethernet slave-type bridge autoconnect yes con-name bridge-port-eth0 ifname eno2 master br0
+nmcli connection down eno2 && nmcli connection up br0
+
+ip addr show br0
+ping google.com
+```
+
+- Add Bridge network on KVM
+
+```
+cat << EOF > host-bridge.xml
+<network>
+  <name>host-bridge</name>
+  <forward mode="bridge"/>
+  <bridge name="br0"/>
+</network>
+EOF
+virsh net-define host-bridge.xml
+virsh net-start host-bridge
+virsh net-autostart host-bridge
+```
+
+## Setup SNO ACM Cluster
+
+- Create SNO Cluster in RedHAt portal (https://console.redhat.com/)
+
+- Create VM for SNO ACM Cluster
+
+```
+mkdir -p /home/sno/ocp-acm
+cd /home/sno/ocp-acm/
+qemu-img create -f qcow2 /home/sno/ocp-acm/sno-acm.qcow2 120G
+
+virt-install \
+  --name=sno-acm \
+  --ram=28384 \
+  --vcpus=12 \
+  --cpu host-passthrough \
+  --os-variant=rhel8.0 \
+  --noreboot \
+  --events on_reboot=restart \
+  --noautoconsole \
+  --import \
+  --cdrom /home/sno/ocp-acm/sno-acm.iso \
+  --disk path=/home/sno/ocp-acm/sno-acm.qcow2,size=120 \
+  --network network=host-bridge \
+  --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
+
+sleep 10
+virsh list --all
+```
+
+- Download Kubeconfig from Redhat Portal (https://console.redhat.com/)
+
+- Verify Cluster
+
+```
+oc get no
+oc get co
+oc get po -A | grep -Ev "Running|Completed"
+```
+
+### Setup ACM
+
+- Install ACM Operator
+
+```
+cat << EOF > acm-operator.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: open-cluster-management
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: open-cluster-management
+  namespace: open-cluster-management
+spec:
+  targetNamespaces:
+  - open-cluster-management  
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: advanced-cluster-management
+  namespace: open-cluster-management
+spec:
+  channel: release-2.15
+  installPlanApproval: Automatic
+  name: advanced-cluster-management
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+
+oc create -f  acm-operator.yaml
+sleep 20
+```
+
+- Install ACM Multi Cluster Hub
+
+```
+cat << EOF > acm-mch.yaml
+apiVersion: operator.open-cluster-management.io/v1
+kind: MultiClusterHub
+metadata:
+  name: multiclusterhub
+  namespace: open-cluster-management
+spec: {}
+EOF
+
+oc create -f acm-mch.yaml
+```
+
+- Check ACM Deployment
+
+```
+oc get po -n open-cluster-management
+oc get po -n multicluster-engine
+```
+
+### Setup NFS Storage in ACM cluster
+
+```
+NFSRV=192.168.1.160
+NFSMOUNT=/home/sno/ocp-acm/nfsshare
+
+mkdir nfsstorage
+cd nfsstorage
+
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/nfs-rbac.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/nfs-deployment.yaml
+wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/kubenfs-storage-class.yaml
+
+sed -i "s/10.128.0.9/$NFSRV/g" nfs-deployment.yaml
+sed -i "s|/root/nfs/kubedata|$NFSMOUNT|g" nfs-deployment.yaml
+
+oc new-project kubenfs
+oc create -f nfs-rbac.yaml
+oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:kubenfs:nfs-client-provisioner
+oc create -f nfs-deployment.yaml -f kubenfs-storage-class.yaml -n kubenfs
+#oc patch storageclass managed-nfs-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+```
+
+### Setup OCP GitOps
+
+- Install GitOps Operator
+
+```
+oc create ns openshift-gitops-operator
+
+cat << EOF > gitops-operator.yaml
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-gitops-operator
+  namespace: openshift-gitops-operator
+spec:
+  upgradeStrategy: Default
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: openshift-gitops-operator
+  namespace: openshift-gitops-operator
+spec:
+  channel: latest
+  installPlanApproval: Automatic
+  name: openshift-gitops-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+
+oc create -f  gitops-operator.yaml
+sleep 40
+```
+- Check GitOps Deployment
+
+```
+oc get pods -n openshift-gitops-operator
+oc get pods -n openshift-gitops
+```
+- Openshift Gitops RBAC for clusterinstance and policy
+
+```
+cat << EOF > openshift-gitops-acm-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: openshift-gitops-acm-clusterrole
+rules:
+- apiGroups: ["siteconfig.open-cluster-management.io"]
+  resources: ["clusterinstances"]
+  verbs: ["create", "get", "list", "update", "delete", "watch"]
+- apiGroups: ["policy.open-cluster-management.io"]
+  resources: ["policies", "placementbindings"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+- apiGroups: ["apps.open-cluster-management.io"]
+  resources: ["placementrules"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+- apiGroups: ["cluster.open-cluster-management.io"]
+  resources: ["placements", "placements/status", "placementdecisions", "placementdecisions/status"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: openshift-gitops-acm-clusterrolebinding
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-application-controller
+  namespace: openshift-gitops
+roleRef:
+  kind: ClusterRole
+  name: openshift-gitops-acm-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+EOF
+
+oc create -f openshift-gitops-acm-rbac.yaml
+```
+
+- Integrate Kustomize plugin with OpenShift GitOps
+
+```
+cat << EOF > argocd-patch.yaml
+apiVersion: argoproj.io/v1beta1
+kind: ArgoCD
+metadata:
+  name: openshift-gitops
+  namespace: openshift-gitops
+spec:
+  kustomizeBuildOptions: --enable-alpha-plugins
+  repo:
+    env:
+    - name: KUSTOMIZE_PLUGIN_HOME
+      value: /etc/kustomize/plugin
+    initContainers:
+    - args:
+      - -c
+      - cp /policy-generator/PolicyGenerator-not-fips-compliant /policy-generator-tmp/PolicyGenerator
+      command:
+      - /bin/bash
+      image: registry.redhat.io/rhacm2/multicluster-operators-subscription-rhel9:v2.11.7-13
+      name: policy-generator-install
+      volumeMounts:
+      - mountPath: /policy-generator-tmp
+        name: policy-generator
+    volumeMounts:
+    - mountPath: /etc/kustomize/plugin/policy.open-cluster-management.io/v1/policygenerator
+      name: policy-generator
+    volumes:
+    - emptyDir: {}
+      name: policy-generator
+EOF
+
+oc patch argocd openshift-gitops -n openshift-gitops --type merge --patch-file argocd-patch.yaml
+```
+
+### Setup MetalLB
+
+- Install MetalLB Operator
+
+```
+cat << EOF > metallb-operator.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metallb-system
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: metallb-operator
+  namespace: metallb-system
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: metallb-operator-sub
+  namespace: metallb-system
+spec:
+  channel: stable
+  name: metallb-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+
+oc create -f  metallb-operator.yaml
+sleep 40
+```
+- Confirm install plan
+
+```oc get installplan -n metallb-system```
+
+- Verify Operator is installed
+
+```oc get clusterserviceversion -n metallb-system -o custom-columns=Name:.metadata.name,Phase:.status.phase```
+
+- Create MetalLB instance
+
+```
+cat << EOF > metallb-system.yaml
+apiVersion: metallb.io/v1beta1
+kind: MetalLB
+metadata:
+  name: metallb
+  namespace: metallb-system
+EOF
+
+oc create -f metallb-system.yaml
+```
+
+- Check Metallb Deployment
+
+```oc get pods -n metallb-system```
+
+- Define IP Pool
+
+```
+cat << EOF > metallb-ip-pool.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: ocp-hcp-ip-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.1.170-192.168.1.180
+  autoAssign: true
+  avoidBuggyIPs: false
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: ocp-hcp-l2-adv
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - ocp-hcp-ip-pool
+EOF
+
+oc create -f metallb-ip-pool.yaml
+```
+
+- Verify
+
+```oc get ipaddresspool -n metallb-system```
+
+
+## Tools setup
+
+- Install XRDP
+
+```
+dnf install epel-release -y
+dnf -y install xrdp
+systemctl enable xrdp --now
+
+# How to allow RDP through Firewalld
+#firewall-cmd --add-port=3389/tcp
+#firewall-cmd --runtime-to-permanent
+```
+
+- NFS setup
+
+```
+yum install -y nfs-utils
+systemctl enable rpcbind
+systemctl enable nfs-server
+systemctl start rpcbind
+systemctl start nfs-server
+mkdir /home/sno/ocp-acm/nfsshare
+chmod -R 755 /home/sno/ocp-acm/nfsshare
+
+echo "/home/sno/ocp-acm/nfsshare *(rw,sync,no_root_squash,no_subtree_check,insecure)" >> /etc/exports
+
+systemctl restart nfs-server
+```
+
+- Download oc tools
+
+```
+mkdir ocp-tools
+cd ocp-tools
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.19/openshift-client-linux.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.19/openshift-install-linux.tar.gz
+chmod 777 *
+tar xvf openshift-install-linux.tar.gz openshift-install
+tar xvf openshift-client-linux.tar.gz oc kubectl
+cp oc kubectl /usr/local/bin
+```
+
+- Download HCP CLI
+
+```
+oc get ConsoleCLIDownload hcp-cli-download -o json | jq -r ".spec" | grep amd64 | grep linux
+wget --no-check-certificat `oc get ConsoleCLIDownload hcp-cli-download -o json | jq -r ".spec" | grep amd64 | grep linux | cut -d '"' -f4`
+tar -zxvf hcp.tar.gz
+mv hcp /usr/local/bin/
+```
+
+- KVM Install
+
+```
+yum update -y
+dnf groupinstall "Virtualization Host" -y
+systemctl enable --now libvirtd
+yum -y install virt-top libguestfs-tools virt-install virt-manager
+```
+
+### Setup MetalLB using yamls
+
+- Download yamls
+
+```
+wget https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
+wget https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
+```
+
+- Edit file metallb.yaml and remove spec.template.spec.securityContext from controller Deployment and the speaker DaemonSet.
+
+```
+Lines to be deleted:
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+```
+
+- Deploy MetalLB
+
+```
+oc create -f namespace.yaml
+oc create -f metallb.yaml
+
+oc adm policy add-scc-to-user privileged -n metallb-system -z speaker 
+
+cat << EOF > metallb-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 192.168.1.170-192.168.1.180
+EOF
+oc create -f metallb-config.yaml
+```
+
+- Setup Oauth using htpasswd
+
+```
+yum install httpd-tools -y
+
+htpasswd -c -B -b ./htpasswd pkar pkar2675
+htpasswd -B -b ./htpasswd dkar dkar2675
+
+oc create secret generic htpasswd-secret --from-file=htpasswd=./htpasswd -n openshift-config
+
+oc extract secret/htpasswd-secret -n openshift-config  --to /tmp/ --confirm
+more /tmp/htpasswd
+
+cat << EOF > oauth.yaml
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+  - name: htpasswd
+    mappingMethod: claim
+    type: HTPasswd
+    htpasswd:
+      fileData:
+        name: htpasswd-secret
+EOF
+
+oc replace -f oauth.yaml
+
+oc adm policy add-cluster-role-to-user cluster-admin pkar 
+oc adm policy add-cluster-role-to-user cluster-admin dkar
+```
+
+## Troubleshooting
+
+- KVM Commands
+
+```
+virsh net-list
+virsh list --all
+virsh shutdown sno-acm-ts
+virsh destroy sno-acm-ts
+virsh domifaddr sno-acm-ts
+virsh dominfo sno-acm-ts
+virsh setmem sno-acm-ts 27G --config
+virsh setmaxmem sno-ztp 24G --config
+virsh undefine sno-acm-ts --remove-all-storage
+virsh undefine sno-ztp --remove-all-storage --nvram
+virsh domifaddr sno-acm-ts --source arp
+```
+
+- Check Utilizations
+
+```
+kubectl top pods -n metallb-system --sum
+oc adm top pods -n openshift-monitoring --sum
+oc adm top pods -n multicluster-engine --sum
+oc adm top pods -n open-cluster-management --sum
+for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do echo "Namespace: $ns"; kubectl top po -n $ns --sum ; sleep 3; done
+```
+
+- Disable Openshift Monitoring using CVO (cluster-version-operator)
+
+> Cluster Monitoring Operator (CMO) is managed by the Cluster Version Operator (CVO), disable CVO then scale down the CMO and Prometheus statefulset.
+
+```
+oc get pods -n openshift-cluster-version
+oc scale deployment/cluster-version-operator --replicas=0 -n openshift-cluster-version
+oc get pods -n openshift-cluster-version
+oc get deployment -n openshift-monitoring
+oc scale deployment cluster-monitoring-operator --replicas=0 -n openshift-monitoring
+oc scale deployment prometheus-operator --replicas=0 -n openshift-monitoring
+
+cat << EOF > cluster-monitoring-config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    enableUserWorkload: false
+    alertmanagerMain:
+      enabled: false
+    kubeStateMetrics:
+      enabled: false
+    nodeExporter:
+      enabled: false
+    prometheusK8s:
+      enabled: false
+EOF
+
+oc apply -f cluster-monitoring-config
+
+oc scale deployment cluster-monitoring-operator --replicas=0 -n openshift-monitoring
+oc scale deployment prometheus-operator --replicas=0 -n openshift-monitoring
+oc scale deployment thanos-querier --replicas=0 -n openshift-monitoring
+oc scale deployment telemeter-client --replicas=0 -n openshift-monitoring
+oc scale deployment openshift-state-metrics --replicas=0 -n openshift-monitoring
+oc scale deployment kube-state-metrics --replicas=0 -n openshift-monitoring
+oc scale deployment monitoring-plugin --replicas=0 -n openshift-monitoring
+oc scale statefulset.apps/prometheus-k8s --replicas=0 -n openshift-monitoring
+oc scale statefulset.apps/alertmanager-main --replicas=0 -n openshift-monitoring
+oc patch ds node-exporter -p '{"spec": {"template": {"spec": {"nodeSelector": {"non-existing": "true"}}}}}' -n openshift-monitoring
+oc get po -n openshift-monitoring
+```
+
+- Disable community-operators redhat-marketplace and certified-operators
+
+```
+oc patch operatorhubs/cluster --type merge --patch '{"spec":{"sources":[{"disabled": true,"name": "community-operators"},{"disabled": true,"name": "certified-operators"},{"disabled": true,"name": "redhat-marketplace"}]}}'
+
+oc get catsrc -n openshift-marketplace
+```
+
+- Kubeadmin user password change
+
+```
+PASS=g9GVb-I92co-kU379-IHjB5
+ASD=`htpasswd -bnBC 10 "" $PASS | tr -d ':\n'`
+EPASS=`echo "$ASD" | base64 -w0`
+oc patch secret/kubeadmin -n kube-system -p '{"data":{"kubeadmin": "'$EPASS'"}}'
+```
+
+- Remove Exited containers
+
+```crictl rm `crictl ps -a | grep Exited | awk '{ print $1}'```
+
+- Remove stuck resource
+
+```oc patch <object> <resource name> -p '{"metadata":{"finalizers":null}}'```
+
+- Remove Terminating namespace
+
+```
+NS=sno-ztp
+kubectl get ns $NS -o json | tr -d "\\n" | sed "s/\"finalizers\": \[[^]]\+]/\"finalizers\": []/" | kubectl replace --raw /api/v1/namespaces/$NS/finalize -f -
+```
+
+- Merge multiple kubeconfig
+
+```
+export KUBECONFIG=/home/sno/ocp-acm/sno-acm-kubeconfig:/home/sno/ocp-acm/sno-ztp-kubeconfig
+kubectl config view --flatten > all-clusters-kubeconfig
+cp all-clusters-kubeconfig ~/.kube/config
+```
+
+- Labeling Managed Clusters
+
+```
+oc label managedcluster ztp-sno cluster.open-cluster-management.io/clusterset=ocp-ztp-gitops  --overwrite
+oc label managedcluster local-cluster cluster.open-cluster-management.io/clusterset=ocp-ztp-gitops  --overwrite
+```
+
+- Unlabeled
+
+```oc label managedcluster local-cluster cluster.open-cluster-management.io/clusterset-```
+
+## Lesson learned
+
+#### openshift argocd "user" as cluster-admin not able to create apps or view
+
+> Even with cluster-admin privileges in OpenShift, a user might not have automatic permissions within the Argo CD application itself because Argo CD manages its own internal Role-Based Access Control (RBAC)
+
+- Edit the ArgoCD CR in the openshift-gitops namespace
+
+```oc edit argocd openshift-gitops -n openshift-gitops```
+
+- Add or modify the following lines to the spec section
+
+```
+spec:
+  rbac:
+    defaultPolicy: ""
+    policy: |
+      g, system:cluster-admins, role:admin
+      g, cluster-admins, role:admin
+      g, cluster-admin, role:admin
+    scopes: '[groups]'
+```
+
+#### default Storage Pool issue from KVM [libvirt](https://serverfault.com/questions/840519/how-to-change-the-default-storage-pool-from-libvirt/840520#840520)
+
+> error: Storage pool not found: no storage pool with matching name 'default'
+
+- Listing current pools
+
+```virsh pool-list```
+
+- Remove existing storage pool
+
+```
+virsh pool-destroy sno
+virsh pool-destroy images
+```
+
+- Undefine pool
+
+```virsh pool-undefine default```
+
+- Defining a new pool with name default
+
+```virsh pool-define-as --name default --type dir --target /home/sno```
+
+- Set pool to be started when libvirt daemons starts
+
+```virsh pool-autostart default```
+
+- Start pool
+
+```virsh pool-start default```
+
+- Checking pool state
+
+```virsh pool-list```
+
+
+### DNS resolve issue (Not able to pull intrim images from ACM Cluster)
+
+- Modify clusterinstance dns-resolver section and put both SNO cluster host IPs and router GW
+
+```
+          dns-resolver:
+            config:
+              search:
+                - pkar.tech
+              server:
+                - 192.168.1.18
+                - 192.168.1.21
+                - 192.168.1.1
+```
+
+### Cluster Image not found
+
+- Find proper image based on AgentServiceConfig download version
+
+```oc get clusterimagesets```
+
+- Modify clusterinstance below section
+
+> clusterImageSetNameRef: img4.18.5-x86-64-appsub
+
+### If POD not start in HCP due to memory issue (preemption: not eligible due to preemptionPolicy=Never)
+
+> Not recommended for production
+
+- Check priorityclasses
+
+```oc get priorityclasses```
+
+- Save below priorityclasses then delete and edit save file (modify Never to PreemptLowerPriority) and deploy again
+
+> hypershift-api-critical    100001000    false            133m    Never
+> hypershift-control-plane   100000000    false            133m    Never
+> hypershift-etcd            100002000    false            139m    Never
+> hypershift-operator        100003000    false            6d8h    Never
+
+- Verify
+
+```oc get priorityclasses```
+
+> Should be as below
+
+```
+oc get priorityclasses
+NAME                       VALUE        GLOBAL-DEFAULT   AGE     PREEMPTIONPOLICY
+hypershift-api-critical    100001000    false            133m    PreemptLowerPriority
+hypershift-control-plane   100000000    false            133m    PreemptLowerPriority
+hypershift-etcd            100002000    false            139m    PreemptLowerPriority
+hypershift-operator        100003000    false            6d8h    PreemptLowerPriority
+klusterlet-critical        1000000      false            6d9h    PreemptLowerPriority
+openshift-user-critical    1000000000   false            6d15h   PreemptLowerPriority
+system-cluster-critical    2000000000   false            6d15h   PreemptLowerPriority
+system-node-critical       2000001000   false            6d15h   PreemptLowerPriority
+```
+
+### Test VM Creation
+
+> Download images (wget https://releases.ubuntu.com/jammy/ubuntu-22.04.5-desktop-amd64.iso) and rename ubuntu-2204.iso
+
+```
+qemu-img create -f qcow2 /home/sno/ubuntu-2204.qcow2 30G
+
+virt-install \
+  --name ubuntu-2204 \
+  --memory 2048 \
+  --vcpus=12 \
+  --cpu host-passthrough \
+  --os-type linux \
+  --os-variant ubuntu22.04 \
+  --noreboot \
+  --events on_reboot=restart \
+  --noautoconsole \
+  --import \
+  --cdrom /home/kvm/images/ubuntu-2204.iso \
+  --disk path=/home/sno/ubuntu-2204.qcow2,size=20 \
+  --network network=host-bridge \
+  --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
+```
