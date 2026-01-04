@@ -175,6 +175,8 @@ virt-install \
 
 - Create Cluster Instance
 
+> Verify BMC address IP should match with Where Sushy Emulator deployed
+
 ```
 cat << EOF > sno-ztp-clusterinstance.yaml
 apiVersion: siteconfig.open-cluster-management.io/v1alpha1
