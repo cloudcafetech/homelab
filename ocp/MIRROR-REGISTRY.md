@@ -224,7 +224,7 @@ oc apply -f agentserviceconfig-mirror.yaml
 podman run -d --name rh-operator-index -p50051:50051 -it registry.redhat.io/redhat/redhat-operator-index:v4.18
 grpcurl -plaintext localhost:50051 api.Registry/ListPackages > packages.out
 
-podman kill rh-operator-index; podman rm rh-operator-index
+#podman kill rh-operator-index; podman rm rh-operator-index
 podman ps -a
 ```
 
