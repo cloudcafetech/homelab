@@ -37,7 +37,9 @@ virt-install \
 - Install packages
 
 ```
-yum install podman openssl jq -y
+wget https://github.com/fullstorydev/grpcurl/releases/download/v1.9.3/grpcurl_1.9.3_linux_amd64.rpm
+mv grpcurl_1.9.3_linux_amd64.rpm grpcurl.rpm
+yum install podman openssl jq grpcurl.rpm -y
 
 mkdir -p mirror-registry/tools
 cd mirror-registry/tools
@@ -214,6 +216,18 @@ oc apply -f agentserviceconfig-mirror.yaml
 
 ```
 
+- To know name of the operators from Redhat Operator Index
+
+> Make sure grpcurl should install (wget https://github.com/fullstorydev/grpcurl/releases/download/v1.9.3/grpcurl_1.9.3_linux_amd64.rpm; yum install grpcurl_1.9.3_linux_amd64.rpm -y)
+
+```
+podman run -d --name rh-operator-index -p50051:50051 -it registry.redhat.io/redhat/redhat-operator-index:v4.18
+grpcurl -plaintext localhost:50051 api.Registry/ListPackages > packages.out
+
+podman kill rh-operator-index; podman rm rh-operator-index
+podman ps -a
+```
+
 - Restart process (command) if killed
 
 > Modify PROCESS_COMMAND as per requirement 
@@ -248,3 +262,4 @@ EOF
 
 chmod 755 download-restart.sh
 ```
+
