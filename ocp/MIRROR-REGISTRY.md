@@ -157,6 +157,63 @@ nohup ./oc-mirror --config imageset.yaml --workspace file://root/mirror-registry
 
 ```
 
+- Setup Web Server
+
+```
+yum install -y httpd
+systemctl enable --now httpd
+sed -i 's/Listen 80/Listen 0.0.0.0:8080/' /etc/httpd/conf/httpd.conf
+mkdir /var/www/html/ocp418
+systemctl restart httpd
+systemctl status httpd
+
+wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.18/4.18.30/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img -O /var/www/html/ocp418/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img
+
+wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.18/4.18.30/rhcos-4.18.30-x86_64-live.x86_64.iso -O /var/www/html/ocp418/rhcos-4.18.30-x86_64-live.x86_64.iso
+
+curl http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img
+curl http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live.x86_64.iso
+```
+
+- Create agentserviceconfig file download images from locally (registry server)
+
+```
+cat << EOF > agentserviceconfig-mirror.yaml
+apiVersion: agent-install.openshift.io/v1beta1
+kind: AgentServiceConfig
+metadata:
+  name: agent
+spec:
+  databaseStorage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+  filesystemStorage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 30Gi
+  imageStorage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 30Gi
+  osImages:
+    - cpuArchitecture: x86_64
+      openshiftVersion: '4.18'
+      rootFSUrl: 'http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img'
+      url: 'http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live.x86_64.iso'
+      version: 4.18.30
+EOF
+
+oc apply -f agentserviceconfig-mirror.yaml
+
+```
+
 - Restart process (command) if killed
 
 > Modify PROCESS_COMMAND as per requirement 
