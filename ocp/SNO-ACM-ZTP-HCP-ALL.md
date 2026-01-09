@@ -1173,7 +1173,12 @@ oc patch secret/kubeadmin -n kube-system -p '{"data":{"kubeadmin": "'$EPASS'"}}'
 
 - Remove stuck resource
 
-```oc patch <object> <resource name> -p '{"metadata":{"finalizers":null}}'```
+```
+oc patch apps sno-ztp-cluster-app -n openshift-gitops --type json --patch='[ { "op": "remove", "path": "/metadata/finalizers" } ]'
+
+oc patch <object> <resource name> -p '{"metadata":{"finalizers":null}}'
+
+```
 
 - Remove Terminating namespace
 
