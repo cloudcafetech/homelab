@@ -3,7 +3,7 @@ kind: Kustomization
 
 generators:
   #- policy-generator.yaml
-  #- policy-generator-acm.yaml  
+  - policy-generator-hub.yaml  
   - policy-generator-sno.yaml  
 resources:
   - 00-managed-clusterset.yaml
