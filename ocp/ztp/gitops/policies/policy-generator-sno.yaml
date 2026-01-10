@@ -1,0 +1,99 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: policies-sno-clusters
+placementBindingDefaults:
+  # Set an explicit placement binding name to use rather than rely on the default.
+  name: "placementbinding"
+
+policyDefaults:
+  categories:
+    - "CM Configuration Management"
+  controls:
+    - "CM-2 Baseline Configuration"
+  standards:
+    - "NIST SP 800-53"
+  namespaceSelector:
+    include: ["*"]
+    exclude: []
+  namespace: open-cluster-management-policies
+  remediationAction: inform
+  complianceType: "musthave"
+  severity: low
+  pruneObjectBehavior: "None"
+  metadataComplianceType: "musthave"
+
+policySets:
+  - name: sno-ztp
+    description: "Configurations sno-ztp cluster"
+    placement:  
+      name: "sno-ztp-placement"
+      labelSelector:
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - sno-ztp
+          - key: vendor
+            operator: NotIn
+            values:
+              - OpenShift
+    policies:
+      - disable-operator
+      - oauth-configuration
+      - install-metallb-operator
+      - install-cert-manager
+
+policies:
+  - name: disable-operator
+    description: "Disable community-operators redhat-marketplace and certified-operators"
+    manifests:
+      - path: ../policies/global/common/disable-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: low
+
+  - name: oauth-configuration
+    description: "Configure HTTPaswd authentication and associated roles"
+    manifests:
+      - path: ../policies/global/security-auth/htpasswd.yaml
+    remediationAction: enforce
+    categories:
+      - "SC System and Communications Protection"
+    controls:
+      - "SC-1 SYSTEM AND COMMUNICATIONS PROTECTION POLICY AND PROCEDURES"
+    standards:
+      - "NIST SP 800-53"
+    severity: high
+
+  - name: install-cert-manager
+    description: "Install and configure Cert Manager for certificate management"
+    manifests:
+      - path: ../policies/global/operators/certmanager-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: low
+
+  - name: install-metallb-operator
+    description: "Install MetalLB Operator for Loadbalancer"
+    manifests:
+      - path: ../policies/global/operators/metallb-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: medium
+
