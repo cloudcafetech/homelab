@@ -7,7 +7,7 @@ metadata:
   labels:
     name: sno-ztp
     cluster-name: sno-ztp
-    base-domain: 
+    base-domain: pkar.tech
     environment-chain: prod
     cluster-location: india
     cluster.open-cluster-management.io/clusterset: ocp-ztp-gitops
