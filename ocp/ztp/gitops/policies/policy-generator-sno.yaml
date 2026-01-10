@@ -34,10 +34,6 @@ policySets:
             operator: In
             values:
               - sno-ztp
-          - key: vendor
-            operator: NotIn
-            values:
-              - OpenShift
     policies:
       - disable-operator
       - oauth-configuration
