@@ -256,14 +256,17 @@ rules:
   resources: ["clusterinstances"]
   verbs: ["create", "get", "list", "update", "delete", "watch"]
 - apiGroups: ["policy.open-cluster-management.io"]
-  resources: ["policies", "placementbindings"]
+  resources: ["policies", "policysets", "placementbindings"]
   verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
 - apiGroups: ["apps.open-cluster-management.io"]
   resources: ["placementrules"]
   verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
 - apiGroups: ["cluster.open-cluster-management.io"]
-  resources: ["placements", "placements/status", "placementdecisions", "placementdecisions/status"]
+  resources: ["managedclustersets", "managedclustersetbindings", "managedclustersets/bind", "managedclustersets/join", "placements", "placements/status", "placementdecisions", "placementdecisions/status"]
   verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+- apiGroups: ["cluster.open-cluster-management.io"]
+  resources: ["managedclusters"]
+  verbs: ["get", "list", "update", "watch", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
