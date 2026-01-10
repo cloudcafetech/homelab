@@ -718,7 +718,7 @@ chmod 755 download-restart.sh
 
 ## Lesson learned
 
-### To recover the cluster, please try to reimport the cluster
+### To recover the cluster, please try to reimport the cluster (https://access.redhat.com/solutions/6988100)
 
 > clusters unknown status in ACM, seems Klusterlet Registration Degraded and expired bootstrap secret
 
