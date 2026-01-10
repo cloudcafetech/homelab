@@ -177,14 +177,138 @@ curl http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live-rootfs.x86_64.im
 curl http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live.x86_64.iso
 ```
 
-- Create agentserviceconfig file download images from locally (registry server)
+#### Extra preparation 
+
+- Get Certificate Chain and save in file
+
+```
+echo | openssl s_client -connect mirror-registry.pkar.tech:8443 -showcerts </dev/null | sed -n '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/p' > certificate_chain.pem
+```
+
+- Add extra 4 space in certificate chain file
+
+> copy and paste content of file in ca-bundle.crt section
+
+```sed -i 's/^/    /' certificate_chain.pem```
+
+
+- Create AgentServiceConfig file
 
 ```
 cat << EOF > agentserviceconfig-mirror.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: assisted-installer-mirror-config
+  namespace: multicluster-engine
+  labels:
+    app: assisted-service
+data:
+  registries.conf: |
+    unqualified-search-registries = ["registry.access.redhat.com", "docker.io"]
+
+    [[registry]]
+      prefix = ""
+      location = "registry.redhat.io/cert-manager"
+      mirror-by-digest-only = true
+      [[registry.mirror]]
+        location = "mirror-registry.pkar.tech:8443/ocp/cert-manager"
+
+    [[registry]]
+      prefix = ""
+      location = "registry.redhat.io/lvms4"
+      mirror-by-digest-only = true
+      [[registry.mirror]]
+        location = "mirror-registry.pkar.tech:8443/ocp/lvms4"
+
+    [[registry]]
+      prefix = ""
+      location = "registry.redhat.io/openshift4"
+      mirror-by-digest-only = true
+      [[registry.mirror]]
+        location = "mirror-registry.pkar.tech:8443/ocp/openshift4"
+
+    [[registry]]
+      prefix = ""
+      location = "registry.redhat.io/ubi8"
+      mirror-by-digest-only = true
+      [[registry.mirror]]
+        location = "mirror-registry.pkar.tech:8443/ocp/ubi8"
+
+    [[registry]]
+      prefix = ""
+      location = "registry.redhat.io/ubi9"
+      mirror-by-digest-only = true
+      [[registry.mirror]]
+        location = "mirror-registry.pkar.tech:8443/ocp/ubi9"
+
+    [[registry]]
+      prefix = ""
+      location = "quay.io/openshift-release-dev/ocp-release"
+      mirror-by-digest-only = true
+      [[registry.mirror]]
+        location = "mirror-registry.pkar.tech:8443/ocp/openshift/release-images"
+
+    [[registry]]
+      prefix = ""
+      location = "quay.io/openshift-release-dev/ocp-v4.0-art-dev"
+      mirror-by-digest-only = true
+      [[registry.mirror]]
+        location = "mirror-registry.pkar.tech:8443/ocp/openshift/release"
+
+  ca-bundle.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDpzCCAo+gAwIBAgIUMo+eBh/XOUjfjb9VTu6lOr2HDbcwDQYJKoZIhvcNAQEL
+    BQAwczELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAlZBMREwDwYDVQQHDAhOZXcgWW9y
+    azENMAsGA1UECgwEUXVheTERMA8GA1UECwwIRGl2aXNpb24xIjAgBgNVBAMMGW1p
+    cnJvci1yZWdpc3RyeS5wa2FyLnRlY2gwHhcNMjYwMTA4MTQwOTQ1WhcNMjYxMjMw
+    MTQwOTQ1WjAaMRgwFgYDVQQDDA9xdWF5LWVudGVycHJpc2UwggEiMA0GCSqGSIb3
+    DQEBAQUAA4IBDwAwggEKAoIBAQDcCB9hauTmHbTOSGp26tNXH/Cz3NrZ72qlko01
+    LqCWkLDMRMTzo7t1R21ClEhtyKRyEJFQPer1EFauHrkymWdxB5ruUYHAnpf5lIbd
+    em03brgqkuaXicXvs5gtPEayZiv0X8xLM3LVy8hrjWOnST5cD4shqieZISQfPNI8
+    9+2F87U9LfnyYNjSNZ0LklxEATzrskBqCzT9BBcqcV9GTr07mpshI1tZLUCSU3pv
+    cSSBy8r1k0hoNeTnQDgHlNgKttgthuoTH+cq4Za72jit2f7/wKZTzQQrEJFJfqCv
+    SKig0eu6v4859vYCYn5iXXm0QE0Ck3hJRa31N3vOTy9vSgsnAgMBAAGjgYswgYgw
+    CwYDVR0PBAQDAgLkMBMGA1UdJQQMMAoGCCsGAQUFBwMBMCQGA1UdEQQdMBuCGW1p
+    cnJvci1yZWdpc3RyeS5wa2FyLnRlY2gwHQYDVR0OBBYEFC3T+oKBnU3rweBFbAeb
+    O7xROmytMB8GA1UdIwQYMBaAFH/E3ISB2jFNsYrQO/Fih1szYuqjMA0GCSqGSIb3
+    DQEBCwUAA4IBAQAziOzzPwFG9/gQOJgOvBNXi2FNi7EQ4SUwgjkWNPlwllC4bywG
+    xNpFvGdQiu115okaiTibzatoPXIqRmj9QcrV68qEYGPSf8mfWCOfahO++s4g2e1b
+    CYB1KKP5Wv7A1bBT0ipx3YYKkR7og2jtVQtBsLj8gDzPTGNjXtotF25+53CAJ6Wt
+    JK+rn58IakUZgXr5Owg7hlz/tXlDgfUbIWT0icOrwU+rLhVtuFTcpFIcZzljznI4
+    IIrBSXYyTXs+Pushk6hZOPl7pwDePrcFbgRGyXTHHWz+kcxOi0pX2eKTXIoCUrW5
+    MlOlyD/xGV5pepYhPo5CkJ12UAkmo+QPaMHW
+    -----END CERTIFICATE-----
+    -----BEGIN CERTIFICATE-----
+    MIID8TCCAtmgAwIBAgIUTtDLZ0pCIL/VqsOsNJ3Z/I0pYe8wDQYJKoZIhvcNAQEL
+    BQAwczELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAlZBMREwDwYDVQQHDAhOZXcgWW9y
+    azENMAsGA1UECgwEUXVheTERMA8GA1UECwwIRGl2aXNpb24xIjAgBgNVBAMMGW1p
+    cnJvci1yZWdpc3RyeS5wa2FyLnRlY2gwHhcNMjYwMTA4MTQwOTQzWhcNMjgxMDI4
+    MTQwOTQzWjBzMQswCQYDVQQGEwJVUzELMAkGA1UECAwCVkExETAPBgNVBAcMCE5l
+    dyBZb3JrMQ0wCwYDVQQKDARRdWF5MREwDwYDVQQLDAhEaXZpc2lvbjEiMCAGA1UE
+    AwwZbWlycm9yLXJlZ2lzdHJ5LnBrYXIudGVjaDCCASIwDQYJKoZIhvcNAQEBBQAD
+    ggEPADCCAQoCggEBAI28UiCa+Iv0WJZQ/9u/6zwEfobncWfbsxZG8bhhFHsHSrwU
+    /NhjBS1QDoPDPoOoL1Lg4S712oLtMAVVOnyHLTIIoLVjZ0i4Fc2q4TRIoppE1f6z
+    COGjhgL0q5IVBTL3ZtkX75B/wl4wHW9XZ+hiRXf+2jRYbUUSylcCQ3dDntE14tfl
+    7WXfn1hVcoOHfuirq8PgfiVLCr1pL2s0NZnynodscgLC4uBTG84SI0CGZGckI9SR
+    TAaN+f6CmHJ7UoYMeffHi9QM9ogDRcKHwTKXNGQ5dUpgbm7HSIo45xmBBGb3Oxjb
+    7SUXO5aM5GzOrMqxAXEcyTe2pID7TgMXDaLO/CkCAwEAAaN9MHswCwYDVR0PBAQD
+    AgLkMBMGA1UdJQQMMAoGCCsGAQUFBwMBMCQGA1UdEQQdMBuCGW1pcnJvci1yZWdp
+    c3RyeS5wa2FyLnRlY2gwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4EFgQUf8Tc
+    hIHaMU2xitA78WKHWzNi6qMwDQYJKoZIhvcNAQELBQADggEBAFLj4wT7t6vtNl9c
+    e1M58YOcAjjN/Pz0Aw5Rrxf36JO1ZnFT/yKVxDMhfvV4C3hGMWIiaHymap2yTZxZ
+    ozAGMMiXps3+EjEAfWTlQcSosm8pkY51+oWpUo5Z/QtmwuQ7PtQ1sI8so+8rRBqH
+    6qyVsmBI82RrbeMvBzARHa1Va2jov76KXLwsXnDvzQkzfW+nB0Ea/Wo1HlyKzRQC
+    x4mSEOfY2Z75pBdjMnmD2cRt4JR/10aV10rot6TSXHqOIcA9XZ1A9Vr1anve5N/2
+    Rzk8jcVj7c5OKWTOSXhyspsKk9JUS9PLdv+rFEuDTgzfZ6NYB6YBhZAHz9gkohgi
+    TGaluAY=
+    -----END CERTIFICATE-----
+---
 apiVersion: agent-install.openshift.io/v1beta1
 kind: AgentServiceConfig
 metadata:
   name: agent
+  namespace: multicluster-engine
 spec:
   databaseStorage:
     accessModes:
@@ -204,6 +328,8 @@ spec:
     resources:
       requests:
         storage: 30Gi
+  mirrorRegistryRef:
+    name: assisted-installer-mirror-config
   osImages:
     - cpuArchitecture: x86_64
       openshiftVersion: '4.18'
@@ -211,10 +337,7 @@ spec:
       url: 'http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live.x86_64.iso'
       version: 4.18.30
 EOF
-
-oc apply -f agentserviceconfig-mirror.yaml
-
-```
+---
 
 - To know name of the operators from Redhat Operator Index
 
