@@ -96,18 +96,3 @@ policies:
     standards:
       - "NIST SP 800-53"
     severity: medium
-
-  - name: remove-kubeadmin
-    description: "Remove the kubeadmin user for security reasons"
-    manifests:
-      - path: ../policies/global/security-auth/remove-kubeadmin.yaml
-    remediationAction: enforce
-    complianceType: "mustnothave"
-    categories:
-      - "SC System and Communications Protection"
-    controls:
-      - "SC-1 SYSTEM AND COMMUNICATIONS PROTECTION POLICY AND PROCEDURES"
-    standards:
-      - "NIST SP 800-53"
-    severity: high   
-
