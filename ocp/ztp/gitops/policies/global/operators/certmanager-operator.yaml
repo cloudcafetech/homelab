@@ -4,9 +4,9 @@ metadata:
   name: cert-manager-operator
   namespace: open-cluster-management-policies    
 spec:
-  #complianceType: musthave
-  #remediationAction: enforce
-  #severity: critical
+  complianceType: musthave
+  remediationAction: enforce
+  severity: critical
   subscription:
     channel: stable-v1
     name: openshift-cert-manager-operator
