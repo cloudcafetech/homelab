@@ -13,13 +13,20 @@ mv kubectl /usr/local/bin/
 rm openshift-install-linux.tar.gz openshift-client-linux.tar.gz README.md
 ```
 
-- Preparation 
+- Transfer pull-secret file (/root/.docker/config.json) from Mirror Registry server
+
+```
+scp cloudcafe@192.168.1.150:/home/cloudcafe/config.json .
+mv config.json pull-secret
+```
+  
+- Preparation
 
 ```
 ssh-keygen -t rsa -N '' -f cloudcafe
 
 ISO_URL=$(./openshift-install coreos print-stream-json | jq -r '.architectures.x86_64.artifacts' | grep location | grep iso | cut -d\" -f4)
-PULLSECRET=`cat pull-secret`
+PULLSECRET=`cat pull-secret` 
 SSHKEY=`cat cloudcafe.pub`
 
 echo $ISO_URL
@@ -191,4 +198,12 @@ virt-install \
 - Verify install complete
 
 ```openshift-install --dir=ocp418 agent wait-for install-complete --log-level=debug```
+
+- Login Cluster
+
+```
+export KUBECONFIG=/home/sno/standalone/ocp418/auth/kubeconfig
+oc get no
+oc get co
+```
 
