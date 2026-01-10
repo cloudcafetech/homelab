@@ -1,0 +1,18 @@
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  annotations:
+    apps.open-cluster-management.io/do-not-delete: 'true'  
+    apps.open-cluster-management.io/reconcile-option: replace     
+  labels:
+    name: sno-ztp
+    cluster-name: sno-ztp
+    base-domain: 
+    environment-chain: prod
+    cluster-location: india
+    cluster.open-cluster-management.io/clusterset: ocp-ztp-gitops
+  name: sno-ztp
+spec:
+  hubAcceptsClient: true
+  leaseDurationSeconds: 120
+
