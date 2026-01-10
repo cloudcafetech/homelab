@@ -681,34 +681,6 @@ oc label managedcluster local-cluster cluster.open-cluster-management.io/cluster
 
 ```oc label managedcluster local-cluster cluster.open-cluster-management.io/clusterset-```
 
-### To recover the cluster, please try to reimport the cluster
-
-> clusters unknown status in ACM, seems Klusterlet Registration Degraded and expired bootstrap secret
-
-- Delete the klusterlet on the each managed cluster
-
-```oc delete klusterlets klusterlet```
-
-- Delete the import secret from each managed cluster namespace on the hub
-
-```
-oc delete secrets sno-ztp-import -n sno-ztp
-sleep 10
-```
-
-- After import secret is recreated, expose the import resources from the import secret on the hub
-
-```
-oc get secrets sno-ztp-import -n sno-ztp -o=jsonpath='{.data.crds\.yaml}' | base64 -d > klusterlet-crds-sno-ztp.yaml
-oc get secrets sno-ztp-import -n sno-ztp -o=jsonpath='{.data.import\.yaml}' | base64 -d > import-sno-ztp.yaml
-```
-- Apply yamls on the managed cluster
-
-```
-oc apply -f klusterlet-crds-sno-ztp.yaml
-oc apply -f import-sno-ztp.yaml
-```
-
 - Restart process (command) if killed
 
 > Modify PROCESS_COMMAND as per requirement 
@@ -745,6 +717,34 @@ chmod 755 download-restart.sh
 ```
 
 ## Lesson learned
+
+### To recover the cluster, please try to reimport the cluster
+
+> clusters unknown status in ACM, seems Klusterlet Registration Degraded and expired bootstrap secret
+
+- Delete the klusterlet on the each managed cluster
+
+```oc delete klusterlets klusterlet```
+
+- Delete the import secret from each managed cluster namespace on the hub
+
+```
+oc delete secrets sno-ztp-import -n sno-ztp
+sleep 10
+```
+
+- After import secret is recreated, expose the import resources from the import secret on the hub
+
+```
+oc get secrets sno-ztp-import -n sno-ztp -o=jsonpath='{.data.crds\.yaml}' | base64 -d > klusterlet-crds-sno-ztp.yaml
+oc get secrets sno-ztp-import -n sno-ztp -o=jsonpath='{.data.import\.yaml}' | base64 -d > import-sno-ztp.yaml
+```
+- Apply yamls on the managed cluster
+
+```
+oc apply -f klusterlet-crds-sno-ztp.yaml
+oc apply -f import-sno-ztp.yaml
+```
 
 #### openshift argocd "user" as cluster-admin not able to create apps or view
 
