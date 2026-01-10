@@ -1,0 +1,96 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: policies-acm-cluster
+placementBindingDefaults:
+  # Set an explicit placement binding name to use rather than rely on the default.
+  name: "placementbinding"
+
+policyDefaults:
+  categories:
+    - "CM Configuration Management"
+  controls:
+    - "CM-2 Baseline Configuration"
+  standards:
+    - "NIST SP 800-53"
+  namespaceSelector:
+    include: ["*"]
+    exclude: []
+  namespace: open-cluster-management-policies
+  remediationAction: inform
+  complianceType: "musthave"
+  severity: low
+  pruneObjectBehavior: "None"
+  metadataComplianceType: "musthave"
+
+policySets:
+  - name: global
+    description: "Global configuration for all managed clusters"
+    placement:
+      name: "global-placement"
+      labelSelector:
+        matchExpressions:
+          - key: vendor
+            operator: In
+            values:
+              - OpenShift
+
+    policies:
+      - disable-operator
+      - oauth-configuration
+
+policies:
+  - name: disable-operator
+    description: "Disable community-operators redhat-marketplace and certified-operators"
+    manifests:
+      - path: ../policies/global/common/disable-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: low
+
+  - name: install-cert-manager
+    description: "Install and configure Cert Manager for certificate management"
+    manifests:
+      - path: ../policies/global/operators/certmanager-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: low
+
+  - name: install-metallb-operator
+    description: "Install MetalLB Operator for Loadbalancer"
+    manifests:
+      - path: ../policies/global/operators/metallb-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: medium
+
+  - name: install-nmstate-operator
+    description: "Install NMState Operator for Networking"
+    manifests:
+      - path: ../policies/global/operators/nmstate-operator.yaml
+    remediationAction: enforce
+    categories:
+      - "CM Configuration Management"
+    controls:
+      - "CM-2 Baseline Configuration"
+    standards:
+      - "NIST SP 800-53"
+    severity: medium
+
+
+
