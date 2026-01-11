@@ -167,6 +167,15 @@ virt-install \
 
 - Create Pull Secret (First login Redhat console url then download pull secret from download section)
 
+> #### Zero Touch Provisioning (ZTP) with Mirror Registry integration, pull secret should contains credentials for both Mirror Registry and official Red Hat Registries.
+
+> Transfer merged-pull-secret file (/home/cloudcafe/merge-pull-secret) from Mirror Registry server
+
+```
+scp cloudcafe@192.168.1.150:/home/cloudcafe/merge-pull-secret .
+cp merge-pull-secret pull-secret.json
+```
+
 ```oc create secret generic pull-secret -n sno-ztp --from-file=.dockerconfigjson=pull-secret.json --type=kubernetes.io/dockerconfigjson```
 
 - Create BMC Credentials Secret
