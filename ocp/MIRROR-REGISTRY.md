@@ -28,7 +28,7 @@ virt-install \
   --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
 ```
 
-- Configure OS from VNC
+- Configure OS from VNC [Download RealVNC Viewer and install in Desktop](https://downloads.realvnc.com/download/file/realvnc-connect/RealVNC-Connect-Installer-3.2.0-Windows.exe)
 
 - Add DNS entry ( nslookup mirror-registry.pkar.tech )
 
@@ -112,6 +112,16 @@ more /root/.docker/config.json | jq '.auths | keys[]'
 
 podman login -u admin -p Admin2675 mirror-registry.pkar.tech:8443
 
+```
+
+- Save Merge pull secret
+
+> This merge pull secret require for creating clusters using mirror registry.
+> TIPS: Only download pull secret from RedHat will not work, local mirror registry need to be merge else installation failed.
+
+```
+cp /root/.docker/config.json /home/cloudcafe/merge-pull-secret
+chown cloudcafe:cloudcafe /home/cloudcafe/merge-pull-secret
 ```
 
 - Create ImageSetConfiguration and start mirror 4.18 base images
@@ -385,4 +395,3 @@ EOF
 
 chmod 755 download-restart.sh
 ```
-
