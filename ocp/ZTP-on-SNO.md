@@ -54,6 +54,8 @@ oc get provisioning
 
 - Create AgentServiceConfig
 
+> IF ZTP in disconnected network from Mirror registry follow instruction for [AgentServiceConfig file creation](https://github.com/cloudcafetech/homelab/blob/main/ocp/MIRROR-REGISTRY.md#extra-preparation)
+
 ```
 cat << EOF > agentserviceconfig.yaml
 apiVersion: agent-install.openshift.io/v1beta1
