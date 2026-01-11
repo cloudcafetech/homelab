@@ -136,8 +136,8 @@ mirror:
  platform:
    channels:
    - name: stable-4.18
-     minVersion: 4.18.9
-     maxVersion: 4.18.9
+     minVersion: 4.18.30
+     maxVersion: 4.18.30
      type: ocp
    graph: true
  operators:
@@ -200,7 +200,6 @@ echo | openssl s_client -connect mirror-registry.pkar.tech:8443 -showcerts </dev
 > copy and paste content of file in ca-bundle.crt section
 
 ```sed -i 's/^/    /' certificate_chain.pem```
-
 
 - Create AgentServiceConfig file
 
