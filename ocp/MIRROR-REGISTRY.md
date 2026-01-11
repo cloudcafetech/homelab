@@ -116,6 +116,7 @@ podman login -u admin -p Admin2675 mirror-registry.pkar.tech:8443
 - Save Merge pull secret
 
 > This merge pull secret require for creating clusters using mirror registry.
+
 > TIPS: Only download pull secret from RedHat will not work, local mirror registry need to be merge else installation failed.
 
 ```
