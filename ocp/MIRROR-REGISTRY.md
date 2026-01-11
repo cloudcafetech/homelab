@@ -55,7 +55,6 @@ chmod 755 oc-mirror
 rm -rf *.tar.gz README.md
 
 ```
-
 - Install Mirror Registry
 
 ```
