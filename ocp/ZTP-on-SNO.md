@@ -165,7 +165,7 @@ virt-install \
 
 ```oc create ns sno-ztp```
 
-- Create Pull Secret (First login Redhat console url then download section)
+- Create Pull Secret (First login Redhat console url then download pull secret from download section)
 
 ```oc create secret generic pull-secret -n sno-ztp --from-file=.dockerconfigjson=pull-secret.json --type=kubernetes.io/dockerconfigjson```
 
