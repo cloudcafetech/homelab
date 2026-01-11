@@ -13,11 +13,11 @@ mv kubectl /usr/local/bin/
 rm openshift-install-linux.tar.gz openshift-client-linux.tar.gz README.md
 ```
 
-- Transfer pull-secret file (/root/.docker/config.json) from Mirror Registry server
+- Transfer merged-pull-secret file (/home/cloudcafe/merge-pull-secret) from Mirror Registry server
 
 ```
-scp cloudcafe@192.168.1.150:/home/cloudcafe/config.json .
-mv config.json pull-secret
+scp cloudcafe@192.168.1.150:/home/cloudcafe/merge-pull-secret .
+cp merge-pull-secret pull-secret
 ```
   
 - Preparation
