@@ -34,6 +34,7 @@ policySets:
             operator: In
             values:
               - sno-ztp
+              - sno-sa              
     policies:
       - disable-operator
       - oauth-configuration
