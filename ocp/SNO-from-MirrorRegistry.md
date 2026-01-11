@@ -15,6 +15,8 @@ rm openshift-install-linux.tar.gz openshift-client-linux.tar.gz README.md
 
 - Transfer merged-pull-secret file (/home/cloudcafe/merge-pull-secret) from Mirror Registry server
 
+> TIPS: Cluster Build in disconnected network from Mirror Registry, pull secret should contains credentials for both Mirror Registry and official Red Hat Registries.
+
 ```
 scp cloudcafe@192.168.1.150:/home/cloudcafe/merge-pull-secret .
 cp merge-pull-secret pull-secret
