@@ -1,6 +1,8 @@
 #!/bin/bash
 # https://github.com/brandonrc/qemu2liveiso
 
+yum install qemu-img grub2 squashfs-tools libguestfs-tools-c grub2-efi-x64-modules -y
+
 echo "QCOW file name: $1"
 FN=$1
 
