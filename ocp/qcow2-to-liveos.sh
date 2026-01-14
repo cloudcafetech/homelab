@@ -1,4 +1,5 @@
 #!/bin/bash
+# https://github.com/brandonrc/qemu2liveiso
 
 echo "QCOW file name: $1"
 FN=$1
