@@ -52,7 +52,7 @@ virt-customize -a mirror-registry.qcow2 --memsize 8192 --update --selinux-relabe
 
 ```cp mirror-registry.qcow2 mirror-registry.qcow2-bkp```
 
-- Test VM
+- Create VM
 
 ``` 
 virt-install \
@@ -68,6 +68,13 @@ virt-install \
   --disk /root/golden-image/mirror-registry.qcow2 \
   --network network=host-bridge \
   --graphics vnc,listen=0.0.0.0,port=5999,password=pkar2675
+```
+
+- Start VM
+
+```
+virsh start registry
+virsh list --all
 ```
 
 - Make Bootable (not tested)
