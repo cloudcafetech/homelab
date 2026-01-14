@@ -52,7 +52,9 @@ virt-customize -a mirror-registry.qcow2 --memsize 8192 --update --selinux-relabe
 
 ```cp mirror-registry.qcow2 mirror-registry.qcow2-bkp```
 
-# Test VM
+- Test VM
+
+``` 
 virt-install \
   --name registry \
   --memory 2048 \
@@ -66,7 +68,7 @@ virt-install \
   --disk /root/golden-image/mirror-registry.qcow2 \
   --network network=host-bridge \
   --graphics vnc,listen=0.0.0.0,port=5999,password=pkar2675
-
+```
 
 - Make Bootable (not tested)
 
@@ -75,4 +77,3 @@ wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp
 chmod 755 qcow2-to-liveos.sh
 ./qcow2-to-liveos.sh mirror-registry.qcow2
 ```
-
