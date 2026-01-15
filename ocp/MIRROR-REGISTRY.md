@@ -390,7 +390,7 @@ spec:
       url: 'http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live.x86_64.iso'
       version: 4.18.30
 EOF
----
+```
 
 - To know name of the operators from Redhat Operator Index
 
