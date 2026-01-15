@@ -400,6 +400,17 @@ EOF
 podman run -d --name rh-operator-index -p50051:50051 -it registry.redhat.io/redhat/redhat-operator-index:v4.18
 grpcurl -plaintext localhost:50051 api.Registry/ListPackages > packages.out
 
+> operator-list-json
+for PKG in $(grpcurl -plaintext localhost:50051 api.Registry/ListPackages | jq -r .name); do
+  grpcurl -plaintext -d "{\"name\":\"$PKG\"}" localhost:50051 api.Registry/GetPackage | jq -r '{"package": .name, "defaultChannel": .defaultChannelName}' >> operator-list-json
+done
+
+> operator-list-csv
+grpcurl -plaintext localhost:50051 api.Registry/ListPackages | jq -r --raw-output '.name' | while read pkg; do
+    grpcurl -plaintext -d "{\"name\":\"$pkg\"}" localhost:50051 api.Registry/GetPackage | jq -r --raw-output 'select(.defaultChannelName) | [.name, .defaultChannelName] | @csv' >> operator-list-csv
+done
+sed 's/"//g' operator-list-csv
+
 #podman kill rh-operator-index; podman rm rh-operator-index
 podman ps -a
 ```
