@@ -716,6 +716,17 @@ EOF
 chmod 755 download-restart.sh
 ```
 
+#### Configure IP, GW & DNS
+
+```
+nmcli con mod "System eth0" ipv4.addresses 192.168.1.15/24
+nmcli con mod "System eth0" ipv4.method manual
+nmcli con mod "System eth0" ipv4.gateway 192.168.1.1
+nmcli con mod "System eth0" ipv4.dns "192.168.1.161 192.168.1.1"
+nmcli con up "System eth0"
+nmcli connection show "System eth0"
+```
+
 ## Lesson learned
 
 ### To recover the cluster, please try to reimport the cluster (https://access.redhat.com/solutions/6988100)
