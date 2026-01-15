@@ -187,6 +187,38 @@ curl http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live-rootfs.x86_64.im
 curl http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live.x86_64.iso
 ```
 
+#### Mirror Registry using tar backup
+
+- ImageSetConfiguration file 
+
+```
+cat << EOF > isc-cert-manager.yaml
+apiVersion: mirror.openshift.io/v2alpha2
+kind: ImageSetConfiguration
+mirror:
+ operators:
+ - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+   packages:
+   - name: openshift-cert-manager-operator
+     channels:
+     - name: stable-v1
+EOF
+```
+
+- Download
+
+```
+mkdir -p /root/registry/mirror/operator
+oc-mirror -c ./isc-cert-manager.yaml file:///root/registry/mirror/operator --v2
+```
+
+- Upload
+
+```
+MIREG='registry.pkar.tech:8443'
+oc-mirror -c ./isc-cert-manager.yaml --from file:///root/registry/mirror/operator docker://$MIREG --v2
+```
+
 #### Extra preparation 
 
 - Get Certificate Chain and save in file
