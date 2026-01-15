@@ -203,6 +203,18 @@ mirror:
      channels:
      - name: stable-v1
 EOF
+
+cat << EOF > isc-metallb.yaml
+apiVersion: mirror.openshift.io/v2alpha2
+kind: ImageSetConfiguration
+mirror:
+ operators:
+ - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+   packages:
+   - name: metallb-operator
+     channels:
+     - name: stable
+EOF
 ```
 
 - Download
