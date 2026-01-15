@@ -411,6 +411,23 @@ grpcurl -plaintext localhost:50051 api.Registry/ListPackages | jq -r --raw-outpu
 done
 sed -i 's/"//g' operator-list-csv
 
+while IFS=, read -r -a op; do
+# echo "Name: ${op[0]}"
+# echo "Channel: ${op[1]}"
+
+cat << EOF > isc-${op[0]}.yaml
+apiVersion: mirror.openshift.io/v2alpha2
+kind: ImageSetConfiguration
+mirror:
+ operators:
+ - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+   packages:
+   - name: ${op[0]}
+     channels:
+     - name: ${op[1]}
+EOF
+done < operator-list-csv
+
 #podman kill rh-operator-index; podman rm rh-operator-index
 podman ps -a
 ```
