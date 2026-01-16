@@ -262,41 +262,6 @@ data:
 
     [[registry]]
       prefix = ""
-      location = "registry.redhat.io/cert-manager"
-      mirror-by-digest-only = true
-      [[registry.mirror]]
-        location = "mirror-registry.pkar.tech:8443/ocp/cert-manager"
-
-    [[registry]]
-      prefix = ""
-      location = "registry.redhat.io/lvms4"
-      mirror-by-digest-only = true
-      [[registry.mirror]]
-        location = "mirror-registry.pkar.tech:8443/ocp/lvms4"
-
-    [[registry]]
-      prefix = ""
-      location = "registry.redhat.io/openshift4"
-      mirror-by-digest-only = true
-      [[registry.mirror]]
-        location = "mirror-registry.pkar.tech:8443/ocp/openshift4"
-
-    [[registry]]
-      prefix = ""
-      location = "registry.redhat.io/ubi8"
-      mirror-by-digest-only = true
-      [[registry.mirror]]
-        location = "mirror-registry.pkar.tech:8443/ocp/ubi8"
-
-    [[registry]]
-      prefix = ""
-      location = "registry.redhat.io/ubi9"
-      mirror-by-digest-only = true
-      [[registry.mirror]]
-        location = "mirror-registry.pkar.tech:8443/ocp/ubi9"
-
-    [[registry]]
-      prefix = ""
       location = "quay.io/openshift-release-dev/ocp-release"
       mirror-by-digest-only = true
       [[registry.mirror]]
@@ -308,6 +273,13 @@ data:
       mirror-by-digest-only = true
       [[registry.mirror]]
         location = "mirror-registry.pkar.tech:8443/ocp/openshift/release"
+
+    [[registry]]
+      prefix = ""
+      location = "registry.redhat.io"
+      mirror-by-digest-only = true
+      [[registry.mirror]]
+        location = "mirror-registry.pkar.tech:8443/ocp"
 
   ca-bundle.crt: |
     -----BEGIN CERTIFICATE-----
