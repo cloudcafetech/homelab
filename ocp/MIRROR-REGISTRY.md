@@ -248,38 +248,36 @@ echo | openssl s_client -connect mirror-registry.pkar.tech:8443 -showcerts </dev
 - Create AgentServiceConfig file
 
 ```
-cat << EOF > agentserviceconfig-mirror.yaml
+cat << EOF > mirror-registry-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: assisted-installer-mirror-config
+  name: mirror-registry-config
   namespace: multicluster-engine
-  labels:
-    app: assisted-service
 data:
   registries.conf: |
-    unqualified-search-registries = ["registry.access.redhat.com", "docker.io"]
+    unqualified-search-registries = ["registry.redhat.io", "registry.access.redhat.com", "docker.io"]
 
     [[registry]]
       prefix = ""
       location = "quay.io/openshift-release-dev/ocp-release"
-      mirror-by-digest-only = true
       [[registry.mirror]]
         location = "mirror-registry.pkar.tech:8443/ocp/openshift/release-images"
+        pull-from-mirror = "digest-only"
 
     [[registry]]
       prefix = ""
       location = "quay.io/openshift-release-dev/ocp-v4.0-art-dev"
-      mirror-by-digest-only = true
       [[registry.mirror]]
         location = "mirror-registry.pkar.tech:8443/ocp/openshift/release"
+        pull-from-mirror = "digest-only"
 
     [[registry]]
       prefix = ""
       location = "registry.redhat.io"
-      mirror-by-digest-only = true
       [[registry.mirror]]
         location = "mirror-registry.pkar.tech:8443/ocp"
+        pull-from-mirror = "digest-only"
 
   ca-bundle.crt: |
     -----BEGIN CERTIFICATE-----
@@ -354,7 +352,7 @@ spec:
       requests:
         storage: 30Gi
   mirrorRegistryRef:
-    name: assisted-installer-mirror-config
+    name: mirror-registry-config
   osImages:
     - cpuArchitecture: x86_64
       openshiftVersion: '4.18'
