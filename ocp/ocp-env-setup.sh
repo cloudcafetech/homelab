@@ -18,6 +18,11 @@ REGPASS=Admin2675
 REGURL=registry.$DOMAIN
 AUTH=`echo -n 'admin:$REGPASS'|base64 -w0`
 
+if [ ! -f /root/pull-secret ]; then
+ echo "pull-secret file not found under /root folder, PLEASE download pull secret from RedHat Console & save in /root folder"
+ exit
+fi
+
 if [ ! -f /root/config.json ]; then
 cat << EOF > /root/config.json
 "$REGURL:8443": {
