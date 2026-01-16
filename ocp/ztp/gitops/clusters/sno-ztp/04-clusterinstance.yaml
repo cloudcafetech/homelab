@@ -11,6 +11,16 @@ spec:
   holdInstallation: false
   cpuPartitioningMode: None
   networkType: OVNKubernetes
+  extraManifestsRefs:
+    - 03-mirror-registry-config.yaml
+    - 05-htpass-secret.yaml
+    - 06-cluster-config-data.yaml
+  extraLabels:
+    mirrorRegistry: "mirror-registry.pkar.tech"
+    timezone: "Asia/Kolkata"
+  mirrorRegistryRef:
+    name: mirror-registry-config
+    namespace: sno-ztp  
   machineNetwork:
     - cidr: 192.168.1.0/24
   pullSecretRef:
