@@ -18,13 +18,16 @@ REGPASS=Admin2675
 REGURL=registry.$DOMAIN
 AUTH=`echo -n 'admin:$REGPASS'|base64 -w0`
 
+if [ ! -f /root/config.json ]; then
 cat << EOF > /root/config.json
 "$REGURL:8443": {
    "auth": "$AUTH",
    "email": "cloudcafe@gmail.com"
 }
 EOF
+fi
 
+if [ ! -f /etc/named.conf ]; then
 cat << EOF > /etc/named.conf
 options {
         listen-on port 53 { $HIP;127.0.0.1; };
@@ -81,6 +84,7 @@ zone "$DOMAIN" IN {
 include "/etc/named.rfc1912.zones";
 include "/etc/named.root.key";
 EOF
+fi
 
 #### ALL Functions ####
 
@@ -93,6 +97,8 @@ mirrorreg() {
  yum install podman openssl jq grpcurl.rpm -y
  
  echo "Setup Mirror Registry ..."
+
+ if [ ! -d "/root/mirror-registry" ]; then
  mkdir -p /root/mirror-registry/tools
  mkdir /root/.docker
  cd /root/mirror-registry/tools
@@ -107,6 +113,7 @@ mirrorreg() {
  chmod 755 oc-mirror
  cp oc kubectl oc-mirror /usr/local/bin
  rm -rf *.tar.gz README.md
+fi
 
  ./mirror-registry install \
   --quayHostname $REGURL \
