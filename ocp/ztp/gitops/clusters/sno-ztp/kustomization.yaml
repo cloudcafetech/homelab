@@ -8,4 +8,4 @@ resources:
   - 04-clusterinstance.yaml
   #- 05-htpass-secret.yaml
   #- 06-cluster-config-data.yaml
-  - 07-KlusterletAddonConfig.yaml  
+  - 07-klusterlet-addon-config.yaml  
