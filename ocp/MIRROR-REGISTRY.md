@@ -81,7 +81,7 @@ podman login -u admin -p Admin2675 $REGURL:8443
 
 ```
 
-- Download pull secret (https://console.redhat.com) and save file as pull-secret then convert to json format 
+- Download pull secret from [Redhat Console](https://console.redhat.com) and save file as pull-secret then convert to json format 
 
 ```cat ./pull-secret | jq . > pull-secret.json```
 
@@ -120,7 +120,7 @@ chown cloudcafe:cloudcafe /home/cloudcafe/merge-pull-secret
 
 ### Create ImageSetConfiguration from 4.18 base images
 
-> [To know Operators & channel version]([https://myopenshiftblog.com/disconnected-registry-mirroring/](https://github.com/cloudcafetech/homelab/blob/main/ocp/MIRROR-REGISTRY.md#to-know-name-of-the-operators-from-redhat-operator-index))
+> [To know Operators & channel version](https://github.com/cloudcafetech/homelab/blob/main/ocp/MIRROR-REGISTRY.md#to-know-name-of-the-operators-from-redhat-operator-index)
 
 ```
 cat << EOF > isc-all.yaml
