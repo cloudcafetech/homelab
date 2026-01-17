@@ -193,7 +193,7 @@ mkdir -p $OPERATOR
 mkdir -p $CACHEDIR
 ```
 
-### Setup Mirror Registry (mirror 2 mirror)
+### Setup Mirror Registry (Mirror 2 Mirror)
 
 - Mirror Platform Images to Registry
 
@@ -203,21 +203,21 @@ mkdir -p $CACHEDIR
 
 ```./oc-mirror --v2 -c ./isc-operator.yaml --cache-dir $CACHE-DIR --workspace file://$OPERATOR docker://$REGURL:8443/ocp```
 
-### Setup Mirror Registry using locally (Download & Upload)
+### Setup Mirror Registry Images (Download & Upload)
 
-- Mirror Platform Images to local folder
+- Mirror 2 Disk (Platform Images Download)
 
 ```./oc-mirror --v2 -c ./isc-platform.yaml --cache-dir $CACHE-DIR file://$PLATFORM```
 
-- Mirror Platform Images from disk to local registry
+- Disk 2 Mirror (Platform Images Upload)
 
 ```./oc-mirror --v2 -c ./isc-platform.yaml --cache-dir $CACHE-DIR --from file://$PLATFORM docker://$REGURL:8443/ocp```
 
-- Mirror Operator Images to local folder
+- Mirror 2 Disk (Operator Images Download)
 
 ```./oc-mirror --v2 -c ./isc-operator.yaml --cache-dir $CACHE-DIR file://$OPERATOR```
 
-- Mirror Operator Images from disk to local registry   
+- Disk 2 Mirror (Operator Images Upload)  
 
 ```./oc-mirror --v2 -c ./isc-operator.yaml --cache-dir $CACHE-DIR --from file://$OPERATOR docker://$REGURL:8443/ocp```
 
@@ -336,21 +336,21 @@ data:
       prefix = ""
       location = "quay.io/openshift-release-dev/ocp-release"
       [[registry.mirror]]
-        location = "mirror-registry.pkar.tech:8443/ocp/openshift/release-images"
+        location = "$REGURL:8443/ocp/openshift/release-images"
         pull-from-mirror = "digest-only"
 
     [[registry]]
       prefix = ""
       location = "quay.io/openshift-release-dev/ocp-v4.0-art-dev"
       [[registry.mirror]]
-        location = "mirror-registry.pkar.tech:8443/ocp/openshift/release"
+        location = "$REGURL:8443/ocp/openshift/release"
         pull-from-mirror = "digest-only"
 
     [[registry]]
       prefix = ""
       location = "registry.redhat.io"
       [[registry.mirror]]
-        location = "mirror-registry.pkar.tech:8443/ocp"
+        location = "$REGURL.pkar.tech:8443/ocp"
         pull-from-mirror = "digest-only"
 
   ca-bundle.crt: |
@@ -430,8 +430,8 @@ spec:
   osImages:
     - cpuArchitecture: x86_64
       openshiftVersion: '4.18'
-      rootFSUrl: 'http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img'
-      url: 'http://192.168.1.150:8080/ocp418/rhcos-4.18.30-x86_64-live.x86_64.iso'
+      rootFSUrl: 'http://192.168.1.150:8080/ocp/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img'
+      url: 'http://192.168.1.150:8080/ocp/rhcos-4.18.30-x86_64-live.x86_64.iso'
       version: 4.18.30
 EOF
 ```
