@@ -319,6 +319,9 @@ spec:
   - mirrors:
     - $REGURL:8443/ocp
     source: registry.redhat.io
+  - mirrors:
+    - $REGURL:8443/ocp/k8s-staging-sig-storage
+    source: gcr.io/k8s-staging-sig-storage
 ---
 apiVersion: olm.operatorframework.io/v1
 kind: ClusterCatalog
