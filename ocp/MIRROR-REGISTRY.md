@@ -1,4 +1,4 @@
-# Openshift Mirror Registry setup for diconnect environment
+# Openshift Mirror Registry setup for disconnect environment
 
 ### Server setup
 
