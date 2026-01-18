@@ -174,6 +174,12 @@ mirror:
     - name: mtv-operator
       channels:
       - name: release-v2.10
+    - name: cluster-observability-operator
+      channels:
+      - name: stable
+    - name: netobserv-operator
+      channels:
+      - name: stable
   additionalImages:
   - name: registry.redhat.io/ubi8/ubi:latest
   - name: registry.redhat.io/ubi9/ubi:latest
@@ -181,6 +187,7 @@ mirror:
   - name: registry.redhat.io/rhel9/support-tools
   - name: registry.redhat.io/rhel8/rhel-guest-image:latest
   - name: registry.redhat.io/rhel9/rhel-guest-image:latest
+  - name: gcr.io/k8s-staging-sig-storage/nfs-subdir-external-provisioner:v4.0.0
 EOF
 
 cat << EOF > isc-platform.yaml
@@ -248,6 +255,12 @@ mirror:
     - name: mtv-operator
       channels:
       - name: release-v2.10
+    - name: cluster-observability-operator
+      channels:
+      - name: stable
+    - name: netobserv-operator
+      channels:
+      - name: stable
 EOF
 
 PLATFORM=/home/cloudcafe/platform-images
