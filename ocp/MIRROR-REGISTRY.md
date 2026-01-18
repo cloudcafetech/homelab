@@ -195,6 +195,14 @@ mirror:
       minVersion: 4.18.30
       maxVersion: 4.18.30
     graph: true
+  additionalImages:
+  - name: registry.redhat.io/ubi8/ubi:latest
+  - name: registry.redhat.io/ubi9/ubi:latest
+  - name: registry.redhat.io/rhel8/support-tools
+  - name: registry.redhat.io/rhel9/support-tools
+  - name: registry.redhat.io/rhel8/rhel-guest-image:latest
+  - name: registry.redhat.io/rhel9/rhel-guest-image:latest
+  - name: gcr.io/k8s-staging-sig-storage/nfs-subdir-external-provisioner:v4.0.0
 EOF
 
 cat << EOF > isc-operator.yaml
