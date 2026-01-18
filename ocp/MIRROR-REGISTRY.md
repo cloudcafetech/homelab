@@ -139,13 +139,41 @@ mirror:
   - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
     packages:
     - name: cluster-logging
+      channels:
+      - name: stable-6.4
     - name: loki-operator
+      channels:
+      - name: stable-6.4
     - name: metallb-operator
+      channels:
+      - name: stable
     - name: openshift-cert-manager-operator
+      channels:
+      - name: stable-v1
     - name: openshift-gitops-operator
+      channels:
+      - name: stable
     - name: advanced-cluster-management
+      channels:
+      - name: release-2.15
     - name: multicluster-engine
+      channels:
+      - name: stable-2.10
     - name: lvms-operator
+      channels:
+      - name: stable-4.18
+    - name: kubernetes-nmstate-operator
+      channels:
+      - name: stable
+    - name: kubevirt-hyperconverged
+      channels:
+      - name: stable
+    - name:local-storage-operator
+      channels:
+      - name: stable
+    - name: mtv-operator
+      channels:
+      - name: release-v2.10
   additionalImages:
   - name: registry.redhat.io/ubi8/ubi:latest
   - name: registry.redhat.io/rhel9/support-tools
@@ -174,13 +202,41 @@ mirror:
   - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
     packages:
     - name: cluster-logging
+      channels:
+      - name: stable-6.4
     - name: loki-operator
+      channels:
+      - name: stable-6.4
     - name: metallb-operator
+      channels:
+      - name: stable
     - name: openshift-cert-manager-operator
+      channels:
+      - name: stable-v1
     - name: openshift-gitops-operator
+      channels:
+      - name: stable
     - name: advanced-cluster-management
+      channels:
+      - name: release-2.15
     - name: multicluster-engine
+      channels:
+      - name: stable-2.10
     - name: lvms-operator
+      channels:
+      - name: stable-4.18
+    - name: kubernetes-nmstate-operator
+      channels:
+      - name: stable
+    - name: kubevirt-hyperconverged
+      channels:
+      - name: stable
+    - name:local-storage-operator
+      channels:
+      - name: stable
+    - name: mtv-operator
+      channels:
+      - name: release-v2.10
 EOF
 
 PLATFORM=/home/cloudcafe/platform-images
