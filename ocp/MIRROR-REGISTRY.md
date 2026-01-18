@@ -168,7 +168,7 @@ mirror:
     - name: kubevirt-hyperconverged
       channels:
       - name: stable
-    - name:local-storage-operator
+    - name: local-storage-operator
       channels:
       - name: stable
     - name: mtv-operator
@@ -234,7 +234,7 @@ mirror:
     - name: kubevirt-hyperconverged
       channels:
       - name: stable
-    - name:local-storage-operator
+    - name: local-storage-operator
       channels:
       - name: stable
     - name: mtv-operator
