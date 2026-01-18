@@ -176,7 +176,10 @@ mirror:
       - name: release-v2.10
   additionalImages:
   - name: registry.redhat.io/ubi8/ubi:latest
+  - name: registry.redhat.io/ubi9/ubi:latest
+  - name: registry.redhat.io/rhel8/support-tools
   - name: registry.redhat.io/rhel9/support-tools
+  - name: registry.redhat.io/rhel8/rhel-guest-image:latest
   - name: registry.redhat.io/rhel9/rhel-guest-image:latest
 EOF
 
