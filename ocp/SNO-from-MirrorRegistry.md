@@ -196,7 +196,7 @@ cat << EOF > redhat-operator-cs.yaml
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
-  name: redhat-operator-cs
+  name: redhat-operators
   namespace: openshift-marketplace
 spec:
   image: $REGURL:8443/ocp/redhat/redhat-operator-index:v4.18
