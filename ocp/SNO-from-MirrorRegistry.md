@@ -185,3 +185,24 @@ oc get no
 oc get co
 ```
 
+- Disable default OperatorHub Catalog Sources and create disconnected Operator Catalog
+
+```
+oc patch OperatorHub cluster --type merge --patch '{"spec":{"disableAllDefaultSources":true}}'
+
+oc get catalogsource --all-namespaces
+
+cat << EOF > redhat-operator-cs.yaml
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: redhat-operator-cs
+  namespace: openshift-marketplace
+spec:
+  image: $REGURL:8443/ocp/redhat/redhat-operator-index:v4.18
+  sourceType: grpc
+status: {}
+EOF
+
+oc apply -f redhat-operator-cs.yaml
+```
