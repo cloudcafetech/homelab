@@ -471,7 +471,7 @@ mv hcp /usr/local/bin/
 yum update -y
 dnf groupinstall "Virtualization Host" -y
 systemctl enable --now libvirtd
-yum -y install virt-top libguestfs-tools virt-install virt-manager
+yum -y install virt-top libguestfs-tools virt-install virt-manager virt-customize
 ```
 
 ### Setup MetalLB using yamls
