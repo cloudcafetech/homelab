@@ -620,6 +620,8 @@ oc scale deployment telemeter-client --replicas=0 -n openshift-monitoring
 oc scale deployment openshift-state-metrics --replicas=0 -n openshift-monitoring
 oc scale deployment kube-state-metrics --replicas=0 -n openshift-monitoring
 oc scale deployment monitoring-plugin --replicas=0 -n openshift-monitoring
+oc scale deployment.apps/metrics-server --replicas=0 -n openshift-monitoring
+oc scale deployment.apps/prometheus-operator-admission-webhook --replicas=0 -n openshift-monitoring
 oc scale statefulset.apps/prometheus-k8s --replicas=0 -n openshift-monitoring
 oc scale statefulset.apps/alertmanager-main --replicas=0 -n openshift-monitoring
 oc patch ds node-exporter -p '{"spec": {"template": {"spec": {"nodeSelector": {"non-existing": "true"}}}}}' -n openshift-monitoring
