@@ -152,7 +152,7 @@ mirror:
       - name: stable-v1
     - name: openshift-gitops-operator
       channels:
-      - name: stable
+      - name: latest
     - name: advanced-cluster-management
       channels:
       - name: release-2.15
@@ -233,7 +233,7 @@ mirror:
       - name: stable-v1
     - name: openshift-gitops-operator
       channels:
-      - name: stable
+      - name: latest
     - name: advanced-cluster-management
       channels:
       - name: release-2.15
