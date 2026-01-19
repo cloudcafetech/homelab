@@ -146,11 +146,13 @@ cp *-config.yaml ocp418/
 - Create VM using ISO
 
 ```
-qemu-img create -f qcow2 /home/sno/sno-sa.qcow2 120G
+DISKPATH=/home/sno/ocp-acm
+ISOPATH=/home/sno/tools/ocp418
+qemu-img create -f qcow2 $DISKPATH/$CLUSTER-os-disk.qcow2 120G
 
 virt-install \
-  --name=sno-sa \
-  --ram=16384 \
+  --name=$CLUSTER \
+  --ram=28384 \
   --vcpus=12 \
   --cpu host-passthrough \
   --os-variant=rhel8.0 \
@@ -158,10 +160,13 @@ virt-install \
   --events on_reboot=restart \
   --noautoconsole \
   --import \
-  --cdrom /home/sno/standalone/ocp418/agent.x86_64.iso \
-  --disk path=/home/sno/sno-sa.qcow2,size=120 \
-  --network network=host-bridge,mac=52:54:00:42:a4:40 \
-  --graphics vnc,listen=0.0.0.0,port=5979,password=pkar2675
+  --cdrom $ISOPATH/agent.x86_64.iso \
+  --disk path=$DISKPATH/$CLUSTER-os-disk.qcow2,size=120 \
+  --network network=host-bridge,mac=$MAC \
+  --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
+
+sleep 10
+virsh list --all
 ```
 
 - Monitor install boostrapping
