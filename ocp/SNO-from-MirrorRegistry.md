@@ -180,7 +180,7 @@ virsh list --all
 - Login Cluster
 
 ```
-export KUBECONFIG=/home/sno/standalone/ocp418/auth/kubeconfig
+export KUBECONFIG=/home/sno/tools/ocp418/auth/kubeconfig
 oc get no
 oc get co
 ```
