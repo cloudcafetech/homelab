@@ -5,7 +5,7 @@ resources:
   - 01-bmc-secret.yaml
   #- 02-pull-secret.yaml
   - 03-mirror-registry-config.yaml
-  - 04-clusterinstance.yaml
+  #- 04-clusterinstance.yaml
   #- 05-htpass-secret.yaml
   #- 06-cluster-config-data.yaml
   #- 07-klusterlet-addon-config.yaml
