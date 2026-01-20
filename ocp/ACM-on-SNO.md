@@ -254,7 +254,7 @@ metadata:
 rules:
 - apiGroups: ["siteconfig.open-cluster-management.io"]
   resources: ["clusterinstances"]
-  verbs: ["create", "get", "list", "update", "delete", "watch"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
 - apiGroups: ["policy.open-cluster-management.io"]
   resources: ["policies", "policysets", "placementbindings"]
   verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
