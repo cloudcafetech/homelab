@@ -15,7 +15,6 @@ spec:
   #  mirrorRegistry: "mirror-registry.pkar.tech"
   #  timezone: "Asia/Kolkata" 
   extraManifestsRefs:
-    - name: 03-mirror-registry-config.yaml
     - name: 09-disable-operator.yaml
     - name: 08-redhat-operator-cs.yaml
   mirrorRegistryRef:
