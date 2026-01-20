@@ -11,12 +11,14 @@ spec:
   holdInstallation: false
   cpuPartitioningMode: None
   networkType: OVNKubernetes
-  #extraLabels:
-  #  mirrorRegistry: "mirror-registry.pkar.tech"
-  #  timezone: "Asia/Kolkata" 
-  #extraManifestsRefs:
-  #  - name: 09-disable-operator.yaml
-  #  - name: 08-redhat-operator-cs.yaml
+  #additionalNTPSources:
+  #  - 192.168.1.1  
+  clusterLabels:
+    mirrorRegistry: "mirror-registry.pkar.tech"
+    timezone: "Asia/Kolkata" 
+  extraManifestsRefs:
+    - name: cm-disable-operator
+    - name: cm-redhat-operator-cs
   mirrorRegistryRef:
     name: mirror-registry-config
     namespace: sno-ztp  
