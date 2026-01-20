@@ -13,8 +13,8 @@ spec:
   networkType: OVNKubernetes
   extraManifestsRefs:
     - 03-mirror-registry-config.yaml
-    - 05-htpass-secret.yaml
-    - 06-cluster-config-data.yaml
+    - 09-disable-operator.yaml
+    - 08-redhat-operator-cs.yaml
   extraLabels:
     mirrorRegistry: "mirror-registry.pkar.tech"
     timezone: "Asia/Kolkata"
@@ -56,7 +56,7 @@ spec:
                 enabled: true
                 dhcp: false
                 address:
-                  - ip: 192.168.1.21
+                  - ip: 192.168.1.110
                     prefix-length: 24
               ipv6:
                 enabled: false
@@ -65,9 +65,9 @@ spec:
               search:
                 - pkar.tech
               server:
-                - 192.168.1.12
-                - 192.168.1.21
-                - 192.168.1.1
+                - 192.168.1.135
+                - 192.168.1.161
+                - 192.168.1.110
           routes:
             config:
               - destination: 0.0.0.0/0
