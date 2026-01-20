@@ -12,12 +12,12 @@ spec:
   cpuPartitioningMode: None
   networkType: OVNKubernetes
   extraManifestsRefs:
-    - 03-mirror-registry-config.yaml
-    - 09-disable-operator.yaml
-    - 08-redhat-operator-cs.yaml
+    - name: 03-mirror-registry-config.yaml
+    - name: 09-disable-operator.yaml
+    - name: 08-redhat-operator-cs.yaml
   extraLabels:
-    mirrorRegistry: "mirror-registry.pkar.tech"
-    timezone: "Asia/Kolkata"
+    mirrorRegistry: mirror-registry.pkar.tech
+    timezone: Asia/Kolkata
   mirrorRegistryRef:
     name: mirror-registry-config
     namespace: sno-ztp  
