@@ -163,9 +163,12 @@ virt-install \
 
 ### Create Clusterinstance 
 
-- Create Namespace
+- Create Namespace and set label
 
-```oc create ns sno-ztp```
+```
+oc create ns sno-ztp
+oc label namespace sno-ztp argocd.argoproj.io/managed-by=openshift-gitops
+```
 
 - Create Pull Secret (First login Redhat console url then download pull secret from download section)
 
