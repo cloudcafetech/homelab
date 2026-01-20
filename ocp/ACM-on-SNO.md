@@ -720,6 +720,46 @@ EOF
 chmod 755 download-restart.sh
 ```
 
+#### Modify or add DNS in Openshift
+
+> To add a general upstream DNS server for all non-cluster queries, use the upstreamResolvers field: as follows
+
+
+```
+spec:
+  # ... other spec fields
+  upstreamResolvers:
+    policy: Sequential
+    protocolStrategy: ""
+    transportConfig: {}
+    upstreams:
+    - address: 192.168.1.161
+      port: 53
+      type: Network
+    - port: 53
+      type: SystemResolvConf # Keeps the original fallback
+```
+
+- Edit DNS Operator
+
+```
+oc edit dns.operator/default
+```
+
+- Delete DNS pod 
+
+```
+oc get po -n openshift-dns
+oc delete po `oc get po -n openshift-dns | grep dns-default | awk '{ print $1 }'` -n openshift-dns  --force
+oc get po -n openshift-dns
+```
+
+- Verify
+
+```
+oc get configmap/dns-default -n openshift-dns -o yaml
+```
+
 #### Configure IP, GW & DNS
 
 ```
