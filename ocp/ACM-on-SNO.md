@@ -647,7 +647,9 @@ oc patch secret/kubeadmin -n kube-system -p '{"data":{"kubeadmin": "'$EPASS'"}}'
 
 - Remove Exited containers
 
-```crictl rm `crictl ps -a | grep Exited | awk '{ print $1}'```
+``` 
+crictl rm `crictl ps -a | grep Exited | awk '{ print $1}'`
+```
 
 - Remove stuck resource
 
