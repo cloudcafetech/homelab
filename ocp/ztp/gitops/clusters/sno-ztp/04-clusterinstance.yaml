@@ -16,9 +16,9 @@ spec:
     - name: 09-disable-operator.yaml
     - name: 08-redhat-operator-cs.yaml
   extraLabels:
-    region: "home"
-    mirrorRegistry: "mirror-registry.pkar.tech"
-    timezone: "Asia/Kolkata"  
+    "region": "home"
+    "mirrorRegistry": "mirror-registry.pkar.tech"
+    "timezone": "Asia/Kolkata"  
   mirrorRegistryRef:
     name: mirror-registry-config
     namespace: sno-ztp  
