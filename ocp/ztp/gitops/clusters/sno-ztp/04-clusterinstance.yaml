@@ -11,9 +11,9 @@ spec:
   holdInstallation: false
   cpuPartitioningMode: None
   networkType: OVNKubernetes
-  extraLabels:
-    mirrorregistry: "mirror-registry.pkar.tech"
-    timezone: "Asia/Kolkata" 
+  #extraLabels:
+  #  mirrorRegistry: "mirror-registry.pkar.tech"
+  #  timezone: "Asia/Kolkata" 
   extraManifestsRefs:
     - name: 03-mirror-registry-config.yaml
     - name: 09-disable-operator.yaml
