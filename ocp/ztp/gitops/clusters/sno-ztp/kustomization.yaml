@@ -9,5 +9,5 @@ resources:
   #- 05-htpass-secret.yaml
   #- 06-cluster-config-data.yaml
   - 07-klusterlet-addon-config.yaml
-  #- 09-disable-operator.yaml
-  #- 08-redhat-operator-cs.yaml
+  - 09-cm-disable-operator.yaml
+  - 08-cm-redhat-operator-cs.yaml
