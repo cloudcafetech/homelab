@@ -187,7 +187,7 @@ cp merge-pull-secret pull-secret.json
 
 ```oc create secret generic bmc-secret -n sno-ztp --from-literal=username=admin --from-literal=password=password```
 
-- Create Cluster Instance
+- Create Cluster Instance [Ref Sample](https://github.com/stolostron/siteconfig/tree/main/config/samples)
 
 > Verify BMC address IP should match with Where Sushy Emulator deployed
 
