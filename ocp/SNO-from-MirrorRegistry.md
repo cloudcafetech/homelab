@@ -86,7 +86,7 @@ EOF
 
 cat << EOF > install-config.yaml
 apiVersion: v1
-baseDomain: pkar.tech
+baseDomain: $DOMAIN
 compute:
 - architecture: amd64
   name: worker
