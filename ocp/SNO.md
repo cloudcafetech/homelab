@@ -5,7 +5,7 @@
 ```
 mkdir -p /root/sno
 cd /root/sno
-VER=4.18.9
+VER=4.18.30
 PULLSEC=`cat pull-secret`
 CLUSTER_NAME=sno-acm
 DOMAIN=pkar.tech
