@@ -13,9 +13,10 @@ spec:
   networkType: OVNKubernetes
   #additionalNTPSources:
   #  - 192.168.1.1  
-  clusterLabels:
-    mirrorRegistry: "mirror-registry.pkar.tech"
-    timezone: "Asia/Kolkata" 
+  extraLabels:
+    ManagedCluster:
+      mirrorRegistry: "mirror-registry.pkar.tech"
+      timezone: "Asia/Kolkata" 
   extraManifestsRefs:
     - name: cm-disable-operator
     - name: cm-redhat-operator-cs
