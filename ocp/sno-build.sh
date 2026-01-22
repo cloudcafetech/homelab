@@ -17,6 +17,7 @@ MAC=52:54:00:42:a4:35
 DNS=192.168.1.161
 DOMAIN=pkar.tech
 GW=192.168.1.1
+VNCPORT=5920
 
 echo - Install necessary packages and create ssh key
 
@@ -178,12 +179,13 @@ virt-install \
   --cdrom $INSTDIR/ocp$VER/agent.x86_64.iso \
   --disk path=$INSTDIR/$CLUSTER-os-disk.qcow2,size=120 \
   --network network=host-bridge,mac=$MAC \
-  --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
+  --graphics vnc,listen=0.0.0.0,port=$VNCPORT,password=pkar2675
 
 sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
+
 
 
 
