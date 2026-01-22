@@ -35,7 +35,7 @@ ssh-keygen -t rsa -N '' -f id_rsa
 PULLSECRET=`cat $PULLSECPATH`
 SSHKEY=`cat id_rsa.pub`
 
-yum install ncat podman jq -y
+yum install netcat podman jq -y
 dnf install /usr/bin/nmstatectl -y
 
 wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/$VER/openshift-install-linux.tar.gz
@@ -184,6 +184,7 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
+
 
 
 
