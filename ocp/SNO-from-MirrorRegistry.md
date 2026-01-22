@@ -169,6 +169,8 @@ sleep 10
 virsh list --all
 ```
 
+### POST Installation
+
 - Monitor install boostrapping
 
 ```openshift-install --dir=ocp418 agent wait-for bootstrap-complete --log-level=debug```
