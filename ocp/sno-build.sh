@@ -31,8 +31,8 @@ mkdir $INSTDIR
 cd $INSTDIR
 mkdir ocp$VER
 mkdir ocp$VER-backup
-ssh-keygen -t rsa -N '' -f id_rsa
-PULLSECRET=`cat pull-secret` 
+ssh-keygen -t rsa -N '' -f id_rsa 
+PULLSECRET=`cat $PULLSECPATH`
 SSHKEY=`cat id_rsa.pub`
 
 yum install ncat podman jq -y
@@ -184,5 +184,6 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
+
 
 
