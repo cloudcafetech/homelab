@@ -7,10 +7,10 @@ systemctl stop firewalld; systemctl disable firewalld
 PULLSECPATH=/root/pull-secret
 DOMAIN=pkar.tech
 
-SNO_ACM=192.168.1.130
-SNO_ZTP=192.168.1.131
-SNO_HCP=192.168.1.132
-SNO_SA=192.168.1.133
+SNO_ACM=192.168.1.135
+SNO_ZTP=192.168.1.110
+SNO_SA=192.168.1.120
+SNO_HCP=192.168.1.130
 
 NFSLOCATION=/home/sno/nfsshare
 
