@@ -12,6 +12,13 @@ SNO_ZTP=192.168.1.110
 SNO_SA=192.168.1.120
 SNO_HCP=192.168.1.130
 
+MAS1=ocp-m1
+MAS2=ocp-m2
+MAS3=ocp-m3
+MAS1IP=192.168.1.151
+MAS2IP=192.168.1.152
+MAS3IP=192.168.1.153
+
 NFSLOCATION=/home/sno/nfsshare
 
 REGPASS=Admin2675
@@ -181,6 +188,15 @@ api-int.sno-sa.$DOMAIN.	IN A $SNO_SA
 api.sno-hcp.$DOMAIN.    	IN A $SNO_HCP
 api-int.sno-hcp.$DOMAIN.	IN A $SNO_HCP
 *.apps.sno-hcp.$DOMAIN. 	IN A $SNO_HCP
+
+; OCP HA cluster entries
+api.ocp-ha.pkar.tech.          IN A 192.168.1.149
+api-int.ocp-ha.pkar.tech.      IN A 192.168.1.149
+*.apps.ocp-ha.pkar.tech.       IN A 192.168.1.150
+
+ocp-m1.pkar.tech.              IN A 192.168.1.151
+ocp-m2.pkar.tech.              IN A 192.168.1.152
+ocp-m3.pkar.tech.              IN A 192.168.1.153
 EOF
 
 systemctl start named;systemctl enable --now named
@@ -259,7 +275,6 @@ frontend k8s_api_frontend
 backend k8s_api_backend
     mode tcp
     balance source
-    server      $BOOT $BOOTIP:6443 check
     server      $MAS1 $MAS1IP:6443 check
     server      $MAS2 $MAS2IP:6443 check
     server      $MAS3 $MAS3IP:6443 check
@@ -273,7 +288,6 @@ frontend ocp_machine_config_server_frontend
 backend ocp_machine_config_server_backend
     mode tcp
     balance source
-    server      $BOOT $BOOTIP:22623 check
     server      $MAS1 $MAS1IP:22623 check
     server      $MAS2 $MAS2IP:22623 check
     server      $MAS3 $MAS3IP:22623 check
@@ -290,8 +304,6 @@ backend ocp_http_ingress_backend
     server $MAS1 $MAS1IP:80 check
     server $MAS2 $MAS2IP:80 check
     server $MAS3 $MAS3IP:80 check
-    server $INF1 $INF1IP:80 check
-    server $INF2 $INF2IP:80 check
 
 frontend ocp_https_ingress_frontend
     bind *:443
@@ -304,8 +316,6 @@ backend ocp_https_ingress_backend
     server $MAS1 $MAS1IP:443 check
     server $MAS2 $MAS2IP:443 check
     server $MAS3 $MAS3IP:443 check
-    server $INF1 $INF1IP:443 check
-    server $INF2 $INF2IP:443 check
 
 EOF
 
