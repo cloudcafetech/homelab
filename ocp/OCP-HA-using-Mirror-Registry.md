@@ -221,6 +221,8 @@ ll /home/cloudcafe/
 - Create VM using ISO on Host-01
 
 ```
+MAS1MAC=52:54:00:42:a4:51
+
 mkdir -p /home/sno/ocp-ha
 cd /home/sno/ocp-ha
 scp cloudcafe@192.168.1.161:/home/cloudcafe/agent.x86_64.iso .
@@ -239,7 +241,7 @@ virt-install \
   --import \
   --cdrom /home/sno/ocp-ha/ocp418/agent.x86_64.iso \
   --disk path=/home/sno/ocp-ha/ocp-m1-os-disk.qcow2,size=100 \
-  --network network=host-bridge,mac=52:54:00:42:a4:51 \
+  --network network=host-bridge,mac=$MAS1MAC \
   --graphics vnc,listen=0.0.0.0,port=5951,password=pkar2675
 
 sleep 10
@@ -249,6 +251,8 @@ virsh list --all
 - Create VM using ISO on Host-02
 
 ```
+MAS2MAC=52:54:00:42:a4:52
+
 mkdir -p /home/sno/ocp-ha
 cd /home/sno/ocp-ha
 scp cloudcafe@192.168.1.161:/home/cloudcafe/agent.x86_64.iso .
@@ -267,7 +271,7 @@ virt-install \
   --import \
   --cdrom /home/sno/ocp-ha/agent.x86_64.iso \
   --disk path=/home/sno/ocp-ha/ocp-m2-os-disk.qcow2,size=100 \
-  --network network=host-bridge,mac=52:54:00:42:a4:52 \
+  --network network=host-bridge,mac=$MAS2MAC \
   --graphics vnc,listen=0.0.0.0,port=5952,password=pkar2675
 
 sleep 10
@@ -277,6 +281,8 @@ virsh list --all
 - Create VM using ISO on Host-03
 
 ```
+MAS3MAC=52:54:00:42:a4:53
+
 mkdir -p /home/sno/ocp-ha
 cd /home/sno/ocp-ha
 scp cloudcafe@192.168.1.161:/home/cloudcafe/agent.x86_64.iso .
@@ -295,7 +301,7 @@ virt-install \
   --import \
   --cdrom /home/sno/ocp-ha/agent.x86_64.iso \
   --disk path=/home/sno/ocp-ha/ocp-m3-os-disk.qcow2,size=100 \
-  --network network=host-bridge,mac=52:54:00:42:a4:53 \
+  --network network=host-bridge,mac=$MAS3MAC \
   --graphics vnc,listen=0.0.0.0,port=5953,password=pkar2675
 
 sleep 10
