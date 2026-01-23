@@ -21,6 +21,16 @@ rm openshift-install-linux.tar.gz openshift-client-linux.tar.gz README.md
 scp cloudcafe@192.168.1.150:/home/cloudcafe/merge-pull-secret .
 cp merge-pull-secret pull-secret
 ```
+
+- DNS Setup
+
+> Modify script as per requirement
+
+```
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/ocp-env-setup.sh
+chmod 755 ocp-env-setup.sh
+vi ocp-env-setup.sh
+```
   
 - Generate Agent and Install Config
 
