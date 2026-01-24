@@ -11,6 +11,7 @@ SNO_ACM=192.168.1.135
 SNO_ZTP=192.168.1.110
 SNO_SA=192.168.1.120
 SNO_HCP=192.168.1.130
+OCP_HA=192.168.1.159
 
 MAS1=ocp-m1
 MAS2=ocp-m2
@@ -192,13 +193,13 @@ api-int.sno-hcp.$DOMAIN.	IN A $SNO_HCP
 *.apps.sno-hcp.$DOMAIN. 	IN A $SNO_HCP
 
 ; OCP HA cluster entries
-api.ocp-ha.$DOMAIN.            IN A 192.168.1.159
-api-int.ocp-ha.$DOMAIN.        IN A 192.168.1.159
-*.apps.ocp-ha.$DOMAIN.         IN A 192.168.1.159
+api.ocp-ha.$DOMAIN.            IN A $OCP_HA
+api-int.ocp-ha.$DOMAIN.        IN A $OCP_HA
+*.apps.ocp-ha.$DOMAIN.         IN A $OCP_HA
 
-ocp-m1.$DOMAIN.                IN A 192.168.1.151
-ocp-m2.$DOMAIN.                IN A 192.168.1.152
-ocp-m3.$DOMAIN.                IN A 192.168.1.153
+$MAS1.$DOMAIN.                 IN A $MAS1IP
+$MAS2.$DOMAIN.                 IN A $MAS2IP
+$MAS3.$DOMAIN.                 IN A $MAS3IP
 EOF
 
 systemctl start named;systemctl enable --now named
