@@ -16,6 +16,8 @@ dnf install /usr/bin/nmstatectl -y
 dnf install epel-release -y
 dnf -y install xrdp
 systemctl enable xrdp --now
+systemctl stop firewalld
+systemctl disable firewalld
 rm -rf grpcurl.rpm
 ```
 
