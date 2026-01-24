@@ -25,11 +25,6 @@ REGPASS=Admin2675
 REGURL=registry.$DOMAIN
 AUTH=`echo -n 'admin:$REGPASS'|base64 -w0`
 
-if [ ! -f /root/pull-secret ]; then
- echo "pull-secret file not found under /root folder, PLEASE download pull secret from RedHat Console & save in /root folder"
- exit
-fi
-
 if [ ! -f /root/config.json ]; then
 cat << EOF > /root/config.json
 "$REGURL:8443": {
@@ -103,10 +98,17 @@ fi
 # Setup Mirror Registry
 mirrorreg() {
 
+ # Check pull-secret
+ if [ ! -f /root/pull-secret ]; then
+   echo "pull-secret file not found under /root folder, PLEASE download pull secret from RedHat Console & save in /root folder"
+   exit
+ fi
+
  # Install required packages
  wget https://github.com/fullstorydev/grpcurl/releases/download/v1.9.3/grpcurl_1.9.3_linux_amd64.rpm
  mv grpcurl_1.9.3_linux_amd64.rpm grpcurl.rpm
  yum install podman openssl jq grpcurl.rpm -y
+ rm grpcurl.rpm
  
  echo "Setup Mirror Registry ..."
 
@@ -190,13 +192,13 @@ api-int.sno-hcp.$DOMAIN.	IN A $SNO_HCP
 *.apps.sno-hcp.$DOMAIN. 	IN A $SNO_HCP
 
 ; OCP HA cluster entries
-api.ocp-ha.pkar.tech.          IN A 192.168.1.149
-api-int.ocp-ha.pkar.tech.      IN A 192.168.1.149
-*.apps.ocp-ha.pkar.tech.       IN A 192.168.1.150
+api.ocp-ha.$DOMAIN.            IN A 192.168.1.159
+api-int.ocp-ha.$DOMAIN.        IN A 192.168.1.159
+*.apps.ocp-ha.$DOMAIN.         IN A 192.168.1.159
 
-ocp-m1.pkar.tech.              IN A 192.168.1.151
-ocp-m2.pkar.tech.              IN A 192.168.1.152
-ocp-m3.pkar.tech.              IN A 192.168.1.153
+ocp-m1.$DOMAIN.                IN A 192.168.1.151
+ocp-m2.$DOMAIN.                IN A 192.168.1.152
+ocp-m3.$DOMAIN.                IN A 192.168.1.153
 EOF
 
 systemctl start named;systemctl enable --now named
