@@ -1,5 +1,60 @@
 # Setup Advance Cluster Management on SNO
 
+### Base Setup on CentOS host
+
+- Update and basic tools
+
+```
+yum update -y
+dnf groupinstall "Virtualization Host" -y
+systemctl enable --now libvirtd
+yum -y install virt-top libguestfs-tools virt-install virt-manager virt-customize
+wget https://github.com/fullstorydev/grpcurl/releases/download/v1.9.3/grpcurl_1.9.3_linux_amd64.rpm
+mv grpcurl_1.9.3_linux_amd64.rpm grpcurl.rpm
+yum install podman openssl jq grpcurl.rpm -y
+dnf install /usr/bin/nmstatectl -y
+rm -rf grpcurl.rpm
+```
+
+- Default storage pool
+
+```
+virsh pool-list
+mkdir -p /kvm_pool/default
+virsh pool-define-as --name default --type dir --target /kvm_pool/default
+virsh pool-autostart default
+virsh pool-start default
+virsh pool-list
+```
+
+- Create Bridge Interface
+
+```
+INTERFACE=eno2
+nmcli connection add type bridge autoconnect yes con-name br0 ifname br0
+nmcli connection modify br0 ipv4.addresses 192.168.1.160/24 ipv4.gateway 192.168.1.1 ipv4.dns 192.168.1.161,192.168.1.1,8.8.8.8 ipv4.method manual
+nmcli connection add type ethernet slave-type bridge autoconnect yes con-name bridge-port-eth0 ifname $INTERFACE master br0
+nmcli connection down $INTERFACE && nmcli connection up br0
+
+ip addr show br0
+ping google.com
+```
+
+- Add Bridge network on KVM
+
+```
+cat << EOF > host-bridge.xml
+<network>
+  <name>host-bridge</name>
+  <forward mode="bridge"/>
+  <bridge name="br0"/>
+</network>
+EOF
+virsh net-define host-bridge.xml
+virsh net-start host-bridge
+virsh net-autostart host-bridge
+```
+
 ### SSH KEYGEN Setup
 
 ```ssh-keygen -f ./id_rsa -t rsa -N ''```
@@ -52,35 +107,6 @@ zone "pkar.tech" IN {
 - Restart DNS
 
 ```systemctl restart named```
-
-### Setup Bridge network on CentOS host
-
-- Create Bridge Interface
-
-```
-nmcli connection add type bridge autoconnect yes con-name br0 ifname br0
-nmcli connection modify br0 ipv4.addresses 192.168.1.160/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8 ipv4.method manual
-nmcli connection add type ethernet slave-type bridge autoconnect yes con-name bridge-port-eth0 ifname eno2 master br0
-nmcli connection down eno2 && nmcli connection up br0
-
-ip addr show br0
-ping google.com
-```
-
-- Add Bridge network on KVM
-
-```
-cat << EOF > host-bridge.xml
-<network>
-  <name>host-bridge</name>
-  <forward mode="bridge"/>
-  <bridge name="br0"/>
-</network>
-EOF
-virsh net-define host-bridge.xml
-virsh net-start host-bridge
-virsh net-autostart host-bridge
-```
 
 ## Setup SNO ACM Cluster
 
