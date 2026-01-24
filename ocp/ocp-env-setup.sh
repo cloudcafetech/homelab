@@ -20,7 +20,7 @@ MAS1IP=192.168.1.151
 MAS2IP=192.168.1.152
 MAS3IP=192.168.1.153
 
-NFSLOCATION=/home/sno/nfsshare
+NFSLOCATION=/root/nfsshare
 
 REGPASS=Admin2675
 REGURL=registry.$DOMAIN
@@ -321,7 +321,7 @@ nfssetup() {
  mkdir -p $NFSLOCATION
  chown -R nobody:nobody $NFSLOCATION
  chmod -R 777 $NFSLOCATION
- echo "$$NFSLOCATION *(rw,sync,no_subtree_check,no_root_squash,no_all_squash,insecure,no_wdelay)" >> /etc/exports
+ echo "$NFSLOCATION *(rw,sync,no_subtree_check,no_root_squash,no_all_squash,insecure,no_wdelay)" >> /etc/exports
  setsebool -P nfs_export_all_rw 1
  systemctl start nfs-server rpcbind nfs-mountd;systemctl enable --now nfs-server rpcbind
  exportfs -rav
