@@ -35,8 +35,7 @@ cat << EOF > /root/config.json
 EOF
 fi
 
-if [ ! -f /etc/named.conf ]; then
-cat << EOF > /etc/named.conf
+cat << EOF > named.conf
 options {
         listen-on port 53 { $HIP;127.0.0.1; };
         listen-on-v6 port 53 { ::1; };
@@ -47,17 +46,7 @@ options {
         secroots-file   "/var/named/data/named.secroots";
         recursing-file  "/var/named/data/named.recursing";
         allow-query     { localhost; 192.168.1.0/24;};
-
-        /*
-         - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
-         - If you are building a RECURSIVE (caching) DNS server, you need to enable
-           recursion.
-         - If your recursive DNS server has a public IP address, you MUST enable access
-           control to limit queries to your legitimate users. Failing to do so will
-           cause your server to become part of large scale DNS amplification
-           attacks. Implementing BCP38 within your network would greatly
-           reduce such attack surface
-        */
+        
         recursion yes;
 
         dnssec-validation yes;
@@ -92,7 +81,6 @@ zone "$DOMAIN" IN {
 include "/etc/named.rfc1912.zones";
 include "/etc/named.root.key";
 EOF
-fi
 
 #### ALL Functions ####
 
@@ -158,12 +146,13 @@ fi
 
 # Setup DNS
 dnssetup() {
- if [[ -n $(netstat -tunpl | grep 53) ]]; then echo "DNS Port (53) used, DO NOT RUN dnssetup"; exit; fi
+ #if [[ -n $(netstat -tunpl | grep 53) ]]; then echo "DNS Port (53) used, DO NOT RUN dnssetup"; exit; fi
  yum install bind bind-utils -y
+ cp named.conf /etc/named.conf
 
 cat << EOF > /var/named/$DOMAIN.zone
 
-$TTL 86400
+\$TTL 86400
 @   IN  SOA ns1.$DOMAIN. admin.$DOMAIN. (
         2025040301 3600 1800 1209600 86400 )
 
