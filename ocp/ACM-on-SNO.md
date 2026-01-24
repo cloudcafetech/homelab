@@ -13,6 +13,9 @@ wget https://github.com/fullstorydev/grpcurl/releases/download/v1.9.3/grpcurl_1.
 mv grpcurl_1.9.3_linux_amd64.rpm grpcurl.rpm
 yum install podman openssl jq grpcurl.rpm -y
 dnf install /usr/bin/nmstatectl -y
+dnf install epel-release -y
+dnf -y install xrdp
+systemctl enable xrdp --now
 rm -rf grpcurl.rpm
 ```
 
