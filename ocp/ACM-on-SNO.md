@@ -8,7 +8,7 @@
 yum update -y
 dnf groupinstall "Virtualization Host" -y
 systemctl enable --now libvirtd
-yum -y install virt-top libguestfs-tools virt-install virt-manager virt-customize
+yum -y install virt-install virt-top libguestfs-tools virt-manager guestfs-tools
 wget https://github.com/fullstorydev/grpcurl/releases/download/v1.9.3/grpcurl_1.9.3_linux_amd64.rpm
 mv grpcurl_1.9.3_linux_amd64.rpm grpcurl.rpm
 yum install podman openssl jq grpcurl.rpm -y
