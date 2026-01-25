@@ -41,16 +41,24 @@ ssh-keygen -t rsa -N '' -f id_rsa
 PULLSECRET=`cat $PULLSECPATH`
 SSHKEY=`cat id_rsa.pub`
 
-yum install netcat podman jq -y
-dnf install /usr/bin/nmstatectl -y
+command -v podman >/dev/null 2>&1 || { echo - podman was not found; yum install -y podman > /dev/null 2>&1; }
+command -v nc >/dev/null 2>&1 || { echo - nc was not found; yum install -y nc > /dev/null 2>&1; }
+command -v nmstatectl >/dev/null 2>&1 || { echo - nmstatectl was not found; dnf install /usr/bin/nmstatectl -y > /dev/null 2>&1; }
 
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/$VER/openshift-install-linux.tar.gz
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/$VER/openshift-client-linux.tar.gz
-tar zxvf openshift-install-linux.tar.gz
-tar zxvf openshift-client-linux.tar.gz
-mv oc /usr/local/bin/
-mv kubectl /usr/local/bin/
-rm openshift-install-linux.tar.gz openshift-client-linux.tar.gz README.md
+if ! command -v openshift-install &>/dev/null; then
+    wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/$VER/openshift-install-linux.tar.gz
+    tar zxvf openshift-install-linux.tar.gz
+    mv openshift-install /usr/local/bin/
+    rm openshift-install-linux.tar.gz README.md LICENSE
+fi
+
+if ! command -v oc &>/dev/null; then
+    wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/$VER/openshift-client-linux.tar.gz
+    tar zxvf openshift-client-linux.tar.gz
+    mv oc /usr/local/bin/
+    mv kubectl /usr/local/bin/
+    rm openshift-client-linux.tar.gz README.md LICENSE
+fi
 
 echo - Create Agent config
 
@@ -163,7 +171,7 @@ cp *-config.yaml ocp$VER/
 
 echo - Generating ISO .. it will take time !!
 
-./openshift-install --dir=ocp$VER agent create image --log-level=debug 
+openshift-install --dir=ocp$VER agent create image --log-level=debug 
 
 echo - Create VM using ISO
 
@@ -188,3 +196,4 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
+
