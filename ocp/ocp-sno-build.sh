@@ -3,12 +3,14 @@
 
 ### Variable
 
+VM_CREATE=Y
 REGURL=mirror-registry.pkar.tech
 PULLSECPATH=/root/pull-secret
 VER=4.18.30
 DNS=192.168.1.159
 DOMAIN=pkar.tech
 GW=192.168.1.1
+
 
 # ACM
 CLUSTER=sno-acm
@@ -173,6 +175,9 @@ echo - Generating ISO .. it will take time !!
 
 openshift-install --dir=ocp$VER agent create image --log-level=debug 
 
+# Checking if VM Launch
+[[ "$VM_CREATE" != "Y" ]] && exit
+
 echo - Create VM using ISO
 
 qemu-img create -f qcow2 $INSTDIR/$CLUSTER-os-disk.qcow2 120G
@@ -196,5 +201,6 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
+
 
 
