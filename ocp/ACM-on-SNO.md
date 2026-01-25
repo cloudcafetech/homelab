@@ -229,7 +229,8 @@ oc new-project kubenfs
 oc create -f nfs-rbac.yaml
 oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:kubenfs:nfs-client-provisioner
 oc create -f nfs-deployment.yaml -f kubenfs-storage-class.yaml -n kubenfs
-#oc patch storageclass managed-nfs-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+sleep 15
+oc get po -n kubenfs
 
 ```
 
