@@ -185,6 +185,7 @@ virsh list --all
 export KUBECONFIG=/home/sno/tools/ocp418/auth/kubeconfig
 oc get no
 oc get co
+oc get po -A | grep -Ev "Running|Completed"
 ```
 
 - Disable default OperatorHub Catalog Sources and create disconnected Operator Catalog
