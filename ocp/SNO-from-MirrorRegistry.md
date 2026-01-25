@@ -194,6 +194,8 @@ oc patch OperatorHub cluster --type merge --patch '{"spec":{"disableAllDefaultSo
 
 oc get catalogsource --all-namespaces
 
+REGURL=mirror-registry.pkar.tech
+
 cat << EOF > redhat-operator-cs.yaml
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
