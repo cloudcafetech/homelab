@@ -11,7 +11,6 @@ DNS=192.168.1.159
 DOMAIN=pkar.tech
 GW=192.168.1.1
 
-
 # ACM
 CLUSTER=sno-acm
 MEM=28384
@@ -201,6 +200,7 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
+
 
 
 
