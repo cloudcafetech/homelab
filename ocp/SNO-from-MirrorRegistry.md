@@ -33,7 +33,7 @@ PULLSECRET=`cat pull-secret`
 SSHKEY=`cat id_rsa.pub`
 IP=192.168.1.135
 MAC=52:54:00:42:a4:35
-DNS=192.168.1.161
+DNS=192.168.1.159
 DOMAIN=pkar.tech
 GW=192.168.1.1
 
