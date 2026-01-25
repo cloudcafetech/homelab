@@ -1011,3 +1011,63 @@ virt-install \
   --network network=host-bridge \
   --graphics vnc,listen=0.0.0.0,port=5975,password=pkar2675
 ```
+
+## KVM Backup and Restore
+
+> To back up and restore a KVM virtual machine using the CLI, you need to save both the VM's configuration file (XML) and its virtual disk image. The virsh command-line tool is the primary interface for managing KVM guests. 
+Prerequisites
+
+- Ensure you have root privileges or use sudo for all commands.
+
+- Identify your VM's name using virsh list --all.
+
+- Ensure the VM is shut down (virsh shutdown <vm_name>) for a consistent backup, or use disk snapshots for live backups. 
+
+#### Backup Process
+
+- Stop the VM
+
+```virsh shutdown <vm_name>```
+
+- Verify the shutdown 
+
+```virsh domstate <vm_name>```
+
+- Export the VM's XML configuration
+
+```virsh dumpxml <vm_name> > /path/to/backup/location/<vm_name>.xml```
+
+- Locate the virtual disk image path
+
+> This command will show the device and the source path (e.g., /var/lib/libvirt/images/<vm_name>.qcow2).
+
+```virsh domblklist <vm_name>```
+
+- Copy the virtual disk image
+
+```
+cp /var/lib/libvirt/images/<vm_name>.qcow2 /path/to/backup/location/<vm_name>_backup.qcow2
+
+#rsync -avP /var/lib/libvirt/images/<vm_name>.qcow2 user@remote_server:/path/to/backup/location/
+```
+ 
+#### Restore Process
+
+- Copy the backup disk image back
+
+> If restoring to a new host or a clean setup, copy the backed-up disk image to the default KVM image directory or your desired storage pool location.
+
+```cp /path/to/backup/location/<vm_name>_backup.qcow2 /var/lib/libvirt/images/<vm_name>.qcow2```
+
+- Verify and modify the XML configuration
+
+> If restoring to a different host, edit the vm_name.xml file to ensure network interfaces, storage paths and CPU configurations as per new host.
+
+- Define the VM using the XML file
+
+```virsh define /path/to/backup/location/<vm_name>.xml```
+
+- Start the restored VM
+
+```virsh start <vm_name>```
+ 
