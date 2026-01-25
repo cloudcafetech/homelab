@@ -1,23 +1,28 @@
 #!/bin/bash
 # Single Node OpenShift (SNO) in KVM
 
-
 ### Variable
 
 REGURL=mirror-registry.pkar.tech
-CLUSTER=sno-acm
 PULLSECPATH=/root/pull-secret
-
-MEM=28384
-#MEM=16384
-
 VER=4.18.30
-IP=192.168.1.135
-MAC=52:54:00:42:a4:35
-DNS=192.168.1.161
+DNS=192.168.1.159
 DOMAIN=pkar.tech
 GW=192.168.1.1
-VNCPORT=5920
+
+# ACM
+CLUSTER=sno-acm
+MEM=28384
+IP=192.168.1.135
+MAC=52:54:00:42:a4:35
+VNCPORT=5935
+
+# Standalone
+#CLUSTER=sno-sa
+#MEM=16384
+#IP=192.168.1.120
+#MAC=52:54:00:42:a4:20
+#VNCPORT=5920
 
 echo - Install necessary packages and create ssh key
 
@@ -46,7 +51,6 @@ tar zxvf openshift-client-linux.tar.gz
 mv oc /usr/local/bin/
 mv kubectl /usr/local/bin/
 rm openshift-install-linux.tar.gz openshift-client-linux.tar.gz README.md
-
 
 echo - Create Agent config
 
@@ -154,7 +158,6 @@ if [[ ! -z "$REGURL" ]]; then
   fi
 fi
 
-
 cp *-config.yaml ocp$VER-backup/
 cp *-config.yaml ocp$VER/
 
@@ -185,8 +188,3 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
-
-
-
-
-
