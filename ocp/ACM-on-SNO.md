@@ -86,7 +86,7 @@ $TTL 86400
     IN NS ns1.pkar.tech.
 
 ; DNS Server
-ns1.pkar.tech.           	IN A 192.168.1.161
+ns1.pkar.tech.           	IN A 192.168.1.159
 
 ; SNO ACM cluster
 api.sno-acm.pkar.tech.    	IN A 192.168.1.18
@@ -765,7 +765,7 @@ spec:
     protocolStrategy: ""
     transportConfig: {}
     upstreams:
-    - address: 192.168.1.161
+    - address: 192.168.1.159
       port: 53
       type: Network
     - port: 53
@@ -798,7 +798,7 @@ oc get configmap/dns-default -n openshift-dns -o yaml
 nmcli con mod "System eth0" ipv4.addresses 192.168.1.15/24
 nmcli con mod "System eth0" ipv4.method manual
 nmcli con mod "System eth0" ipv4.gateway 192.168.1.1
-nmcli con mod "System eth0" ipv4.dns "192.168.1.161 192.168.1.1"
+nmcli con mod "System eth0" ipv4.dns "192.168.1.159 192.168.1.1"
 nmcli con up "System eth0"
 nmcli connection show "System eth0"
 ```
@@ -900,7 +900,7 @@ virsh pool-destroy images
               search:
                 - pkar.tech
               server:
-                - 192.168.1.18
+                - 192.168.1.159
                 - 192.168.1.21
                 - 192.168.1.1
 ```
