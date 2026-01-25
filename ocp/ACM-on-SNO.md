@@ -599,6 +599,7 @@ virsh setmaxmem sno-ztp 24G --config
 virsh undefine sno-acm-ts --remove-all-storage
 virsh undefine sno-ztp --remove-all-storage --nvram
 virsh domifaddr sno-acm-ts --source arp
+for vm in $(virsh list --all --name); do virsh start $vm;virsh list --all; done
 ```
 
 - Check Utilizations
