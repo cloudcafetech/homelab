@@ -215,11 +215,8 @@ oc get po -n multicluster-engine
 ### Setup NFS Storage in ACM cluster
 
 ```
-NFSRV=192.168.1.160
-NFSMOUNT=/home/sno/ocp-acm/nfsshare
-
-mkdir nfsstorage
-cd nfsstorage
+NFSRV=192.168.1.159
+NFSMOUNT=/root/nfsshare
 
 wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/nfs-rbac.yaml
 wget https://raw.githubusercontent.com/cloudcafetech/kubesetup/master/nfs-storage/nfs-deployment.yaml
