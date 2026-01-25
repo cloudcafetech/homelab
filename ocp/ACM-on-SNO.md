@@ -271,6 +271,8 @@ sleep 40
 ```
 oc get pods -n openshift-gitops-operator
 oc get pods -n openshift-gitops
+sleep 20
+#oc scale deployment.apps/openshift-gitops-applicationset-controller -n openshift-gitops --replicas=0
 ```
 - Openshift Gitops RBAC for clusterinstance and policy
 
