@@ -49,7 +49,7 @@ if ! command -v openshift-install &>/dev/null; then
     wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/$VER/openshift-install-linux.tar.gz
     tar zxvf openshift-install-linux.tar.gz
     mv openshift-install /usr/local/bin/
-    rm openshift-install-linux.tar.gz README.md LICENSE
+    rm -rf openshift-install-linux.tar.gz README.md LICENSE
 fi
 
 if ! command -v oc &>/dev/null; then
@@ -57,7 +57,7 @@ if ! command -v oc &>/dev/null; then
     tar zxvf openshift-client-linux.tar.gz
     mv oc /usr/local/bin/
     mv kubectl /usr/local/bin/
-    rm openshift-client-linux.tar.gz README.md LICENSE
+    rm -rf openshift-client-linux.tar.gz README.md LICENSE
 fi
 
 echo - Create Agent config
@@ -196,4 +196,5 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
+
 
