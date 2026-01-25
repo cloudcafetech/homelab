@@ -179,7 +179,7 @@ openshift-install --dir=ocp$VER agent create image --log-level=debug
 
 echo - Create VM using ISO
 
-qemu-img create -f qcow2 $INSTDIR/$CLUSTER-os-disk.qcow2 120G
+qemu-img create -f qcow2 $INSTDIR/$CLUSTER-os-disk.qcow2 100G
 
 virt-install \
   --name=$CLUSTER \
@@ -192,7 +192,7 @@ virt-install \
   --noautoconsole \
   --import \
   --cdrom $INSTDIR/ocp$VER/agent.x86_64.iso \
-  --disk path=$INSTDIR/$CLUSTER-os-disk.qcow2,size=120 \
+  --disk path=$INSTDIR/$CLUSTER-os-disk.qcow2,size=100 \
   --network network=host-bridge,mac=$MAC \
   --graphics vnc,listen=0.0.0.0,port=$VNCPORT,password=pkar2675
 
@@ -200,7 +200,3 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
-
-
-
-
