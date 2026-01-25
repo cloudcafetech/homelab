@@ -232,7 +232,7 @@ spec:
         search:
           - pkar.tech
         server:
-          - 192.168.1.18
+          - 192.168.1.159
           - 192.168.1.1
     routes:
       config:
