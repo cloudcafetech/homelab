@@ -333,16 +333,17 @@ virsh list --all
 export KUBECONFIG=/home/sno/tools/ocp418/auth/kubeconfig
 oc get no
 oc get co
+oc get po -A | grep -Ev "Running|Completed"
 ```
 
 - Disable default OperatorHub Catalog Sources and create disconnected Operator Catalog
 
 ```
-REGURL=mirror-registry.pkar.tech
-
 oc patch OperatorHub cluster --type merge --patch '{"spec":{"disableAllDefaultSources":true}}'
 
 oc get catalogsource --all-namespaces
+
+REGURL=mirror-registry.pkar.tech
 
 cat << EOF > redhat-operator-cs.yaml
 apiVersion: operators.coreos.com/v1alpha1
