@@ -1,5 +1,5 @@
-#!/bin/bash
-# Single Node OpenShift (SNO) in KVM
+#! /bin/bash
+# Single Node OpenShift (SNO) in KVMt
 
 ### Variable
 
@@ -200,3 +200,4 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
+
