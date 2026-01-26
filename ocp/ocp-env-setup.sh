@@ -205,6 +205,14 @@ websetup() {
  systemctl restart httpd
  #systemctl status httpd
 
+ curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/html/index.html -o /var/www/html/index.html
+ curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/html/viewer.html -o /var/www/html/viewer.html
+ curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/ACM-on-SNO.md -o /var/www/html/ACM-on-SNO.md
+ curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/HCP-on-ACM.md -o /var/www/html/HCP-on-ACM.md
+ curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/MIRROR-REGISTRY.md -o /var/www/html/MIRROR-REGISTRY.md 
+ curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/ZTP-on-SNO.md -o /var/www/html/ZTP-on-SNO.md
+ curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/SNO-from-MirrorRegistry.md -o /var/www/html/OCP-SNO.md
+ curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/OCP-HA-using-Mirror-Registry.md -o /var/www/html/OCP-HA.md
  curl https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.18/4.18.30/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img -o /var/www/html/ocp/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img
  curl https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.18/4.18.30/rhcos-4.18.30-x86_64-live.x86_64.iso -o /var/www/html/ocp/rhcos-4.18.30-x86_64-live.x86_64.iso
 
