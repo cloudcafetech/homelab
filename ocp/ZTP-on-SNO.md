@@ -265,3 +265,14 @@ sleep 20
 oc get clusterinstance sno-ztp -n sno-ztp
 
 ```
+
+- Download Kubeconfig & Kubeadmin Password
+
+> Make sure RHACM logged in and Managed Cluster Ready
+
+```
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/get-ocp-cred.sh
+chmod 755 get-ocp-cred.sh
+# ./get-ocp-cred.sh <Cluster Name>
+./get-ocp-cred.sh sno-ztp
+```
