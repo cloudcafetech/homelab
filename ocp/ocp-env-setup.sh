@@ -213,6 +213,7 @@ websetup() {
  curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/ZTP-on-SNO.md -o /var/www/html/ZTP-on-SNO.md
  curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/SNO-from-MirrorRegistry.md -o /var/www/html/OCP-SNO.md
  curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/OCP-HA-using-Mirror-Registry.md -o /var/www/html/OCP-HA.md
+ curl https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/ocp-vm-build.sh /var/www/html/ocp/ocp-vm-build.sh
  curl https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.18/4.18.30/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img -o /var/www/html/ocp/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img
  curl https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.18/4.18.30/rhcos-4.18.30-x86_64-live.x86_64.iso -o /var/www/html/ocp/rhcos-4.18.30-x86_64-live.x86_64.iso
 
