@@ -16,7 +16,7 @@ spec:
   extraLabels:
     ManagedCluster:
       mirrorRegistry: "mirror-registry.pkar.tech"
-      timezone: "Asia/Kolkata" 
+      timezone: "Asia-Kolkata" 
   extraManifestsRefs:
     - name: cm-disable-operator
     - name: cm-redhat-operator-cs
