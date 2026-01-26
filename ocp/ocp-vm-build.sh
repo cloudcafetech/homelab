@@ -5,13 +5,13 @@ echo "Before execute edit as per requirement."
 
 # Create SNO ACM VM
 sno-acm() {
-
 CLUSTER=sno-acm
 MEM=28384
 IP=192.168.1.135
 MAC=52:54:00:42:a4:35
 VNCPORT=5935
-INSTDIR=/home/sno/$CLUSTER
+INSTDIR=/home/ocp/$CLUSTER
+rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
 wget http://192.168.1.159:8080/ocp/$CLUSTER.iso
@@ -37,19 +37,18 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
-
 }
 
 # Create SNO ZTP VM
 sno-ztp() {
-
 CLUSTER=sno-ztp
 UUID=d54f3990-12c9-4749-8b89-a1242e6af101
 MEM=16384
 IP=192.168.1.110
 MAC=52:54:00:42:a4:10
 VNCPORT=5910
-INSTDIR=/home/sno/$CLUSTER
+INSTDIR=/home/ocp/$CLUSTER
+rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
 
@@ -73,18 +72,17 @@ virt-install \
 
 sleep 10
 virsh list --all
-
 }
 
 # Create SNO Stand Alone VM
 sno-sa() {
-
 CLUSTER=sno-sa
 MEM=16384
 IP=192.168.1.120
 MAC=52:54:00:42:a4:20
 VNCPORT=5920
-INSTDIR=/home/sno/$CLUSTER
+INSTDIR=/home/ocp/$CLUSTER
+rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
 wget http://192.168.1.159:8080/ocp/$CLUSTER.iso
@@ -110,18 +108,17 @@ sleep 10
 virsh list --all
 
 echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
-
 }
 
 # Create OCP Master1
 ocp-m1() {
-
 CLUSTER=ocp-m1
 MEM=16384
 IP=192.168.1.151
 MAC=52:54:00:42:a4:51
 VNCPORT=5951
-INSTDIR=/home/sno/$CLUSTER
+INSTDIR=/home/ocp/$CLUSTER
+rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
 wget http://192.168.1.159:8080/ocp/ocp-ha.iso
@@ -145,20 +142,17 @@ virt-install \
 
 sleep 10
 virsh list --all
-
-echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
-
 }
 
 # Create OCP Master2
 ocp-m2() {
-
 CLUSTER=ocp-m2
 MEM=16384
 IP=192.168.1.152
 MAC=52:54:00:42:a4:52
 VNCPORT=5952
 INSTDIR=/home/ocp/$CLUSTER
+rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
 wget http://192.168.1.159:8080/ocp/ocp-ha.iso
@@ -182,20 +176,17 @@ virt-install \
 
 sleep 10
 virsh list --all
-
-echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
-
 }
 
 # Create OCP Master3
 ocp-m3() {
-
 CLUSTER=ocp-m3
 MEM=16384
 IP=192.168.1.153
 MAC=52:54:00:42:a4:53
 VNCPORT=5953
 INSTDIR=/home/ocp/$CLUSTER
+rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
 wget http://192.168.1.159:8080/ocp/ocp-ha.iso
@@ -219,11 +210,7 @@ virt-install \
 
 sleep 10
 virsh list --all
-
-echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main/ocp/SNO-from-MirrorRegistry.md#post-installation )"
-
 }
-
 
 case "$1" in
     'sno-acm')
