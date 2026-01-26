@@ -1,5 +1,5 @@
 #! /bin/bash
-# Openshift Jumphost (Mirror Registry,DNS,WEB,LB,NFS,Sushy) setup script
+# Openshift Jumphost (Mirror Registry,DNS,WEB,LB,NFS,NTP,Sushy) setup script
 
 HIP=`ip -o -4 addr list br0 | grep -v secondary | awk '{print $4}' | cut -d/ -f1`
 systemctl stop firewalld; systemctl disable firewalld
@@ -374,6 +374,32 @@ EOF
  systemctl status sushy-emulator.service
 }
 
+
+# Setup NTP Server
+ntpsetup()
+{
+dnf install chrony -y
+systemctl enable --now chronyd
+
+sed -i '/iburst/s/^/#/' /etc/chrony.conf
+
+sed -i '/iburst/a\
+server 0.in.pool.ntp.org iburst\
+server 1.in.pool.ntp.org iburst\
+server 2.in.pool.ntp.org iburst\
+server 3.in.pool.ntp.org iburst' /etc/chrony.conf
+
+sed -i '/allow/a\
+allow 192.168.1.0/24' /etc/chrony.conf
+
+systemctl restart chronyd
+
+chronyc sources -v
+chronyc tracking
+date
+timedatectl status
+}
+
 case "$1" in
     'mirrorreg')
             mirrorreg
@@ -393,12 +419,15 @@ case "$1" in
     'sushysetup')
             sushysetup
             ;;
+    'ntpsetup')
+            ntpsetup
+            ;;            
     *)
             clear
             echo
-            echo "Openshift Jumphost (Mirror Registry,DNS,WEB,LB,NFS,Sushy) setup script"
+            echo "Openshift Jumphost (Mirror Registry,DNS,WEB,LB,NFS,NTP,Sushy) setup script"
             echo
-            echo "Usage: $0 { mirrorreg | dnssetup | websetup | lbsetup | nfssetup | sushysetup } $nor"
+            echo "Usage: $0 { mirrorreg | dnssetup | websetup | lbsetup | nfssetup | sushysetup | ntpsetup } $nor"
             echo
             exit 1
             ;;
