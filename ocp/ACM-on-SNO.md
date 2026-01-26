@@ -600,6 +600,7 @@ virsh undefine sno-acm-ts --remove-all-storage
 virsh undefine sno-ztp --remove-all-storage --nvram
 virsh domifaddr sno-acm-ts --source arp
 for vm in $(virsh list --all --name); do virsh start $vm;virsh list --all; done
+for vm in $(virsh list --name --inactive); do virsh start $vm; sleep 5; done
 ```
 
 - Check Utilizations
