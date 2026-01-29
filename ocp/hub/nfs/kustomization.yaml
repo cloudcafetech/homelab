@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 00-ns-kubenfs.yaml
+  - 01-nfs-rbac.yaml
+  - 02-nfs-deployment.yaml
+  - 03-storage-class.yaml
