@@ -57,4 +57,17 @@ roleRef:
   kind: Role
   name: leader-locking-nfs-client-provisioner
   apiGroup: rbac.authorization.k8s.io
-  
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nfs-rb
+  namespace: kubenfs
+subjects:
+- kind: ServiceAccount
+  name: nfs-client-provisioner
+  namespace: kubenfs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "system:openshift:scc:hostmount-anyuid"
