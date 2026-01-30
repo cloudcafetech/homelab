@@ -26,7 +26,8 @@ OLDNS=`cat $MOUNTPATH/etc/NetworkManager/system-connections/enp1s0.nmconnection 
 
 sed -i "s/$OLDIP/$NEWIP/g" $MOUNTPATH/etc/NetworkManager/system-connections/enp1s0.nmconnection 
 sed -i "s/$OLDNS/$NEWDNS/g" $MOUNTPATH/etc/NetworkManager/system-connections/enp1s0.nmconnection
-sed -i "s/$OLDHOST/$NEWHOST/g" $MOUNTPATH/etc/hostname
+#sed -i "s/$OLDHOST/$NEWHOST/g" $MOUNTPATH/etc/hostname
+sed -i "s/registry/registry2/g" $MOUNTPATH/etc/hostname
 
 # Navigate to quay-install directory (quay-config and quay-rootCA)
 # In quay-config, all SSL related plus and in quay-rootCA root CA. Same rootCA can be use
