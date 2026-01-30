@@ -24,6 +24,7 @@ cd /path/to/quay-install
 ls -lrth
 ls -lrth quay-config
 ls -lrth quay-rootCA
+```
 
 > Output
 
