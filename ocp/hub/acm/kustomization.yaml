@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - 00-ns-acm.yaml
+  #- 00-ns-acm.yaml
   - 01-og-acm.yaml
   - 02-sub-acm.yaml
   - 04-mch-acm.yaml
