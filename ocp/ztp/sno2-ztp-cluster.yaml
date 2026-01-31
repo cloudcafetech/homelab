@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: sno2-ztp-cluster
+  name: sno2-ztp
   namespace: openshift-gitops
   labels:
     app.kubernetes.io/managed-by: sno-ztp
@@ -17,3 +17,7 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - Validate=true
+      - RespectIgnoreDifferences=true      
