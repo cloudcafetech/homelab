@@ -7,14 +7,14 @@ echo "Before execute edit as per requirement."
 sno-acm() {
 CLUSTER=sno-acm
 MEM=28384
-IP=192.168.1.135
+IP=192.168.0.135
 MAC=52:54:00:42:a4:35
 VNCPORT=5935
 INSTDIR=/home/ocp/$CLUSTER
 rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
-wget http://192.168.1.159:8080/ocp/$CLUSTER.iso
+wget http://192.168.0.159:8080/ocp/$CLUSTER.iso
 
 qemu-img create -f qcow2 $INSTDIR/$CLUSTER-os-disk.qcow2 100G
 
@@ -44,7 +44,7 @@ sno-ztp() {
 CLUSTER=sno-ztp
 UUID=d54f3990-12c9-4749-8b89-a1242e6af101
 MEM=16384
-IP=192.168.1.110
+IP=192.168.0.110
 MAC=52:54:00:42:a4:10
 VNCPORT=5910
 INSTDIR=/home/ocp/$CLUSTER
@@ -79,7 +79,7 @@ sno2-ztp() {
 CLUSTER=sno2-ztp
 UUID=d54f3990-12c9-4749-8b89-a1242e6af102
 MEM=16384
-IP=192.168.1.112
+IP=192.168.0.112
 MAC=52:54:00:42:a4:12
 VNCPORT=5912
 INSTDIR=/home/ocp/$CLUSTER
@@ -113,14 +113,14 @@ virsh list --all
 sno-sa() {
 CLUSTER=sno-sa
 MEM=16384
-IP=192.168.1.120
+IP=192.168.0.120
 MAC=52:54:00:42:a4:20
 VNCPORT=5920
 INSTDIR=/home/ocp/$CLUSTER
 rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
-wget http://192.168.1.159:8080/ocp/$CLUSTER.iso
+wget http://192.168.0.159:8080/ocp/$CLUSTER.iso
 
 qemu-img create -f qcow2 $INSTDIR/$CLUSTER-os-disk.qcow2 100G
 
@@ -149,14 +149,14 @@ echo "Post Install follow!! ( https://github.com/cloudcafetech/homelab/blob/main
 ocp-m1() {
 CLUSTER=ocp-m1
 MEM=16384
-IP=192.168.1.151
+IP=192.168.0.151
 MAC=52:54:00:42:a4:51
 VNCPORT=5951
 INSTDIR=/home/ocp/$CLUSTER
 rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
-wget http://192.168.1.159:8080/ocp/ocp-ha.iso
+wget http://192.168.0.159:8080/ocp/ocp-ha.iso
 
 qemu-img create -f qcow2 $INSTDIR/$CLUSTER-os-disk.qcow2 100G
 
@@ -183,14 +183,14 @@ virsh list --all
 ocp-m2() {
 CLUSTER=ocp-m2
 MEM=16384
-IP=192.168.1.152
+IP=192.168.0.152
 MAC=52:54:00:42:a4:52
 VNCPORT=5952
 INSTDIR=/home/ocp/$CLUSTER
 rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
-wget http://192.168.1.159:8080/ocp/ocp-ha.iso
+wget http://192.168.0.159:8080/ocp/ocp-ha.iso
 
 qemu-img create -f qcow2 $INSTDIR/$CLUSTER-os-disk.qcow2 100G
 
@@ -217,14 +217,14 @@ virsh list --all
 ocp-m3() {
 CLUSTER=ocp-m3
 MEM=16384
-IP=192.168.1.153
+IP=192.168.0.153
 MAC=52:54:00:42:a4:53
 VNCPORT=5953
 INSTDIR=/home/ocp/$CLUSTER
 rm -rf $INSTDIR
 mkdir -p $INSTDIR
 cd $INSTDIR
-wget http://192.168.1.159:8080/ocp/ocp-ha.iso
+wget http://192.168.0.159:8080/ocp/ocp-ha.iso
 
 qemu-img create -f qcow2 $INSTDIR/$CLUSTER-os-disk.qcow2 100G
 
