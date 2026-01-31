@@ -1,5 +1,5 @@
 #! /bin/bash
-# Openshift VM (sno-acm sno-ztp sno-sa ocp-m1 ocp-m2 ocp-m3) Create script
+# Openshift VM (sno-acm sno-ztp sno2-ztp sno-sa ocp-m1 ocp-m2 ocp-m3) Create script
 
 echo "Before execute edit as per requirement."
 
@@ -47,6 +47,41 @@ MEM=16384
 IP=192.168.1.110
 MAC=52:54:00:42:a4:10
 VNCPORT=5910
+INSTDIR=/home/ocp/$CLUSTER
+rm -rf $INSTDIR
+mkdir -p $INSTDIR
+cd $INSTDIR
+
+qemu-img create -f qcow2 $INSTDIR/$CLUSTER-os-disk.qcow2 100G
+
+virt-install \
+  --name=$CLUSTER \
+  --uuid=$UUID \
+  --ram=$MEM \
+  --vcpus=12 \
+  --cpu host-passthrough \
+  --os-variant rhel8.0 \
+  --noreboot \
+  --events on_reboot=restart \
+  --noautoconsole \
+  --boot hd,cdrom \
+  --import \
+  --disk path=$INSTDIR/$CLUSTER-os-disk.qcow2,size=20 \
+  --network type=direct,source=br0,mac=$MAC,source_mode=bridge,model=virtio \
+  --graphics vnc,listen=0.0.0.0,port=$VNCPORT,password=pkar2675
+
+sleep 10
+virsh list --all
+}
+
+# Create SNO2 ZTP VM
+sno2-ztp() {
+CLUSTER=sno2-ztp
+UUID=d54f3990-12c9-4749-8b89-a1242e6af102
+MEM=16384
+IP=192.168.1.112
+MAC=52:54:00:42:a4:12
+VNCPORT=5912
 INSTDIR=/home/ocp/$CLUSTER
 rm -rf $INSTDIR
 mkdir -p $INSTDIR
@@ -218,6 +253,9 @@ case "$1" in
             ;;
     'sno-ztp')
             sno-ztp
+            ;;
+    'sno2-ztp')
+            sno2-ztp
             ;;            
     'sno-sa')
             sno-sa
@@ -234,9 +272,9 @@ case "$1" in
     *)
             clear
             echo
-            echo "Openshift VM (sno-acm sno-ztp sno-sa ocp-m1 ocp-m2 ocp-m3) Create script"
+            echo "Openshift VM (sno-acm sno-ztp sno2-ztp sno-sa ocp-m1 ocp-m2 ocp-m3) Create script"
             echo
-            echo "Usage: $0 { sno-acm | sno-ztp | sno-sa | ocp-m1 | ocp-m2 | ocp-m3 }"
+            echo "Usage: $0 { sno-acm | sno-ztp | sno2-ztp | sno-sa | ocp-m1 | ocp-m2 | ocp-m3 }"
             echo
             exit 1
             ;;
