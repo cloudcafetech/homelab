@@ -2,7 +2,6 @@ apiVersion: agent-install.openshift.io/v1beta1
 kind: AgentServiceConfig
 metadata:
   name: agent
-#  namespace: multicluster-engine
   annotations:
     argocd.argoproj.io/sync-wave: "+10"
 spec:
@@ -24,8 +23,6 @@ spec:
     resources:
       requests:
         storage: 10Gi
-  #mirrorRegistryRef:
-  #  name: mirror-registry-config
   osImages:
     - cpuArchitecture: x86_64
       openshiftVersion: '4.18'
