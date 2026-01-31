@@ -284,7 +284,7 @@ metadata:
   name: openshift-gitops-acm-clusterrole
 rules:
 - apiGroups: ["*"]
-  resources: ["serviceaccounts", "deployments", "provisionings"]
+  resources: ["serviceaccounts", "deployments", "provisionings", "agentserviceconfigs"]
   verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
 - apiGroups: ["siteconfig.open-cluster-management.io"]
   resources: ["clusterinstances"]
