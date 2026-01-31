@@ -4,7 +4,7 @@ metadata:
   name: sno2-ztp
   namespace: openshift-gitops
   labels:
-    app.kubernetes.io/managed-by: sno-ztp
+    app.kubernetes.io/managed-by: sno2-ztp
 spec:
   project: default
   source:
