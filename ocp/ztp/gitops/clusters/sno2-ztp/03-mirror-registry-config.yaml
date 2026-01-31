@@ -18,7 +18,7 @@ data:
       prefix = ""
       location = "quay.io/openshift-release-dev/ocp-v4.0-art-dev"
       [[registry.mirror]]
-        location = "mirror-registry.pkar.tech:8443/ocp/openshift/release"
+        location = "mirror-registry2.pkar.tech:8443/ocp/openshift/release"
         pull-from-mirror = "digest-only"
 
     [[registry]]
