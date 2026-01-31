@@ -3,6 +3,8 @@ kind: AgentServiceConfig
 metadata:
   name: agent
 #  namespace: multicluster-engine
+  annotations:
+    argocd.argoproj.io/sync-wave: "+10"
 spec:
   databaseStorage:
     accessModes:
