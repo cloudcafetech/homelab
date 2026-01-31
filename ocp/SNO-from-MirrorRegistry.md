@@ -18,7 +18,7 @@ rm openshift-install-linux.tar.gz openshift-client-linux.tar.gz README.md
 > TIPS: Cluster Build in disconnected network from Mirror Registry, pull secret should contains credentials for both Mirror Registry and official Red Hat Registries.
 
 ```
-scp cloudcafe@192.168.1.150:/home/cloudcafe/merge-pull-secret .
+scp cloudcafe@192.168.0.150:/home/cloudcafe/merge-pull-secret .
 cp merge-pull-secret pull-secret
 ```
   
@@ -103,7 +103,7 @@ networking:
   - cidr: 10.128.0.0/14
     hostPrefix: 23
   machineNetwork:
-  - cidr: 192.168.1.0/24
+  - cidr: 192.168.0.0/24
   networkType: OVNKubernetes
   serviceNetwork:
   - 172.30.0.0/16
