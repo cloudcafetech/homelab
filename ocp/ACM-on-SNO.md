@@ -283,6 +283,9 @@ kind: ClusterRole
 metadata:
   name: openshift-gitops-acm-clusterrole
 rules:
+- apiGroups: ["*"]
+  resources: ["serviceaccounts", "deployments"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
 - apiGroups: ["siteconfig.open-cluster-management.io"]
   resources: ["clusterinstances"]
   verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
