@@ -7,5 +7,5 @@ resources:
   - 02-sub-acm.yaml
   - 04-mch-acm.yaml
   - 05-provisioning.yaml
-  - 06-cm-mirror-registry.yaml
+  #- 06-cm-mirror-registry.yaml
   - 07-agent-service-config.yaml
