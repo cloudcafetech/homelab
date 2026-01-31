@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sno2-ztp-cluster-app
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/managed-by: sno-ztp
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/cloudcafetech/homelab.git'
+    targetRevision: main
+    path: ocp/ztp/gitops/clusters/sno2-ztp/
+  destination:
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
