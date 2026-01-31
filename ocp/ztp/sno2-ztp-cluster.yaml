@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: sno2-ztp-cluster-app
+  name: sno2-ztp-cluster
   namespace: openshift-gitops
   labels:
     app.kubernetes.io/managed-by: sno-ztp
