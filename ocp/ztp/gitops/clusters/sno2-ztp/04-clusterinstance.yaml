@@ -1,0 +1,77 @@
+apiVersion: siteconfig.open-cluster-management.io/v1alpha1
+kind: ClusterInstance
+metadata:
+  name: sno2-ztp
+  namespace: sno2-ztp
+spec:
+  clusterName: sno2-ztp
+  clusterImageSetNameRef: img4.18.30-x86-64-appsub
+  baseDomain: pkar.tech
+  cpuArchitecture: x86_64
+  holdInstallation: false
+  cpuPartitioningMode: None
+  networkType: OVNKubernetes
+  #additionalNTPSources:
+  #  - 192.168.1.1  
+  extraLabels:
+    ManagedCluster:
+      mirrorRegistry: "mirror-registry2.pkar.tech"
+      timezone: "Asia-Kolkata" 
+  extraManifestsRefs:
+    - name: cm-disable-operator
+    - name: cm-redhat-operator-cs
+  mirrorRegistryRef:
+    name: mirror-registry-config
+    namespace: sno-ztp  
+  machineNetwork:
+    - cidr: 192.168.1.0/24
+  pullSecretRef:
+    name: pull-secret
+  templateRefs:
+    - name: ai-cluster-templates-v1
+      namespace: open-cluster-management
+  sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFoML+fLuVqwcWbtH6TGiq9VxIUi0umNaJAEVixhTLhiAnHEk8OT8p06fFxYAM+1B+oMPfU5u/36+gWIrTPUD+jgzdEZksZ8BoHveDOrrJBEGWD4xsVGj7szV4bXBEHbxgD4WeILIAtYy/QMaH+Nxkdj/eUoD7KYSelNkwKPJpJkbTIzQs6r76VYYxQkeGbraRJ5EnGQWjeAVqXXlCvzssJxGbEagub3cmv99niCa3EfUd6fPS4OjqYI7SkYSdJezRHJ5Q+eLuqTG5oicD8MWbWMsEvPC97n9bmqLsrfh1g+K69eE92a2Gu6kSwZIMcdbktEBeEeUDz/lgVG1+y/z4JFB57dSVxtdYrawxFMvVNVmX1XXydkQzOJU7WQ3Wm55qS8Zv9vCEmu9hEdZ0AC3+5pFktprNj861ETiKs969HG/xIZxUqvmWVJQI9c9eIo1KF7wxEav5VvCxV4yZq7ulUjkuMOZIPvqyWIbjz1kwFmXU9k1Ihi4gUsnKA94eKpU= root@lenevo-ts-w2
+  nodes:
+    - role: master
+      hostName: sno2-ztp
+      ironicInspect: ''
+      bootMACAddress: '52:54:00:42:a4:12'
+      bootMode: UEFI
+      automatedCleaningMode: disabled
+      cpuArchitecture: x86_64
+      templateRefs:
+        - name: ai-node-templates-v1
+          namespace: open-cluster-management
+      bmcAddress: 'redfish-virtualmedia+http://192.168.1.159:8000/redfish/v1/Systems/d54f3990-12c9-4749-8b89-a1242e6af102'
+      bmcCredentialsName:
+        name: bmc-secret
+      nodeNetwork:
+        interfaces:
+          - macAddress: '52:54:00:42:a4:12'
+            name: enp1s0
+        config:
+          interfaces:
+            - name: enp1s0
+              type: ethernet
+              state: up
+              ipv4:
+                enabled: true
+                dhcp: false
+                address:
+                  - ip: 192.168.1.112
+                    prefix-length: 24
+              ipv6:
+                enabled: false
+          dns-resolver:
+            config:
+              search:
+                - pkar.tech
+              server:
+                - 192.168.1.135
+                - 192.168.1.159
+                - 192.168.1.112
+          routes:
+            config:
+              - destination: 0.0.0.0/0
+                next-hop-address: 192.168.1.1
+                next-hop-interface: enp1s0

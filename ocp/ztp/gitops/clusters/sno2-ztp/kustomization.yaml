@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  #- 00-namespace.yaml	
+  - 01-bmc-secret.yaml
+  #- 02-pull-secret.yaml
+  - 03-mirror-registry-config.yaml
+  - 04-clusterinstance.yaml
+  #- 05-htpass-secret.yaml
+  #- 06-cluster-config-data.yaml
+  - 07-klusterlet-addon-config.yaml
+  - 09-cm-disable-operator.yaml
+  - 08-cm-redhat-operator-cs.yaml
