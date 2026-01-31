@@ -234,7 +234,7 @@ MAS1MAC=52:54:00:42:a4:51
 
 mkdir -p /home/sno/ocp-ha
 cd /home/sno/ocp-ha
-scp cloudcafe@192.168.1.159:/home/cloudcafe/agent.x86_64.iso .
+scp cloudcafe@192.168.0.159:/home/cloudcafe/agent.x86_64.iso .
 chown root:root agent.x86_64.iso
 qemu-img create -f qcow2 /home/sno/ocp-ha/ocp-m1-os-disk.qcow2 100G
 
@@ -264,7 +264,7 @@ MAS2MAC=52:54:00:42:a4:52
 
 mkdir -p /home/sno/ocp-ha
 cd /home/sno/ocp-ha
-scp cloudcafe@192.168.1.159:/home/cloudcafe/agent.x86_64.iso .
+scp cloudcafe@192.168.0.159:/home/cloudcafe/agent.x86_64.iso .
 chown root:root agent.x86_64.iso
 qemu-img create -f qcow2 /home/sno/ocp-ha/ocp-m2-os-disk.qcow2 100G
 
@@ -294,7 +294,7 @@ MAS3MAC=52:54:00:42:a4:53
 
 mkdir -p /home/sno/ocp-ha
 cd /home/sno/ocp-ha
-scp cloudcafe@192.168.1.159:/home/cloudcafe/agent.x86_64.iso .
+scp cloudcafe@192.168.0.159:/home/cloudcafe/agent.x86_64.iso .
 chown root:root agent.x86_64.iso
 qemu-img create -f qcow2 /home/sno/ocp-ha/ocp-m3-os-disk.qcow2 100G
 
