@@ -3,8 +3,6 @@ kind: Application
 metadata:
   name: open-cluster-management
   namespace: openshift-gitops
-  labels:
-    app.kubernetes.io/managed-by: sno-ztp
 spec:
   project: default
   source:
