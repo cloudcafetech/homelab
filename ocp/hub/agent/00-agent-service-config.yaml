@@ -2,8 +2,6 @@ apiVersion: agent-install.openshift.io/v1beta1
 kind: AgentServiceConfig
 metadata:
   name: agent
-  annotations:
-    argocd.argoproj.io/sync-wave: "+10"
 spec:
   databaseStorage:
     accessModes:
