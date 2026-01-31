@@ -24,13 +24,13 @@ spec:
     name: mirror-registry-config
     namespace: sno-ztp  
   machineNetwork:
-    - cidr: 192.168.1.0/24
+    - cidr: 192.168.0.0/24
   pullSecretRef:
     name: pull-secret
   templateRefs:
     - name: ai-cluster-templates-v1
       namespace: open-cluster-management
-  sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFoML+fLuVqwcWbtH6TGiq9VxIUi0umNaJAEVixhTLhiAnHEk8OT8p06fFxYAM+1B+oMPfU5u/36+gWIrTPUD+jgzdEZksZ8BoHveDOrrJBEGWD4xsVGj7szV4bXBEHbxgD4WeILIAtYy/QMaH+Nxkdj/eUoD7KYSelNkwKPJpJkbTIzQs6r76VYYxQkeGbraRJ5EnGQWjeAVqXXlCvzssJxGbEagub3cmv99niCa3EfUd6fPS4OjqYI7SkYSdJezRHJ5Q+eLuqTG5oicD8MWbWMsEvPC97n9bmqLsrfh1g+K69eE92a2Gu6kSwZIMcdbktEBeEeUDz/lgVG1+y/z4JFB57dSVxtdYrawxFMvVNVmX1XXydkQzOJU7WQ3Wm55qS8Zv9vCEmu9hEdZ0AC3+5pFktprNj861ETiKs969HG/xIZxUqvmWVJQI9c9eIo1KF7wxEav5VvCxV4yZq7ulUjkuMOZIPvqyWIbjz1kwFmXU9k1Ihi4gUsnKA94eKpU= root@lenevo-ts-w2
+  sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCWoz7bEt/HTXoRCJFCP310RlzDc6rtlguDoBqCMz+Em4DiY7F6b/+DUwdzGm6KHoHLsPxCV5RdtJ0D++SoFYZHy1J3rl3ASDKtiwWb4ifTcdUZxKHGU48N5j0qYtGB0nAK/BEJn3MI3BTqnuWWcutuDo6xH2aJ7HBUCpqaAaxXsrmp+AQjwpdYIyiKyMUexgByo1MPwU806oxJPiZwgIks6TR+Y0hE/zPfkfTHFTvMpOLu5YfuzgksTJhNxjNxPa4CNZzzRRqDWflWxVSI93iz5Atw/x5Q8sjxzCONfKIjPiRkky6sP2hpwB0cVr/p+U3n6UAYC5lmkqvdr/eh0EY2ZaQ4QsBhtxgTHrWW2l1xFDxVK8FxNfBZMyvSG8K8jingo3hE2udIIG43MpX4HM9Kg75SQTuDIZ4HxHQiSlYrcaNWVOckcZHYrs1AAMLUKtx5InhYa6YpC98WT1/MmP+45vA00UbU8Eh36CeorcC1MpGXmOnj00NYsVZoronPoic= root@lenevo-tci57
   nodes:
     - role: master
       hostName: sno-ztp
