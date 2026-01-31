@@ -22,7 +22,7 @@ spec:
     - name: cm-redhat-operator-cs
   mirrorRegistryRef:
     name: mirror-registry-config
-    namespace: sno-ztp  
+    namespace: sno2-ztp  
   machineNetwork:
     - cidr: 192.168.1.0/24
   pullSecretRef:
