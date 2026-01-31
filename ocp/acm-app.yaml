@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: acm-cluster-app
+  name: acm-app
   namespace: openshift-gitops
   labels:
     app.kubernetes.io/managed-by: sno-ztp
@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/cloudcafetech/homelab.git'
     targetRevision: main
-    path: ocp/hub/
+    path: ocp/hub/acm
   destination:
     server: 'https://kubernetes.default.svc'
   syncPolicy:
