@@ -18,6 +18,7 @@ spec:
       mirrorRegistry: "mirror-registry.pkar.tech"
       timezone: "Asia-Kolkata" 
   extraManifestsRefs:
+    - name: cm-idms 
     - name: cm-disable-operator
     - name: cm-redhat-operator-cs
   mirrorRegistryRef:
