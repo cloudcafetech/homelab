@@ -3,13 +3,13 @@
 
 ### Variable
 
-VM_CREATE=Y
+VM_CREATE=n
 REGURL=mirror-registry.pkar.tech
 PULLSECPATH=/root/pull-secret
 VER=4.18.30
 DNS=192.168.0.159
 DOMAIN=pkar.tech
-GW=192.168.1.1
+GW=192.168.0.1
 
 # ACM
 CLUSTER=sno-acm
