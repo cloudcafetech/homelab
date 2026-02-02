@@ -207,13 +207,13 @@ spec:
   cpuPartitioningMode: None
   networkType: OVNKubernetes
   machineNetwork:
-    - cidr: 192.168.1.0/24
+    - cidr: 192.168.0.0/24
   pullSecretRef:
     name: pull-secret
   templateRefs:
     - name: ai-cluster-templates-v1
       namespace: open-cluster-management
-  sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFoML+fLuVqwcWbtH6TGiq9VxIUi0umNaJAEVixhTLhiAnHEk8OT8p06fFxYAM+1B+oMPfU5u/36+gWIrTPUD+jgzdEZksZ8BoHveDOrrJBEGWD4xsVGj7szV4bXBEHbxgD4WeILIAtYy/QMaH+Nxkdj/eUoD7KYSelNkwKPJpJkbTIzQs6r76VYYxQkeGbraRJ5EnGQWjeAVqXXlCvzssJxGbEagub3cmv99niCa3EfUd6fPS4OjqYI7SkYSdJezRHJ5Q+eLuqTG5oicD8MWbWMsEvPC97n9bmqLsrfh1g+K69eE92a2Gu6kSwZIMcdbktEBeEeUDz/lgVG1+y/z4JFB57dSVxtdYrawxFMvVNVmX1XXydkQzOJU7WQ3Wm55qS8Zv9vCEmu9hEdZ0AC3+5pFktprNj861ETiKs969HG/xIZxUqvmWVJQI9c9eIo1KF7wxEav5VvCxV4yZq7ulUjkuMOZIPvqyWIbjz1kwFmXU9k1Ihi4gUsnKA94eKpU= root@lenevo-ts-w2
+  sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCWoz7bEt/HTXoRCJFCP310RlzDc6rtlguDoBqCMz+Em4DiY7F6b/+DUwdzGm6KHoHLsPxCV5RdtJ0D++SoFYZHy1J3rl3ASDKtiwWb4ifTcdUZxKHGU48N5j0qYtGB0nAK/BEJn3MI3BTqnuWWcutuDo6xH2aJ7HBUCpqaAaxXsrmp+AQjwpdYIyiKyMUexgByo1MPwU806oxJPiZwgIks6TR+Y0hE/zPfkfTHFTvMpOLu5YfuzgksTJhNxjNxPa4CNZzzRRqDWflWxVSI93iz5Atw/x5Q8sjxzCONfKIjPiRkky6sP2hpwB0cVr/p+U3n6UAYC5lmkqvdr/eh0EY2ZaQ4QsBhtxgTHrWW2l1xFDxVK8FxNfBZMyvSG8K8jingo3hE2udIIG43MpX4HM9Kg75SQTuDIZ4HxHQiSlYrcaNWVOckcZHYrs1AAMLUKtx5InhYa6YpC98WT1/MmP+45vA00UbU8Eh36CeorcC1MpGXmOnj00NYsVZoronPoic= root@lenevo-tci57
   nodes:
     - role: master
       hostName: sno-ztp
@@ -225,7 +225,7 @@ spec:
       templateRefs:
         - name: ai-node-templates-v1
           namespace: open-cluster-management
-      bmcAddress: 'redfish-virtualmedia+http://192.168.1.161:8000/redfish/v1/Systems/d54f3990-12c9-4749-8b89-a1242e6af101'
+      bmcAddress: 'redfish-virtualmedia+http://192.168.0.161:8000/redfish/v1/Systems/d54f3990-12c9-4749-8b89-a1242e6af101'
       bmcCredentialsName:
         name: bmc-secret
       nodeNetwork:
@@ -241,7 +241,7 @@ spec:
                 enabled: true
                 dhcp: false
                 address:
-                  - ip: 192.168.1.21
+                  - ip: 192.168.0.21
                     prefix-length: 24
               ipv6:
                 enabled: false
@@ -250,13 +250,13 @@ spec:
               search:
                 - pkar.tech
               server:
-                - 192.168.1.18
-                - 192.168.1.21
-                - 192.168.1.1
+                - 192.168.0.18
+                - 192.168.0.21
+                - 192.168.0.1
           routes:
             config:
               - destination: 0.0.0.0/0
-                next-hop-address: 192.168.1.1
+                next-hop-address: 192.168.0.1
                 next-hop-interface: enp1s0
 EOF
 
@@ -264,6 +264,17 @@ oc apply -f sno-ztp-clusterinstance.yaml
 sleep 20
 oc get clusterinstance sno-ztp -n sno-ztp
 
+```
+
+- Verify
+
+```
+oc describe clusterinstance sno-ztp -n sno-ztp
+oc describe AgentClusterInstall sno-ztp -n sno-ztp
+oc describe ClusterDeployment sno-ztp -n sno-ztp
+oc describe InfraEnv sno-ztp -n sno-ztp
+oc describe BareMetalHost sno-ztp -n sno-ztp
+oc describe NMStateConfig sno-ztp -n sno-ztp
 ```
 
 - Download Kubeconfig & Kubeadmin Password
