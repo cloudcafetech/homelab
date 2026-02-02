@@ -263,7 +263,7 @@ EOF
 oc apply -f sno-ztp-clusterinstance.yaml
 sleep 20
 oc get clusterinstance sno-ztp -n sno-ztp
-
+oc get clusterinstance,AgentClusterInstall,ClusterDeployment,InfraEnv,BareMetalHost,NMStateConfig -n sno-ztp
 ```
 
 - Verify
