@@ -1081,11 +1081,10 @@ cp /var/lib/libvirt/images/<vm_name>.qcow2 /path/to/backup/location/<vm_name>_ba
 - Deploy GITEA
 
 ```
-mkdir -p /root/gitea/{data,config}
+mkdir -p /root/gitea/data
 podman run -d --name gitea --privileged \
   -p 3000:3000 -p 2222:22 \
-  -v /root/gitea/data:/var/lib/gitea:Z \
-  -v /root/gitea/config:/etc/gitea:Z \
+  -v /root/gitea/data:/data:Z \
   --label "io.containers.autoupdate=registry" \
   docker.io/gitea/gitea:latest
 ```
