@@ -53,7 +53,7 @@ MAS3MAC=52:54:00:42:a4:53
 
 DNS=192.168.0.159
 DOMAIN=pkar.tech
-GW=192.168.1.1
+GW=192.168.0.1
 
 mkdir ocp418
 mkdir ocp418-backup
