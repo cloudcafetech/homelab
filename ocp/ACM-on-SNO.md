@@ -1075,4 +1075,45 @@ cp /var/lib/libvirt/images/<vm_name>.qcow2 /path/to/backup/location/<vm_name>_ba
 - Start the restored VM
 
 ```virsh start <vm_name>```
- 
+
+ ### Setup local GitHub
+
+- Deploy GITEA
+
+```
+mkdir -p /root/gitea/{data,config}
+podman run -d --name gitea --privileged \
+  -p 3000:3000 -p 2222:22 \
+  -v /root/gitea/data:/var/lib/gitea:Z \
+  -v /root/gitea/config:/etc/gitea:Z \
+  --label "io.containers.autoupdate=registry" \
+  docker.io/gitea/gitea:latest
+```
+
+- Generate auto restart service
+
+```
+podman generate systemd --restart-policy=always --name gitea --files 
+mv container-gitea.service /etc/systemd/system/gitea.service
+systemctl daemon-reload
+systemctl restart gitea.service
+systemctl enable gitea.service
+systemctl status gitea.service
+```
+
+- Clone and upload
+
+```
+git clone <repo>
+rm -rf .git/
+git init
+git config --global user.email "cloudcafetech@gmail.com"
+git config --global user.name "cloudcafe"
+git checkout -b main
+git remote add origin http://192.168.0.159:3000/cloudcafe/homelab.git
+git pull origin main
+git add .
+git commit -m "all commit"
+git push -u origin main
+```
+
