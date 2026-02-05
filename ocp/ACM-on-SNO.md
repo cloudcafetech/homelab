@@ -953,6 +953,23 @@ openshift-user-critical    1000000000   false            6d15h   PreemptLowerPri
 system-cluster-critical    2000000000   false            6d15h   PreemptLowerPriority
 system-node-critical       2000001000   false            6d15h   PreemptLowerPriority
 ```
+### Increase ROOT FS in CentOS 9 VM (KVM)
+
+- From Host
+
+```
+qemu-img resize mir-reg-os-disk.qcow2 +7G
+```
+
+- Inside VM
+
+```
+growpart /dev/vda 2
+pvresize /dev/vda2
+lvextend -l +100%FREE /dev/mapper/cs-root
+xfs_growfs /
+df -h /
+```
 
 ### Test VM Creation
 
