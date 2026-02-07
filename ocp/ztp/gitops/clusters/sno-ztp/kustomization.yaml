@@ -6,8 +6,15 @@ resources:
   #- 02-pull-secret.yaml
   - 03-mirror-registry-config.yaml
   - 04-clusterinstance.yaml
-  - 05-cm-idms.yaml  
-  #- 06-cluster-config-data.yaml
   - 07-klusterlet-addon-config.yaml
-  - 09-cm-disable-operator.yaml
-  - 08-cm-redhat-operator-cs.yaml
+
+configMapGenerator:
+  - files:
+    - extra-manifests/00-idms.yaml
+    - extra-manifests/01-disable-operator.yaml
+    - extra-manifests/02-redhat-operator-cs.yaml
+    name: extra-manifests-cm
+    namespace: sno-ztp
+
+generatorOptions:
+  disableNameSuffixHash: true
