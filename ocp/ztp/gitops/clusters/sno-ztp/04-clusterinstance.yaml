@@ -17,11 +17,11 @@ spec:
   extraLabels:
     ManagedCluster:
       mirrorRegistry: "mirror-registry.pkar.tech"
-      timezone: "Asia-Kolkata" 
+      timezone: "Asia-Kolkata"
+      siteName: "store"
+      common: "true"      
   extraManifestsRefs:
-    - name: cm-idms 
-    - name: cm-disable-operator
-    - name: cm-redhat-operator-cs
+    - name: extra-manifests-cm
   mirrorRegistryRef:
     name: mirror-registry-config
     namespace: sno-ztp  
