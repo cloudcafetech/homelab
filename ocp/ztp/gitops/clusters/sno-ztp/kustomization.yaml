@@ -6,7 +6,7 @@ resources:
   #- 02-pull-secret.yaml
   - 03-mirror-registry-config.yaml
   - 04-clusterinstance.yaml
-  - 07-klusterlet-addon-config.yaml
+  - 05-klusterlet-addon-config.yaml
 
 configMapGenerator:
   - files:
