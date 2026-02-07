@@ -1,0 +1,18 @@
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+  name: idms
+spec:
+  imageDigestMirrors:
+  - mirrors:
+    - mirror-registry.pkar.tech:8443/ocp/openshift/release
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  - mirrors:
+    - mirror-registry.pkar.tech:8443/ocp/openshift/release-images
+    source: quay.io/openshift-release-dev/ocp-release
+  - mirrors:
+    - mirror-registry.pkar.tech:8443/ocp
+    source: registry.redhat.io
+  - mirrors:
+    - mirror-registry.pkar.tech:8443/ocp/k8s-staging-sig-storage
+    source: gcr.io/k8s-staging-sig-storage
