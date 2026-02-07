@@ -63,43 +63,6 @@ oc get catalogsource --all-namespaces
 oc create -f ../common/00-redhat-operator-cs.yaml
 ```
 
-- Install Lifecycle Agent Operator
-
-```
-cat << EOF > lca-operator.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-lifecycle-agent
-  annotations:
-    workload.openshift.io/allowed: management
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: openshift-lifecycle-agent
-  namespace: openshift-lifecycle-agent
-spec:
-  targetNamespaces:
-  - openshift-lifecycle-agent 
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: openshift-lifecycle-agent-subscription
-  namespace: openshift-lifecycle-agent
-spec:
-  channel: stable
-  name: lifecycle-agent
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-EOF
-
-oc create -f  lca-operator.yaml
-sleep 40
-oc get deploy -n openshift-lifecycle-agent
-```
-
 - [Create separate partition](https://access.redhat.com/solutions/4952011) for sharing /var/lib/containers partition 
 
 ```
@@ -190,6 +153,43 @@ oc apply -f 98-var-lib-containers-partitioned.yaml
 ```
 oc edit mc/98-var-lib-containers
 
+```
+
+- Install Lifecycle Agent Operator
+
+```
+cat << EOF > lca-operator.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-lifecycle-agent
+  annotations:
+    workload.openshift.io/allowed: management
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-lifecycle-agent
+  namespace: openshift-lifecycle-agent
+spec:
+  targetNamespaces:
+  - openshift-lifecycle-agent 
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: openshift-lifecycle-agent-subscription
+  namespace: openshift-lifecycle-agent
+spec:
+  channel: stable
+  name: lifecycle-agent
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+
+oc create -f  lca-operator.yaml
+sleep 40
+oc get deploy -n openshift-lifecycle-agent
 ```
 
 - Create secret and for push seed image to registry.
