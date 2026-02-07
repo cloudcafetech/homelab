@@ -352,7 +352,7 @@ metadata:
   name: redhat-operators
   namespace: openshift-marketplace
 spec:
-  image: $REGURL:8443/ocp/redhat/redhat-operator-index:v4.18
+  image: $REGURL:8443/ocp/redhat/redhat-operator-index:v4.20
   sourceType: grpc
 status: {}
 EOF
