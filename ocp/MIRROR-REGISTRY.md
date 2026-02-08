@@ -131,12 +131,12 @@ mirror:
     architectures:
     - amd64
     channels:
-    - name: stable-4.18
-      minVersion: 4.18.30
-      maxVersion: 4.18.30
+    - name: stable-4.20
+      minVersion: 4.20.0
+      maxVersion: 4.20.30
     graph: true
   operators:
-  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.20
     packages:
     - name: cluster-logging
       channels:
@@ -198,9 +198,9 @@ mirror:
     architectures:
     - amd64
     channels:
-    - name: stable-4.18
-      minVersion: 4.18.30
-      maxVersion: 4.18.30
+    - name: stable-4.20
+      minVersion: 4.20.0
+      maxVersion: 4.20.0
     graph: true
   additionalImages:
   - name: registry.redhat.io/ubi8/ubi:latest
@@ -217,7 +217,7 @@ apiVersion: mirror.openshift.io/v2alpha1
 kind: ImageSetConfiguration
 mirror:
   operators:
-  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.20
     packages:
     - name: cluster-logging
       channels:
@@ -339,22 +339,22 @@ spec:
 apiVersion: olm.operatorframework.io/v1
 kind: ClusterCatalog
 metadata:
-  name: cc-redhat-operator-index-v4-18
+  name: cc-redhat-operator-index-v4-20
 spec:
   priority: 0
   source:
     image:
-      ref: $REGURL:8443/ocp/redhat/redhat-operator-index:v4.18
+      ref: $REGURL:8443/ocp/redhat/redhat-operator-index:v4.20
     type: Image
 status: {}
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
-  name: cs-redhat-operator-index-v4-18
+  name: cs-redhat-operator-index-v4-20
   namespace: openshift-marketplace
 spec:
-  image: $REGURL:8443/ocp/redhat/redhat-operator-index:v4.18
+  image: $REGURL:8443/ocp/redhat/redhat-operator-index:v4.20
   sourceType: grpc
 status: {}
 EOF
@@ -382,10 +382,12 @@ systemctl restart httpd
 systemctl status httpd
 
 wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.20/4.20.0/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img -O /var/www/html/ocp/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img
-wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.20/4.20.0/rhcos-4.20.0-x86_64-live.x86_64.iso -O /var/www/html/ocp/rhcos-4.20.0-x86_64-live.x86_64.iso
+wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.20/4.20.0/rhcos-4.20.0-x86_64-live-iso.x86_64.iso -O /var/www/html/ocp/rhcos-4.20.0-x86_64-live-iso.x86_64.iso
 
 curl http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img
-curl http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live.x86_64.iso
+curl http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live-iso.x86_64.iso
+
+
 ```
 
 #### Extra preparation 
@@ -514,7 +516,7 @@ spec:
     - cpuArchitecture: x86_64
       openshiftVersion: '4.20'
       rootFSUrl: 'http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img'
-      url: 'http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live.x86_64.iso'
+      url: 'http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live-iso.x86_64.iso'
       version: 4.20.0
 EOF
 ```
