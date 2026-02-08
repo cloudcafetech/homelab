@@ -381,11 +381,11 @@ mkdir /var/www/html/ocp
 systemctl restart httpd
 systemctl status httpd
 
-wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.18/4.18.30/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img -O /var/www/html/ocp/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img
-wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.18/4.18.30/rhcos-4.18.30-x86_64-live.x86_64.iso -O /var/www/html/ocp/rhcos-4.18.30-x86_64-live.x86_64.iso
+wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.20/4.20.0/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img -O /var/www/html/ocp/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img
+wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.20/4.20.0/rhcos-4.20.0-x86_64-live.x86_64.iso -O /var/www/html/ocp/rhcos-4.20.0-x86_64-live.x86_64.iso
 
-curl http://192.168.1.150:8080/ocp/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img
-curl http://192.168.1.150:8080/ocp/rhcos-4.18.30-x86_64-live.x86_64.iso
+curl http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img
+curl http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live.x86_64.iso
 ```
 
 #### Extra preparation 
@@ -512,10 +512,10 @@ spec:
     name: mirror-registry-config
   osImages:
     - cpuArchitecture: x86_64
-      openshiftVersion: '4.18'
-      rootFSUrl: 'http://192.168.1.150:8080/ocp/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img'
-      url: 'http://192.168.1.150:8080/ocp/rhcos-4.18.30-x86_64-live.x86_64.iso'
-      version: 4.18.30
+      openshiftVersion: '4.20'
+      rootFSUrl: 'http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img'
+      url: 'http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live.x86_64.iso'
+      version: 4.20.0
 EOF
 ```
 
