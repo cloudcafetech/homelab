@@ -276,7 +276,9 @@ podman run --privileged --pid=host --rm --net=host \
  --entrypoint lca-cli ${LCA_IMG} create -a ${PULL_SEC} -i ${SEED_IMG} --recert-image ${RECERT_IMG} --skip-cleanup
 ```
 
-- Create Image Build and Push
+> If above comman not create Seed Image (Not working 4.18.30) then run below command
+
+- Create Image Build and Push 
 
 ```
 REG_URL=mirror-registry.pkar.tech
