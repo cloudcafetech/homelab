@@ -263,13 +263,11 @@ mirror:
       - name: stable
 EOF
 
-PLATFORM=/home/cloudcafe/platform-images
-OPERATOR=/home/cloudcafe/operator-images
+WORKDIR=/home/cloudcafe/work-dir
 CACHEDIR=/home/cloudcafe/downloads/cache
 REGURL=mirroreg.pkar.tech
 
-mkdir -p $PLATFORM
-mkdir -p $OPERATOR
+mkdir -p $WORKDIR
 mkdir -p $CACHEDIR
 ```
 
@@ -277,29 +275,29 @@ mkdir -p $CACHEDIR
 
 - Mirror Platform Images to Registry
 
-```./oc-mirror --v2 -c ./isc-platform.yaml --cache-dir $CACHE-DIR --workspace file://$MIRROR-DIR docker://$REGURL:8443/ocp```
+```./oc-mirror --v2 -c ./isc-platform.yaml --image-timeout 30m --cache-dir $CACHEDIR --workspace file://$WORKDIR docker://$REGURL:8443/ocp```
 
 - Mirror Operator Images to Registry   
 
-```./oc-mirror --v2 -c ./isc-operator.yaml --cache-dir $CACHE-DIR --workspace file://$OPERATOR docker://$REGURL:8443/ocp```
+```./oc-mirror --v2 -c ./isc-operator.yaml --image-timeout 30m --cache-dir $CACHEDIR --workspace file://$WORKDIR docker://$REGURL:8443/ocp```
 
 ### Setup Mirror Registry Images (Download & Upload)
 
 - Mirror 2 Disk (Platform Images Download)
 
-```./oc-mirror --v2 -c ./isc-platform.yaml --cache-dir $CACHE-DIR file://$PLATFORM```
+```./oc-mirror --v2 -c ./isc-platform.yaml --cache-dir $CACHEDIR file://$WORKDIR```
 
 - Disk 2 Mirror (Platform Images Upload)
 
-```./oc-mirror --v2 -c ./isc-platform.yaml --cache-dir $CACHE-DIR --from file://$PLATFORM docker://$REGURL:8443/ocp```
+```./oc-mirror --v2 -c ./isc-platform.yaml --cache-dir $CACHEDIR --from file://$WORKDIR docker://$REGURL:8443/ocp```
 
 - Mirror 2 Disk (Operator Images Download)
 
-```./oc-mirror --v2 -c ./isc-operator.yaml --cache-dir $CACHE-DIR file://$OPERATOR```
+```./oc-mirror --v2 -c ./isc-operator.yaml --cache-dir $CACHEDIR file://$WORKDIR```
 
 - Disk 2 Mirror (Operator Images Upload)  
 
-```./oc-mirror --v2 -c ./isc-operator.yaml --cache-dir $CACHE-DIR --from file://$OPERATOR docker://$REGURL:8443/ocp```
+```./oc-mirror --v2 -c ./isc-operator.yaml --cache-dir $CACHEDIR --from file://$WORKDIR docker://$REGURL:8443/ocp```
 
 ### Applying Mirror Configuration files in OpenShift
 
