@@ -248,6 +248,21 @@ EOF
 oc create -f clusterimageset.yaml
 ```
 
+- Deploy Clusterinstance BMC and Pull Secrets
+
+- Verify
+
+```
+oc get clusterinstance,ImageClusterInstall,ClusterDeployment,BareMetalHost,secrets,job,po -n sno-ztp
+
+oc describe clusterinstance sno-ztp -n sno-ztp
+oc describe ImageClusterInstall sno-ztp -n sno-ztp
+oc describe ClusterDeployment sno-ztp -n sno-ztp
+oc describe BareMetalHost sno-ztp -n sno-ztp
+oc get secrets sno-ztp -n sno-ztp
+oc get job,pod -n sno-ztp
+```
+
 - Extract IBI seed image from existing Single Node OpenShift (SNO) Cluster
 
 > Mainly --recert-image flag (optional) used for disconnected environments, if not mentioned then tool will use quay.io/edge-infrastructure/recert:v0 as a default recert image.
