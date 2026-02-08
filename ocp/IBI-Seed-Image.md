@@ -212,7 +212,7 @@ kind: SeedGenerator
 metadata:
   name: seedimage
 spec:
-  seedImage: mirror-registry.pkar.tech:8443/ocp/sno-seed-img:4.18.30
+  seedImage: mirror-registry.pkar.tech:8443/ocp/sno-seed-img:4.20.0
 EOF
 
 oc create -f secret-and-seedgen.yaml
@@ -240,9 +240,9 @@ cat << EOF > clusterimageset.yaml
 apiVersion: hive.openshift.io/v1
 kind: ClusterImageSet
 metadata:
-  name: img4.18.30-x86-64-appsub-ibi
+  name: img4.20.0-x86-64-appsub-ibi
 spec:
-  releaseImage: mirror-registry.pkar.tech:8443/ocp/sno-seed-img:4.18.30
+  releaseImage: mirror-registry.pkar.tech:8443/ocp/sno-seed-img:4.20.0
 EOF
 
 oc create -f clusterimageset.yaml
@@ -264,7 +264,7 @@ PULL_SEC=/root/pull-secret
 
 mkdir /root/.docker
 cat $PULL_SEC > /root/.docker/config.json
-SEED_IMG=$REG_URL:8443/ocp/sno-sa:4.18.30
+SEED_IMG=$REG_URL:8443/ocp/sno-sa:4.20.0
 RECERT_IMG=quay.io/edge-infrastructure/recert:v0
 
 podman run --privileged --pid=host --rm --net=host \
@@ -280,7 +280,7 @@ podman run --privileged --pid=host --rm --net=host \
 
 ```
 REG_URL=mirror-registry.pkar.tech
-SEED_IMG=$REG_URL:8443/ocp/sno-sa:4.18.30
+SEED_IMG=$REG_URL:8443/ocp/sno-sa:4.20.0
 
 cat << EOF > dockerfile
 FROM scratch
