@@ -132,7 +132,7 @@ mirror:
     - amd64
     channels:
     - name: stable-4.20
-      minVersion: 4.20.0
+      minVersion: 4.20.11
       maxVersion: 4.20.30
     graph: true
   operators:
@@ -199,8 +199,8 @@ mirror:
     - amd64
     channels:
     - name: stable-4.20
-      minVersion: 4.20.0
-      maxVersion: 4.20.0
+      minVersion: 4.20.11
+      maxVersion: 4.20.11
     graph: true
   additionalImages:
   - name: registry.redhat.io/ubi8/ubi:latest
@@ -379,11 +379,11 @@ mkdir /var/www/html/ocp
 systemctl restart httpd
 systemctl status httpd
 
-wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.20/4.20.0/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img -O /var/www/html/ocp/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img
-wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.20/4.20.0/rhcos-4.20.0-x86_64-live-iso.x86_64.iso -O /var/www/html/ocp/rhcos-4.20.0-x86_64-live-iso.x86_64.iso
+wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.20/4.20.11/rhcos-4.20.11-x86_64-live-rootfs.x86_64.img -O /var/www/html/ocp/rhcos-4.20.11-x86_64-live-rootfs.x86_64.img
+wget https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.20/4.20.11/rhcos-4.20.11-x86_64-live-iso.x86_64.iso -O /var/www/html/ocp/rhcos-4.20.11-x86_64-live-iso.x86_64.iso
 
-curl http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img
-curl http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live-iso.x86_64.iso
+curl http://192.168.1.150:8080/ocp/rhcos-4.20.11-x86_64-live-rootfs.x86_64.img
+curl http://192.168.1.150:8080/ocp/rhcos-4.20.11-x86_64-live-iso.x86_64.iso
 
 
 ```
@@ -513,9 +513,9 @@ spec:
   osImages:
     - cpuArchitecture: x86_64
       openshiftVersion: '4.20'
-      rootFSUrl: 'http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live-rootfs.x86_64.img'
-      url: 'http://192.168.1.150:8080/ocp/rhcos-4.20.0-x86_64-live-iso.x86_64.iso'
-      version: 4.20.0
+      rootFSUrl: 'http://192.168.1.150:8080/ocp/rhcos-4.20.11-x86_64-live-rootfs.x86_64.img'
+      url: 'http://192.168.1.150:8080/ocp/rhcos-4.20.11-x86_64-live-iso.x86_64.iso'
+      version: 4.20.11
 EOF
 ```
 
