@@ -6,7 +6,7 @@
 VM_CREATE=n
 REGURL=mirror-registry.pkar.tech
 PULLSECPATH=/root/pull-secret
-VER=4.20.0
+VER=4.20.11
 DNS=192.168.0.159
 DOMAIN=pkar.tech
 GW=192.168.0.1
