@@ -60,7 +60,7 @@ rm -rf *.tar.gz README.md
 - Install Mirror Registry
 
 ```
-REGURL=mirroreg.pkar.tech
+REGURL=mirror-registry.pkar.tech
 ./mirror-registry install \
   --quayHostname $REGURL \
   --quayRoot /root/mirror-registry/quay-config \
@@ -265,7 +265,7 @@ EOF
 
 WORKDIR=/home/cloudcafe/work-dir
 CACHEDIR=/home/cloudcafe/downloads/cache
-REGURL=mirroreg.pkar.tech
+REGURL=mirror-registry.pkar.tech
 
 mkdir -p $WORKDIR
 mkdir -p $CACHEDIR
@@ -574,7 +574,7 @@ cat << EOF > download-restart.sh
 PLATFORM=/home/cloudcafe/platform-images
 OPERATOR=/home/cloudcafe/operator-images
 CACHEDIR=/home/cloudcafe/downloads/cache
-REGURL=mirroreg.pkar.tech
+REGURL=mirror-registry.pkar.tech
 
 PROCESS_COMMAND="/root/mirror-registry/tools/oc-mirror --v2 -c /root/mirror-registry/tools/isc-platform.yaml --cache-dir $CACHE-DIR --workspace file://$MIRROR-DIR docker://$REGURL:8443/ocp &"
 
