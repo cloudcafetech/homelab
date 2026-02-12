@@ -12,8 +12,8 @@ spec:
   holdInstallation: false
   cpuPartitioningMode: None
   networkType: OVNKubernetes
-  additionalNTPSources:
-    - 192.168.0.159     
+  #additionalNTPSources:
+    #- 192.168.0.159     
   extraLabels:
     ManagedCluster:
       mirrorRegistry: "mirror-registry.pkar.tech"
