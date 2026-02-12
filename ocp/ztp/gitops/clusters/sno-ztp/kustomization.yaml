@@ -4,7 +4,8 @@ resources:
   #- 00-namespace.yaml	
   - 01-bmc-secret.yaml
   #- 02-pull-secret.yaml
-  - 03-mirror-registry-config.yaml
+  #- 03-mirror-registry-config.yaml
+  - mir-reg-41830.yaml
   - 04-clusterinstance.yaml
   - 05-klusterlet-addon-config.yaml
 
