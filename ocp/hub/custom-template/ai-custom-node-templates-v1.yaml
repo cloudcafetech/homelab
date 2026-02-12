@@ -4,32 +4,67 @@ metadata:
   name: ai-custom-node-templates-v1
   namespace: open-cluster-management
 data:
-  BareMetalHost: "apiVersion: metal3.io/v1alpha1\nkind: BareMetalHost\nmetadata:\n{{
-    if .SpecialVars.CurrentNode.HostRef }}\n  name: \"{{ .SpecialVars.CurrentNode.HostRef.Name
-    }}\"\n  namespace: \"{{ .SpecialVars.CurrentNode.HostRef.Namespace }}\"\n{{ else
-    }}\n  name: \"{{ .SpecialVars.CurrentNode.HostName }}\"\n  namespace: \"{{ .Spec.ClusterName
-    }}\" \n{{ end }}    \n  annotations:\n    siteconfig.open-cluster-management.io/sync-wave:
-    \"3\"\n    inspect.metal3.io: \"{{ .SpecialVars.CurrentNode.IronicInspect }}\"\n{{
-    if .SpecialVars.CurrentNode.NodeLabels }}\n{{ range $key, $value := .SpecialVars.CurrentNode.NodeLabels
-    }}\n    bmac.agent-install.openshift.io.node-label.{{ $key }}: {{ $value | quote}}\n{{
-    end }}\n{{ end }}\n    bmac.agent-install.openshift.io/hostname: \"{{ .SpecialVars.CurrentNode.HostName
-    }}\"\n{{ if .SpecialVars.CurrentNode.InstallerArgs  }}\n    bmac.agent-install.openshift.io/installer-args:
-    '{{ .SpecialVars.CurrentNode.InstallerArgs  }}'\n{{ end }}\n{{ if .SpecialVars.CurrentNode.IgnitionConfigOverride
-    }}\n    bmac.agent-install.openshift.io/ignition-config-overrides: '{{ .SpecialVars.CurrentNode.IgnitionConfigOverride
-    }}'\n{{ end }}\n    bmac.agent-install.openshift.io/role: \"{{ .SpecialVars.CurrentNode.Role
-    }}\"\n  labels:\n{{ if .SpecialVars.CurrentNode.HostRef }}\n    infraenvs.agent-install.openshift.io:
-    \"{{ .SpecialVars.CurrentNode.HostRef.Name }}\"\n{{ else }}\n    infraenvs.agent-install.openshift.io:
-    \"{{ .SpecialVars.CurrentNode.HostName }}\"\n{{ end }}\n    cluster.open-cluster-management.io/backup:
-    cluster-activation\nspec:\n  bootMode: \"{{ .SpecialVars.CurrentNode.BootMode
-    }}\"\n  bmc:\n    address: \"{{ .SpecialVars.CurrentNode.BmcAddress }}\"\n    disableCertificateVerification:
-    true\n    credentialsName: \"{{ .SpecialVars.CurrentNode.BmcCredentialsName.Name
-    }}\"\n  bootMACAddress: \"{{ .SpecialVars.CurrentNode.BootMACAddress }}\"\n  automatedCleaningMode:
-    \"{{ .SpecialVars.CurrentNode.AutomatedCleaningMode }}\"\n  online: true\n{{ if
-    .SpecialVars.CurrentNode.CPUArchitecture }}\n  architecture: \"{{ .SpecialVars.CurrentNode.CPUArchitecture
-    }}\"\n{{ else if and\n    (.Spec.CPUArchitecture)\n    (ne .Spec.CPUArchitecture
-    \"multi\")\n}}\n  architecture: \"{{ .Spec.CPUArchitecture }}\"\n{{ end }}\n{{
-    if .SpecialVars.CurrentNode.RootDeviceHints }}\n  rootDeviceHints:\n{{ .SpecialVars.CurrentNode.RootDeviceHints
-    | toYaml | indent 4 }}\n{{ end }}"
+  BareMetalHost: |-
+    apiVersion: metal3.io/v1alpha1
+    kind: BareMetalHost
+    metadata:
+    {{ if .SpecialVars.CurrentNode.HostRef }}
+      name: "{{ .SpecialVars.CurrentNode.HostRef.Name }}"
+      namespace: "{{ .SpecialVars.CurrentNode.HostRef.Namespace }}"
+    {{ else }}
+      name: "{{ .SpecialVars.CurrentNode.HostName }}"
+      namespace: "{{ .Spec.ClusterName }}"
+    {{ end }}
+      annotations:
+        siteconfig.open-cluster-management.io/sync-wave: "3"
+        inspect.metal3.io: "{{ .SpecialVars.CurrentNode.IronicInspect }}"
+    {{ if .SpecialVars.CurrentNode.NodeLabels }}
+
+    {{ range $key, $value := .SpecialVars.CurrentNode.NodeLabels }}
+        bmac.agent-install.openshift.io.node-label.{{ $key }}: {{ $value | quote}}
+    {{ end }}
+
+    {{ end }}
+        bmac.agent-install.openshift.io/hostname: "{{ .SpecialVars.CurrentNode.HostName }}"
+    {{ if .SpecialVars.CurrentNode.InstallerArgs  }}
+        bmac.agent-install.openshift.io/installer-args: '{{ .SpecialVars.CurrentNode.InstallerArgs  }}'
+    {{ end }}
+
+    {{ if .SpecialVars.CurrentNode.IgnitionConfigOverride }}
+        bmac.agent-install.openshift.io/ignition-config-overrides: '{{ .SpecialVars.CurrentNode.IgnitionConfigOverride }}'
+    {{ end }}
+        bmac.agent-install.openshift.io/role: "{{ .SpecialVars.CurrentNode.Role }}"
+      labels:
+    {{ if .SpecialVars.CurrentNode.HostRef }}
+        infraenvs.agent-install.openshift.io: "{{ .SpecialVars.CurrentNode.HostRef.Name }}"
+    {{ else }}
+        infraenvs.agent-install.openshift.io: "{{ .SpecialVars.CurrentNode.HostName }}"
+    {{ end }}
+        cluster.open-cluster-management.io/backup: cluster-activation
+    spec:
+      bootMode: "{{ .SpecialVars.CurrentNode.BootMode }}"
+      bmc:
+        address: "{{ .SpecialVars.CurrentNode.BmcAddress }}"
+        disableCertificateVerification: true
+        credentialsName: "{{ .SpecialVars.CurrentNode.BmcCredentialsName.Name }}"
+      bootMACAddress: "{{ .SpecialVars.CurrentNode.BootMACAddress }}"
+      automatedCleaningMode: "{{ .SpecialVars.CurrentNode.AutomatedCleaningMode }}"
+      online: true
+    {{ if .SpecialVars.CurrentNode.CPUArchitecture }}
+      architecture: "{{ .SpecialVars.CurrentNode.CPUArchitecture }}"
+    {{ else if and
+        (.Spec.CPUArchitecture)
+        (ne .Spec.CPUArchitecture "multi")
+    }}
+      architecture: "{{ .Spec.CPUArchitecture }}"
+    {{ end }}
+
+    {{ if .SpecialVars.CurrentNode.RootDeviceHints }}
+      rootDeviceHints:
+    {{ .SpecialVars.CurrentNode.RootDeviceHints | toYaml | indent 4 }}
+
+    {{ end }}
+
   InfraEnv: |-
     apiVersion: agent-install.openshift.io/v1beta1
     kind: InfraEnv
