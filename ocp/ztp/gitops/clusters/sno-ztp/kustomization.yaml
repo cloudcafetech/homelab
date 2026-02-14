@@ -6,7 +6,8 @@ resources:
   #- 02-pull-secret.yaml
   #- 03-mirror-registry-config.yaml
   - mir-reg-41830.yaml
-  - 04-clusterinstance.yaml
+  #- 04-clusterinstance.yaml
+  - ibi-clusterinstance.yaml  
   - 05-klusterlet-addon-config.yaml
 
 configMapGenerator:
