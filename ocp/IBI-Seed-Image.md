@@ -226,6 +226,152 @@ oc get seedgenerator -o yaml
 oc get seedgenerators
 ```
 
+### Preinstall SNO (Staging with installation ISO)
+
+- Variable Set
+
+```
+REGURL=mirror-registry.pkar.tech
+PULLSECPATH=/root/pull-secret
+VER=4.20.11
+DOMAIN=pkar.tech
+PULLSECRET=`cat $PULLSECPATH`
+SSHKEY=`cat id_rsa.pub`
+```
+
+- Tool Setup
+
+```
+mkdir image-based-sno
+cd image-based-sno
+ssh-keygen -t rsa -N '' -f id_rsa
+mkdir iso
+mkdir kube-data
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.20.11/openshift-install-linux.tar.gz
+tar -zxvf openshift-install-linux.tar.gz
+rm -rf openshift-install-linux.tar.gz README.md
+```
+
+- File preparation
+
+```
+cat << EOF > image-based-installation-config.yaml
+apiVersion: v1beta1
+kind: ImageBasedInstallationConfig
+metadata:
+  name: ibi-sno-config
+seedImage: $REGURL:8443/ocp/sno-sa:$VER
+seedVersion: $VER
+installationDisk: /dev/sda
+sshKey: $SSHKEY
+pullSecret: '$PULLSECRET'
+networkConfig:
+  interfaces:
+    - name: enp1s0
+      type: ethernet
+      state: up
+      ipv4:
+        enabled: true
+        dhcp: false
+        address:
+          - ip: 192.168.0.110
+            prefix-length: 24
+      ipv6:
+        enabled: false
+  dns-resolver:
+    config:
+      search:
+        - $DOMAIN
+      server:
+        - 192.168.0.135
+        - 192.168.0.159
+        - 192.168.0.110
+  routes:
+    config:
+      - destination: 0.0.0.0/0
+        next-hop-address: 192.168.0.1
+        next-hop-interface: enp1s0
+skipDiskCleanup: true
+EOF
+
+cat << EOF > install-config.yaml
+apiVersion: v1
+metadata:
+  name: ibi-sno
+baseDomain: $DOMAIN
+compute:
+  - architecture: amd64
+    name: worker
+    replicas: 0
+controlPlane:
+  architecture: amd64
+  name: master
+  replicas: 1
+networking:
+  machineNetwork:
+  - cidr: 192.168.0.0/24
+platform:
+  none: {}
+fips: false
+cpuPartitioningMode: "AllNodes"
+sshKey: $SSHKEY
+pullSecret: '$PULLSECRET'
+EOF
+
+cat << EOF > image-based-config.yaml
+apiVersion: v1beta1
+kind: ImageBasedConfig
+metadata:
+  name: ibi-sno-config
+additionalNTPSources:
+  - 192.168.0.159
+hostname: ibi-sno
+releaseRegistry: $REGURL:8443/ocp/sno-sa:4.20.11
+networkConfig:
+  interfaces:
+    - name: enp1s0
+      type: ethernet
+      state: up
+      ipv4:
+        enabled: true
+        dhcp: false
+        address:
+          - ip: 192.168.0.110
+            prefix-length: 24
+      ipv6:
+        enabled: false
+  dns-resolver:
+    config:
+      search:
+        - $DOMAIN
+      server:
+        - 192.168.0.159
+        - 192.168.0.110
+  routes:
+    config:
+      - destination: 0.0.0.0/0
+        next-hop-address: 192.168.0.1
+        next-hop-interface: enp1s0
+EOF
+```
+
+- Generating the Installation ISO
+
+> This ISO can 
+
+```
+cp image-based-installation-config.yaml iso/
+./openshift-install image-based create image --dir iso/
+```
+
+- Generating Configuration ISO Kubeconfig and Kubeadmin
+
+```
+cp image-based-config.yaml kube-data/
+cp install-config.yaml kube-data/
+./openshift-install image-based create config-image --dir kube-data/
+```
+
 - Enable Image-Based Install Operator in ACM
 
 ```
@@ -308,3 +454,9 @@ podman build --file dockerfile --tag $SEED_IMG /var/tmp/backup
 podman push $SEED_IMG
 
 ```
+
+
+[Ref #1](https://cloudcult.dev/openshift-image-based-installation-tutorial-part1-2/)
+
+[Ref #2](https://cloudcult.dev/image-based-installation-for-sno-with-the-ran-du-profile-and-ztp-2/)
+
