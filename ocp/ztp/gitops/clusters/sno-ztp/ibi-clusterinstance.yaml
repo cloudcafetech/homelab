@@ -5,7 +5,8 @@ metadata:
   namespace: sno-ztp
 spec:
   clusterName: sno-ztp
-  clusterImageSetNameRef: img4.20.11-x86-64-appsub-ibi  
+  clusterImageSetNameRef: img4.20.11-x86-64-appsub  
+  #clusterImageSetNameRef: img4.20.11-x86-64-appsub-ibi  
   baseDomain: pkar.tech
   cpuArchitecture: x86_64
   holdInstallation: false
