@@ -12,7 +12,7 @@ resources:
 
 configMapGenerator:
   - files:
-    #- extra-manifests/00-idms.yaml
+    - extra-manifests/00-idms.yaml
     - extra-manifests/01-disable-operator.yaml
     - extra-manifests/02-redhat-operator-cs.yaml
     - extra-manifests/50-masters-chrony-configuration.yaml
