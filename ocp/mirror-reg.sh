@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to Create Custom SSL certificate for (OMR) OpenShift Mirror Registry
+# Script to Create OpenShift Mirror Registry (OMR)
 REGURL=mirror-registry.pkar.tech
 
 mkdir -p /root/mirror-registry/{tools,certs}
