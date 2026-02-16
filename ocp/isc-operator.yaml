@@ -1,0 +1,27 @@
+apiVersion: mirror.openshift.io/v2alpha1
+kind: ImageSetConfiguration
+mirror:
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+    packages:
+    - name: metallb-operator
+      channels:
+      - name: stable
+    - name: openshift-cert-manager-operator
+      channels:
+      - name: stable-v1
+    - name: openshift-gitops-operator
+      channels:
+      - name: latest
+    - name: advanced-cluster-management
+      channels:
+      - name: release-2.15
+    - name: multicluster-engine
+      channels:
+      - name: stable-2.10
+    - name: lvms-operator
+      channels:
+      - name: stable-4.18
+    - name: openshift-lifecycle-agent
+      channels:
+      - name: stable
