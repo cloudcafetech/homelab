@@ -1,119 +1,91 @@
-#!/bin/bash -xe
-export OCP_RELEASE="4.5.4"
-export ARCHITECTURE="x86_64"
-export LOCAL_REG='localhost:5000'
-export LOCAL_REPO='ocp4/openshift4'
-export LOCAL_REG_INSEC='true'
-export UPSTREAM_REPO='openshift-release-dev'
-export OCP_ARCH="x86_64"
-# Directory where OCP images are written to or read from
-# When mirroring to disk
-export REMOVABLE_MEDIA_PATH="/home/danclark/packed/ocp-${OCP_RELEASE}"
+#!/bin/bash
+# Script to Create Custom SSL certificate for (OMR) OpenShift Mirror Registry
+REGURL=mirror-registry.pkar.tech
 
-# Registry where cluster images live for the disconnected cluster
-export REMOTE_REG="1234567890.dkr.ecr.us-east-1.amazonaws.com"
+mkdir -p /root/mirror-registry/{tools,certs}
+mkdir -p /home/{work-dir,cache}
 
-# This needs to be a pull secret that combines the pull secret from Red Hat
-# to pull all the images down and a pull secret from your local registry so we
-# can push to it
-export LOCAL_SECRET_JSON="${HOME}/pull-secret.json"
-export RELEASE_NAME="ocp-release"
+echo - Generating Certificates
+cd /root/mirror-registry/certs
+wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/mirror-cert-gen.sh
+chmod 755 mirror-cert-gen.sh
+./mirror-cert-gen.sh
 
-# Set these values to true for the catalog and miror to be created
-export RH_OP='true'
-export CERT_OP='false'
-export COMM_OP='false'
+echo - Downloading tools
+cd ../tools
+wget https://mirror.openshift.com/pub/cgw/mirror-registry/latest/mirror-registry-amd64.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest/oc-mirror.rhel9.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux-amd64-rhel9.tar.gz
 
-export RH_OP_REPO="${LOCAL_REG}/olm/redhat-operators:${OCP_RELEASE}"
-export CERT_OP_REPO="${LOCAL_REG}/olm/certified-operators:${OCP_RELEASE}"
-export COMM_OP_REPO="${LOCAL_REG}/olm/community-operators:${OCP_RELEASE}"
+tar xvzpf mirror-registry-amd64.tar.gz
+tar xvzpf oc-mirror.rhel9.tar.gz
+tar xvzpf openshift-client-linux-amd64-rhel9.tar.gz
+chmod 755 oc-mirror
+rm -rf *.tar.gz README.md
 
-export OPERATOR_REGISTRY='quay.io/operator-framework/operator-registry-server:v1.13.6'
+cat << EOF > isc.yaml
+apiVersion: mirror.openshift.io/v2alpha1
+kind: ImageSetConfiguration
+mirror:
+  platform:
+    architectures:
+    - amd64
+    channels:
+    - name: stable-4.18
+      minVersion: 4.18.30
+      maxVersion: 4.18.30
+    graph: true
+  additionalImages:
+  - name: gcr.io/k8s-staging-sig-storage/nfs-subdir-external-provisioner:v4.0.0
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+    packages:
+    - name: metallb-operator
+      channels:
+      - name: stable
+    - name: openshift-cert-manager-operator
+      channels:
+      - name: stable-v1
+    - name: openshift-gitops-operator
+      channels:
+      - name: latest
+    - name: advanced-cluster-management
+      channels:
+      - name: release-2.15
+    - name: multicluster-engine
+      channels:
+      - name: stable-2.10
+    - name: lvms-operator
+      channels:
+      - name: stable-4.18
+    - name: openshift-lifecycle-agent
+      channels:
+      - name: stable
+EOF
 
-# This is either the directory backing the local podman registry, i.e; /opt/registry/data
-# Or this is the directory where the images will be mirrored to/from if using --to-dir
-export DATA_DIR="/opt/registry/data/docker/"
+echo - Creating Mirror Registry
+./mirror-registry install \
+  --quayHostname $REGURL \
+  --quayRoot /root/mirror-registry/quay-config \
+  --quayStorage /root/mirror-registry/storage \
+  --sqliteStorage /root/mirror-registry/sqlite-storage \
+  --sslCert /root/mirror-registry/cert/ssl.cert --sslKey /root/mirror-registry/cert/ssl.key \
+  --sslCheckSkip --initUser admin --initPassword "Admin2675"
 
-export THREADS=1
+sleep 40
 
-function printhelp()
-{
-   echo "Help me!"
-   exit 0
-}
+echo - Trust root certificate of Quay registry
+cp /root/mirror-registry/certs/rootCA.pem /etc/pki/ca-trust/source/anchors/
+update-ca-trust extract
 
-UPLOAD=false
-DOWNLOAD=false
+echo - Start mirroring for OpenShift
+./oc-mirror --v2 -c ./isc.yaml --image-timeout 60m --cache-dir /home/cache --workspace file:///home/work-dir docker://$REGURL:8443/ocp
 
-while getopts udh flag
-do
-    case "${flag}" in
-        u) UPLOAD=true;;
-        d) DOWNLOAD=true;;
-        h) printhelp;;
-    esac
-done
+#echo - Start mirroring for OpenShift Platform Images
+#wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/isc-platform.yaml
+#./oc-mirror --v2 -c ./isc-platform.yaml --image-timeout 60m --cache-dir /home/cache --workspace file:///home/work-dir docker://$REGURL:8443/ocp
+#sleep 20
+#echo - Start mirroring for OpenShift Operators Images
+#wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/ocp/isc-operator.yaml
+#./oc-mirror --v2 -c ./isc-operator.yaml --image-timeout 60m --cache-dir /home/cache --workspace file:///home/work-dir docker://$REGURL:8443/ocp
 
-if [ "${DOWNLOAD}" = true ]
-then
-
-  mkdir -p "${REMOVABLE_MEDIA_PATH}/mirror"
-  mkdir -p "${REMOVABLE_MEDIA_PATH}/operator_manifests"
-
-  # Looks like this is working
-  # Mirror the cluster images to disk
-  echo "Mirroring cluster images"
-  oc adm release mirror -a ${LOCAL_SECRET_JSON} \
-    --insecure=${LOCAL_REG_INSEC} \
-    --from=quay.io/${UPSTREAM_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} \
-    --to file://openshift/release \
-    --to-dir=${REMOVABLE_MEDIA_PATH}/mirror
-
-  # Looks like this is working
-  # Build the redhat-operators catalog source and mirror to disk
-  echo "Building redhat-operators catalog image"
-  oc adm catalog build --insecure \
-    --appregistry-org redhat-operators \
-    "--from=${OPERATOR_REGISTRY}" "--registry-config=${LOCAL_SECRET_JSON}" \
-    --dir=${REMOVABLE_MEDIA_PATH}/mirror \
-    --to=file://olm/redhat-operators:${OCP_RELEASE}
-
-  # Grab the operator manifests
-  oc adm catalog mirror --manifests-only \
-    --registry-config "${LOCAL_SECRET_JSON}" --insecure=true \
-    --to-manifests=${REMOVABLE_MEDIA_PATH}/operator_manifests \
-    "quay.io/danclark/redhat-operators:v1" --dir=${REMOVABLE_MEDIA_PATH}/operators file://replaceme
-
-# Mirror the images with multiple threads
-# This sed command is weird because the images mirrored by tag already have file in them but not the digest based ones
-  cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" | sed 's|=replaceme|=file://|g' | xargs -n 1 -P ${THREADS} oc image mirror --filter-by-os=.* --keep-manifest-list=true --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
-
-  tar -cf "ocp-${OCP_RELEASE}-${ARCHITECTURE}-packaged.tar" "${REMOVABLE_MEDIA_PATH}"
-fi
-
-if [ "${UPLOAD}" = true ]
-then
-
-  # Push the OCP release images into the remote registry
-  oc image mirror -a ${LOCAL_SECRET_JSON} \
-    --insecure=${LOCAL_REG_INSEC} \
-    --from-dir=${REMOVABLE_MEDIA_PATH}/mirror \
-    file://openshift/release:${OCP_RELEASE}* \
-    ${REMOTE_REG}/${LOCAL_REPOSITORY}
-
-  # Push the redhat-operators catalog image into the remote registry
-  oc image mirror -a ${LOCAL_SECRET_JSON} \
-    --insecure=${LOCAL_REG_INSEC} \
-    --from-dir=${REMOVABLE_MEDIA_PATH}/mirror \
-    file://olm/redhat-operators:${OCP_RELEASE} \
-    ${REMOTE_REG}/olm/redhat-operators:${OCP_RELEASE}
-
-  # Push the redhat-operators images into the remote registry
-  cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" \
-    | sed "s|=replaceme|=${REMOTE_REG}|g" \
-    | sed "s|=file://|=${REMOTE_REG}|g" \
-    | xargs -n 1 -P ${THREADS} oc image mirror --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
-
-fi
-
-exit 0
