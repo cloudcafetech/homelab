@@ -5,7 +5,6 @@ DOMAIN=pkar.tech
 COUNTRY=IN
 STATE=WB
 LOCAL=Kolkata
-MAIL=cloudcafe@pkar.tech
 
 cat << EOF > openssl.cnf
 [req]
