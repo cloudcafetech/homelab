@@ -16,9 +16,7 @@ configMapGenerator:
     - extra-manifests/01-disable-operator.yaml
     - extra-manifests/02-redhat-operator-cs.yaml
     - extra-manifests/50-masters-chrony-configuration.yaml
-    - extra-manifests/50-masters-containers-policy-configuration.yaml
     - extra-manifests/50-workers-chrony-configuration.yaml
-    - extra-manifests/50-workers-containers-policy-configuration.yaml
     - extra-manifests/99-master-custom-timezone-configuration.yaml
     - extra-manifests/99-worker-custom-timezone-configuration.yaml    
     name: extra-manifests-cm
