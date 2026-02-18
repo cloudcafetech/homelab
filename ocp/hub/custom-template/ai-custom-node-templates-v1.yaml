@@ -78,7 +78,7 @@ data:
     spec:
       kernelArguments:
        - operation: append
-         value: 'coreos.live.rootfs_url=http://192.168.0.159:8080/ocp/rhcos-4.20.11-x86_64-live-rootfs.x86_64.img'
+         value: 'coreos.live.rootfs_url=http://{{ .Spec.ClusterName }}-mr.pkar.tech:8080/ocp/rhcos-4.18.30-x86_64-live-rootfs.x86_64.img'
       clusterRef:
         name: "{{ .Spec.ClusterName }}"
         namespace: "{{ .Spec.ClusterName }}"
