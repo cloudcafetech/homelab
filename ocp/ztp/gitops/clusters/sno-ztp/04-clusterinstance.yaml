@@ -70,8 +70,8 @@ spec:
               search:
                 - pkar.tech
               server:
-                - 192.168.0.135
                 - 192.168.0.159
+                - 192.168.0.135
                 - 192.168.0.110
           routes:
             config:
