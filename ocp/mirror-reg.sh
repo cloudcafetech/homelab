@@ -58,7 +58,7 @@ yum install podman -y
   --quayRoot /root/mirror-registry/quay-config \
   --quayStorage /root/mirror-registry/storage \
   --sqliteStorage /root/mirror-registry/sqlite-storage \
-  --sslCert /root/mirror-registry/cert/ssl.cert --sslKey /root/mirror-registry/cert/ssl.key \
+  --sslCert /root/mirror-registry/certs/ssl.cert --sslKey /root/mirror-registry/certs/ssl.key \
   --sslCheckSkip --initUser admin --initPassword "$PASS"
 
 sleep 40
