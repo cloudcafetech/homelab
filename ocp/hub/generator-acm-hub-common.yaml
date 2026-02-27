@@ -3,7 +3,7 @@ kind: PolicyGenerator
 metadata:
   name: hub-common
 placementBindingDefaults:
-  name: local-cluster-placement-binding
+  name: hub-cluster-placement-binding
 
 policyDefaults:
   namespace: hub-config
@@ -24,7 +24,7 @@ policyDefaults:
 policies:
 
 # Wave 10 - Common/base configurations
-- name: local-cluster-authentication
+- name: hub-cluster-authentication
   policyAnnotations:
     ran.openshift.io/ztp-deploy-wave: "10"
     policy.open-cluster-management.io/description: Authentication and authorization resources for htpass
@@ -35,7 +35,17 @@ policies:
     # Authentication
     - path: hub/auth/htpasswd.yaml
 
-- name: local-cluster-tools
+- name: hub-cluster-banner
+  policyAnnotations:
+    ran.openshift.io/ztp-deploy-wave: "10"
+    policy.open-cluster-management.io/description: HUB Cluster Banner
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-02 Baseline Configuration  
+  manifests:
+    - path: hub/console/03-console-banner.yaml    
+
+- name: hub-cluster-tools
   policyAnnotations:
     ran.openshift.io/ztp-deploy-wave: "10"
     policy.open-cluster-management.io/description: Installs and configures the NFS Storage and RHACM 
@@ -55,18 +65,19 @@ policies:
     - path: hub/acm/01-og-acm.yaml
     - path: hub/acm/02-sub-acm.yaml
 
-# Wave 20 - ZTP configuration
-- name: local-cluster-ztp-config
+# Wave 20 - multiclusterhub configuration
+- name: hub-cluster-ztp-config
   policyAnnotations:
     ran.openshift.io/ztp-deploy-wave: "20"
-    policy.open-cluster-management.io/description: Configure the MCH
+    policy.open-cluster-management.io/description: Configure Multi Cluster Hub
     policy.open-cluster-management.io/standards: NIST SP 800-53
     policy.open-cluster-management.io/categories: CM Configuration Management
     policy.open-cluster-management.io/controls: CM-02 Baseline Configuration    
   manifests:
     - path: hub/mch/00-mch-acm.yaml
+    - path: hub/mch/01-provisioning.yaml    
 
-- name: local-cluster-assisted-installer
+- name: hub-cluster-assisted-installer
   policyAnnotations:
     ran.openshift.io/ztp-deploy-wave: "20"
     policy.open-cluster-management.io/description: Assisted Instller templates for SNO clusters
@@ -76,11 +87,11 @@ policies:
   configurationPolicyAnnotations:
     policy.open-cluster-management.io/disable-templates: "true"    
   manifests:
-    - path: mch/01-provisioning.yaml
-    - path: hub/ai-templates/ai-namespace-custom-templates.yaml
-    - path: hub/ai-templates/ai-configmap-custom-cluster-templates.yaml
+    - path: hub/custom-template/ai-namespace-custom-templates.yaml
+    - path: hub/custom-template/ai-custom-cluster-templates-v1.yaml
+    - path: hub/custom-template/ai-custom-node-templates-v1.yaml    
 
-- name: local-cluster-agent-service
+- name: hub-cluster-agent-service
   policyAnnotations:
     ran.openshift.io/ztp-deploy-wave: "20"
     policy.open-cluster-management.io/description: AgentServiceConfig for rootFS and ISO images, with status check
@@ -92,14 +103,4 @@ policies:
   manifests:
     - path: hub/agent/00-agent-service-config.yaml
     - path: hub/agentservice/agentserviceconfig-status.yaml
-
-- name: local-cluster-banner
-  policyAnnotations:
-    ran.openshift.io/ztp-deploy-wave: "5"
-    policy.open-cluster-management.io/description: HUB Cluster Banner
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-    policy.open-cluster-management.io/categories: CM Configuration Management
-    policy.open-cluster-management.io/controls: CM-02 Baseline Configuration  
-  manifests:
-    - path: hub/console/03-console-banner.yaml
 
