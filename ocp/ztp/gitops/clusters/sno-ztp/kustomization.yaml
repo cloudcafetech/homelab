@@ -1,11 +1,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  #- 00-namespace.yaml
+  - 00-namespace.yaml	
   - 01-bmc-secret.yaml
-  #- 02-pull-secret.yaml
+  - 02-pull-secret.yaml
   - 03-mirror-registry-config.yaml
-  - 04-clusterinstance.yaml
+  - 04-clusterinstance.yaml 
   - 05-klusterlet-addon-config.yaml
 
 configMapGenerator:
@@ -16,7 +16,7 @@ configMapGenerator:
     - extra-manifests/50-masters-chrony-configuration.yaml
     - extra-manifests/50-workers-chrony-configuration.yaml
     - extra-manifests/99-master-custom-timezone-configuration.yaml
-    - extra-manifests/99-worker-custom-timezone-configuration.yaml
+    - extra-manifests/99-worker-custom-timezone-configuration.yaml    
     name: extra-manifests-cm
     namespace: sno-ztp
 
