@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ai-custom-node-templates-v1
-  namespace: open-cluster-management
+  namespace: custom-templates
 data:
   BareMetalHost: |-
     apiVersion: metal3.io/v1alpha1
