@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: agent
+  name: hub-policy
   namespace: openshift-gitops
 spec:
   project: default
   source:
     repoURL: 'https://github.com/cloudcafetech/homelab.git'
     targetRevision: main
-    path: ocp/hub/agent
+    path: ocp/hub
   destination:
     server: 'https://kubernetes.default.svc'
   syncPolicy:
