@@ -1,0 +1,105 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: hub-common
+placementBindingDefaults:
+  name: local-cluster-placement-binding
+
+policyDefaults:
+  namespace: hub-config
+  placement:
+    labelSelector:
+      local-cluster: "true"
+  remediationAction: inform
+  severity: high
+  namespaceSelector:
+    exclude:
+      - kube-*
+    include:
+      - '*'
+  evaluationInterval:
+    compliant: 10m
+    noncompliant: 10s
+
+policies:
+
+# Wave 10 - Common/base configurations
+- name: local-cluster-authentication
+  policyAnnotations:
+    ran.openshift.io/ztp-deploy-wave: "10"
+    policy.open-cluster-management.io/description: Authentication and authorization resources for htpass
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: AC Access Control
+    policy.open-cluster-management.io/controls: AC-03 Access Enforcement
+  manifests:
+    # Authentication
+    - path: hub/auth/htpasswd.yaml
+
+- name: local-cluster-tools
+  policyAnnotations:
+    ran.openshift.io/ztp-deploy-wave: "10"
+    policy.open-cluster-management.io/description: Installs and configures the NFS Storage and RHACM 
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-02 Baseline Configuration
+  manifests:
+    # NFS Storage 
+    - path: hub/nfs/00-ns-kubenfs.yaml
+    - path: hub/nfs/01-nfs-rbac.yaml
+    - path: hub/nfs/02-nfs-deployment.yaml
+    - path: hub/nfs/03-storage-class.yaml
+
+    # RHACM operator
+    #   Note: RHACM is part of the hub cluster seeding process.  These CRs are there for Day 2 configration only.
+    - path: hub/acm/00-ns-acm.yaml
+    - path: hub/acm/01-og-acm.yaml
+    - path: hub/acm/02-sub-acm.yaml
+
+# Wave 20 - ZTP configuration
+- name: local-cluster-ztp-config
+  policyAnnotations:
+    ran.openshift.io/ztp-deploy-wave: "20"
+    policy.open-cluster-management.io/description: Configure the MCH
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-02 Baseline Configuration    
+  manifests:
+    - path: hub/mch/00-mch-acm.yaml
+
+- name: local-cluster-assisted-installer
+  policyAnnotations:
+    ran.openshift.io/ztp-deploy-wave: "20"
+    policy.open-cluster-management.io/description: Assisted Instller templates for SNO clusters
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-02 Baseline Configuration
+  configurationPolicyAnnotations:
+    policy.open-cluster-management.io/disable-templates: "true"    
+  manifests:
+    - path: mch/01-provisioning.yaml
+    - path: hub/ai-templates/ai-namespace-custom-templates.yaml
+    - path: hub/ai-templates/ai-configmap-custom-cluster-templates.yaml
+
+- name: local-cluster-agent-service
+  policyAnnotations:
+    ran.openshift.io/ztp-deploy-wave: "20"
+    policy.open-cluster-management.io/description: AgentServiceConfig for rootFS and ISO images, with status check
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-02 Baseline Configuration
+  configurationPolicyAnnotations:
+    policy.open-cluster-management.io/disable-templates: "true"    
+  manifests:
+    - path: hub/agent/00-agent-service-config.yaml
+    - path: hub/agentservice/agentserviceconfig-status.yaml
+
+- name: local-cluster-banner
+  policyAnnotations:
+    ran.openshift.io/ztp-deploy-wave: "5"
+    policy.open-cluster-management.io/description: HUB Cluster Banner
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-02 Baseline Configuration  
+  manifests:
+    - path: hub/console/03-console-banner.yaml
+
