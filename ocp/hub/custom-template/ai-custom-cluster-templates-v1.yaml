@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ai-custom-cluster-templates-v1
-  namespace: open-cluster-management
+  namespace: custom-templates
 data:
   AgentClusterInstall: |-
     apiVersion: extensions.hive.openshift.io/v1beta1
