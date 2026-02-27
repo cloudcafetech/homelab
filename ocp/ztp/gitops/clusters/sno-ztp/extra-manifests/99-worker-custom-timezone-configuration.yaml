@@ -7,7 +7,7 @@ metadata:
 spec:
   config:
     ignition:
-      version: 3.5.0
+      version: 3.4.0
     systemd:
       units:
         - contents: |
@@ -17,7 +17,7 @@ spec:
 
             [Service]
             Type=oneshot
-            ExecStart=timedatectl set-timezone  Asia/Kolkata
+            ExecStart=timedatectl set-timezone Asia/Kolkata
 
             [Install]
             WantedBy=multi-user.target
