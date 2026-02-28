@@ -29,12 +29,12 @@ spec:
             - name: PROVISIONER_NAME
               value: kubenfs
             - name: NFS_SERVER
-              value: 192.168.1.159
+              value: 192.168.0.159
             - name: NFS_PATH
               value: /root/nfsshare
       volumes:
         - name: nfs-client-root
           nfs:
-            server: 192.168.1.159
+            server: 192.168.0.159
             path: /root/nfsshare
             
