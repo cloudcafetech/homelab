@@ -74,8 +74,7 @@ policies:
     policy.open-cluster-management.io/categories: CM Configuration Management
     policy.open-cluster-management.io/controls: CM-02 Baseline Configuration    
   manifests:
-    - path: hub/mch/00-mch-acm.yaml
-    - path: hub/mch/01-provisioning.yaml    
+    - path: hub/acm/03-mch-acm.yaml  
 
 - name: hub-cluster-assisted-installer
   policyAnnotations:
@@ -101,6 +100,7 @@ policies:
   configurationPolicyAnnotations:
     policy.open-cluster-management.io/disable-templates: "true"    
   manifests:
-    - path: hub/agent/00-agent-service-config.yaml
-    - path: hub/agentservice/agentserviceconfig-status.yaml
+    - path: hub/agent/00-provisioning.yaml  
+    - path: hub/agent/01-agent-service-config.yaml
+    - path: hub/agent/agentserviceconfig-status.yaml
 
