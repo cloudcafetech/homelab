@@ -1,11 +1,3 @@
-apiVersion: user.openshift.io/v1
-kind: Group
-metadata:
-  name: cluster-admin-htpasswd
-users:
-  - pkar
-  - dkar
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -37,26 +29,3 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: 'open-cluster-management:subscription-admin'
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: htpasswd-secret
-  namespace: openshift-config
-type: Opaque
-data:
-  htpasswd: cGthcjokMnkkMDUkbFhRYXFCYS5sTE5MNDcxWGFGUEgvLk9mcVBybUV6dDVIb2NGeGxNOTdQNVNvLnFBMUpENWEKZGthcjokMnk
-kMDUkMVBtVTBIclpaaWVmaHdsenEwWEY3LlB1ZHRNUi4vNVV5OGtkdmtKd005S1F2Wm8zcm1qdmkK
----
-apiVersion: config.openshift.io/v1
-kind: OAuth
-metadata:
-  name: cluster
-spec:
-  identityProviders:
-  - name: htpasswd
-    mappingMethod: claim
-    type: HTPasswd
-    htpasswd:
-      fileData:
-        name: htpasswd-secret
