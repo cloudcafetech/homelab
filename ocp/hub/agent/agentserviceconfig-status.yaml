@@ -1,0 +1,11 @@
+apiVersion: agent-install.openshift.io/v1beta1
+kind: AgentServiceConfig
+metadata:
+  name: agent
+spec:
+    - openshiftVersion: '4.18'
+    - openshiftVersion: '4.20'
+status:
+  conditions:
+    - status: 'True'
+      type: ReconcileCompleted
