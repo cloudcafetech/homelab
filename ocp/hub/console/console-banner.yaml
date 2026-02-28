@@ -3,7 +3,7 @@ kind: ConsoleNotification
 metadata:
   name: acm-cluster-banner
 spec:
-  text: "CAUTION: This is a ACM cluster. Handle with care."
+  text: "CAUTION: This is ACM cluster. Handle with care."
   location: BannerTop
   color: '#fff'
   backgroundColor: '#ff0000'
