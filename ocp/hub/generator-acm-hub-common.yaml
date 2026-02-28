@@ -33,7 +33,10 @@ policies:
     policy.open-cluster-management.io/controls: AC-03 Access Enforcement
   manifests:
     # Authentication
-    - path: hub/auth/htpasswd.yaml
+    - path: hub/auth/group.yaml
+    - path: hub/auth/crb.yaml
+    - path: hub/auth/oauth.yaml
+    - path: hub/auth/secrets.yaml    
 
 - name: hub-cluster-banner
   policyAnnotations:
