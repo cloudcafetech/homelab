@@ -34,9 +34,9 @@ policies:
   manifests:
     # Authentication
     - path: ../hub/auth/group.yaml
-    - path: hub/auth/crb.yaml
-    - path: hub/auth/oauth.yaml
-    - path: hub/auth/secrets.yaml    
+    - path: ../hub/auth/crb.yaml
+    - path: ../hub/auth/oauth.yaml
+    - path: ../hub/auth/secrets.yaml    
 
 - name: hub-cluster-banner
   policyAnnotations:
@@ -46,7 +46,7 @@ policies:
     policy.open-cluster-management.io/categories: CM Configuration Management
     policy.open-cluster-management.io/controls: CM-02 Baseline Configuration  
   manifests:
-    - path: hub/console/console-banner.yaml    
+    - path: ../hub/console/console-banner.yaml    
 
 - name: hub-cluster-tools
   policyAnnotations:
@@ -57,16 +57,16 @@ policies:
     policy.open-cluster-management.io/controls: CM-02 Baseline Configuration
   manifests:
     # NFS Storage 
-    - path: hub/nfs/00-ns-kubenfs.yaml
-    - path: hub/nfs/01-nfs-rbac.yaml
-    - path: hub/nfs/02-nfs-deployment.yaml
-    - path: hub/nfs/03-storage-class.yaml
+    - path: ../hub/nfs/00-ns-kubenfs.yaml
+    - path: ../hub/nfs/01-nfs-rbac.yaml
+    - path: ../hub/nfs/02-nfs-deployment.yaml
+    - path: ../hub/nfs/03-storage-class.yaml
 
     # RHACM operator
     #   Note: RHACM is part of the hub cluster seeding process.  These CRs are there for Day 2 configration only.
-    - path: hub/acm/00-ns-acm.yaml
-    - path: hub/acm/01-og-acm.yaml
-    - path: hub/acm/02-sub-acm.yaml
+    - path: ../hub/acm/00-ns-acm.yaml
+    - path: ../hub/acm/01-og-acm.yaml
+    - path: ../hub/acm/02-sub-acm.yaml
 
 # Wave 20 - multiclusterhub configuration
 - name: hub-cluster-ztp-config
@@ -77,7 +77,7 @@ policies:
     policy.open-cluster-management.io/categories: CM Configuration Management
     policy.open-cluster-management.io/controls: CM-02 Baseline Configuration    
   manifests:
-    - path: hub/acm/03-mch-acm.yaml  
+    - path: ../hub/acm/03-mch-acm.yaml  
 
 - name: hub-cluster-assisted-installer
   policyAnnotations:
@@ -89,9 +89,9 @@ policies:
   configurationPolicyAnnotations:
     policy.open-cluster-management.io/disable-templates: "true"    
   manifests:
-    - path: hub/custom-template/ai-namespace-custom-templates.yaml
-    - path: hub/custom-template/ai-custom-cluster-templates-v1.yaml
-    - path: hub/custom-template/ai-custom-node-templates-v1.yaml    
+    - path: ../hub/custom-template/ai-namespace-custom-templates.yaml
+    - path: ../hub/custom-template/ai-custom-cluster-templates-v1.yaml
+    - path: ../hub/custom-template/ai-custom-node-templates-v1.yaml    
 
 - name: hub-cluster-agent-service
   policyAnnotations:
@@ -103,7 +103,6 @@ policies:
   configurationPolicyAnnotations:
     policy.open-cluster-management.io/disable-templates: "true"    
   manifests:
-    - path: hub/agent/00-provisioning.yaml  
-    - path: hub/agent/01-agent-service-config.yaml
-    - path: hub/agent/agentserviceconfig-status.yaml
-
+    - path: ../hub/agent/00-provisioning.yaml  
+    - path: ../hub/agent/01-agent-service-config.yaml
+    - path: ../hub/agent/agentserviceconfig-status.yaml
