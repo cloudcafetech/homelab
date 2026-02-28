@@ -10,7 +10,7 @@ policyDefaults:
   placement:
     labelSelector:
       local-cluster: "true"
-  remediationAction: inform
+  remediationAction: enforce
   severity: high
   namespaceSelector:
     exclude:
