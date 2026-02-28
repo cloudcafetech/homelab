@@ -43,7 +43,7 @@ policies:
     policy.open-cluster-management.io/categories: CM Configuration Management
     policy.open-cluster-management.io/controls: CM-02 Baseline Configuration  
   manifests:
-    - path: hub/console/03-console-banner.yaml    
+    - path: hub/console/console-banner.yaml    
 
 - name: hub-cluster-tools
   policyAnnotations:
