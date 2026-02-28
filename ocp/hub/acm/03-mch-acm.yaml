@@ -57,5 +57,3 @@ spec:
       enabled: false
       name: cnv-mtv-integrations-preview
   separateCertificateManagement: false
-
-  separateCertificateManagement: false
