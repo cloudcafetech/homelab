@@ -24,6 +24,32 @@ policyDefaults:
 policies:
 
 # Wave 10 - Common/base configurations
+- name: hub-cluster-operatorhub
+  policyAnnotations:
+    ran.openshift.io/ztp-deploy-wave: "10"
+    policy.open-cluster-management.io/description: Disable Operator Hub
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-02 Baseline Configuration
+  manifests:
+    # Disable Operator Hub
+    - path: ../hub/common/01-disable-operator.yaml
+    - path: ../hub/common/02-redhat-operator-cs.yaml
+
+- name: hub-cluster-machineconfig
+  policyAnnotations:
+    ran.openshift.io/ztp-deploy-wave: "10"
+    policy.open-cluster-management.io/description: Configuration of Machine Config
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-02 Baseline Configuration
+  manifests:
+    # Configuration of MC
+    - path: ../hub/common/50-masters-chrony-configuration.yaml
+    - path: ../hub/common/50-workers-chrony-configuration.yaml
+    - path: ../hub/common/99-master-custom-timezone-configuration.yaml
+    - path: ../hub/common/99-worker-custom-timezone-configuration.yaml    
+    
 - name: hub-cluster-authentication
   policyAnnotations:
     ran.openshift.io/ztp-deploy-wave: "10"
