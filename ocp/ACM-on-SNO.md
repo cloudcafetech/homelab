@@ -300,7 +300,10 @@ rules:
   verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
 - apiGroups: ["cluster.open-cluster-management.io"]
   resources: ["managedclusters"]
-  verbs: ["get", "list", "update", "watch", "patch"]
+  verbs: ["create", "get", "list", "watch", "update", "patch"]
+- apiGroups: ["operator.open-cluster-management.io"]
+  resources: ["multiclusterhubs"]
+  verbs: ["create", "get", "list", "watch", "update", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
