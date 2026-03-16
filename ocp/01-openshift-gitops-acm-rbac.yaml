@@ -1,0 +1,39 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: openshift-gitops-acm-clusterrole
+rules:
+- apiGroups: ["*"]
+  resources: ["serviceaccounts", "deployments", "provisionings", "agentserviceconfigs"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+- apiGroups: ["siteconfig.open-cluster-management.io"]
+  resources: ["clusterinstances"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+- apiGroups: ["policy.open-cluster-management.io"]
+  resources: ["policies", "policysets", "placementbindings"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+- apiGroups: ["apps.open-cluster-management.io"]
+  resources: ["placementrules"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+- apiGroups: ["cluster.open-cluster-management.io"]
+  resources: ["managedclustersets", "managedclustersetbindings", "managedclustersets/bind", "managedclustersets/join", "placements", "placements/status", "placementdecisions", "placementdecisions/status"]
+  verbs: ["create", "get", "list", "update", "delete", "watch", "patch"]
+- apiGroups: ["cluster.open-cluster-management.io"]
+  resources: ["managedclusters"]
+  verbs: ["create", "get", "list", "watch", "update", "patch"]
+- apiGroups: ["operator.open-cluster-management.io"]
+  resources: ["multiclusterhubs"]
+  verbs: ["create", "get", "list", "watch", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: openshift-gitops-acm-clusterrolebinding
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-application-controller
+  namespace: openshift-gitops
+roleRef:
+  kind: ClusterRole
+  name: openshift-gitops-acm-clusterrole
+  apiGroup: rbac.authorization.k8s.io
