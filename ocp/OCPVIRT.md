@@ -95,7 +95,7 @@ EOF
 oc create -f hpp-sc.yaml
 ```
 
-### Networking(https://www.redhat.com/en/blog/access-external-networks-with-openshift-virtualization)
+### [Networking](https://www.redhat.com/en/blog/access-external-networks-with-openshift-virtualization)
 
 - Install NMState Operator
 
@@ -191,7 +191,7 @@ oc create -f ns-lin-winvm.yaml
 
 > OpenShift provides advanced multi-networking features to segment and isolate traffic using ClusterUserDefinedNetwork (CUDN) or UserDefinedNetwork (UDN) overlays per namespace. 
 
-- CUDN(https://www.redhat.com/en/blog/user-defined-networks-red-hat-openshift-virtualization)
+- [CUDN](https://www.redhat.com/en/blog/user-defined-networks-red-hat-openshift-virtualization)
 
 ```
 cat << EOF > cudn-localnet-lin-winvm.yaml
@@ -275,6 +275,100 @@ spec:
 EOF
 
 oc create -f vm-ip-pool.yaml
+```
+
+- Create VM
+
+```
+cat << EOF > vm-centos9.yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: centos9
+  namespace: default
+  finalizers:
+    - kubevirt.io/virtualMachineControllerFinalize
+  labels:
+    app: centos9
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: centos9
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: centos-stream9
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: centos9
+    spec:
+      accessCredentials:
+        - sshPublicKey:
+            propagationMethod:
+              noCloud: {}
+            source:
+              secret:
+                secretName: common-ssh
+      architecture: amd64
+      domain:
+        cpu:
+          cores: 2
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - bootOrder: 1
+              disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - macAddress: '02:55:c3:fb:7c:b5'
+              masquerade: {}
+              model: virtio
+              name: default
+            - bridge: {}
+              macAddress: '02:55:c3:fb:7c:b6'
+              model: virtio
+              name: ext-nic
+              state: up
+          rng: {}
+        machine:
+          type: pc-q35-rhel9.6.0
+        memory:
+          guest: 2Gi
+        resources: {}
+      networks:
+        - name: default
+          pod: {}
+        - multus:
+            networkName: nad-centos-vm
+          name: ext-nic
+      subdomain: headless
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - dataVolume:
+            name: centos9
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: centos
+              password: cloudcafe2675
+              chpasswd: { expire: False }
+          name: cloudinitdisk
+EOF
 ```
 
 - Create Service for VM 
