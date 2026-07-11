@@ -2,7 +2,7 @@
 
 ### Virtualization
 
-- Install Virtualization Operator CLI or GUI
+- Install Virtualization Operator using CLI or GUI
 
 ```
 cat << EOF > ocp-virt-operator.yaml
@@ -36,7 +36,7 @@ EOF
 oc create -f ocp-virt-operator.yaml
 ```
 
-- Install Instance CLI or GUI
+- Install HyperConverged Instance using CLI or GUI
 
 ```
 oc apply -f - <<EOF
@@ -55,7 +55,7 @@ oc get po -n openshift-cnv
 
 ### Storage
 
-> FOR SNO with one disk, for Storage Virtualization Operator by default install Host Path Provisioner Operator
+> SNO with one disk, the Storage Virtualization Operator by default install Host Path Provisioner Operator
 
 - Install HostPathProvisioner CRD
 
@@ -130,7 +130,7 @@ EOF
 oc apply -f nmstate-operator.yaml
 ```
 
-- Install NMState Operator
+- Install NMState Instance
 
 ```
 oc apply -f - <<EOF
