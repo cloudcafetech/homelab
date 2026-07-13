@@ -460,7 +460,7 @@ EOF
 oc create -f vm-svc.yaml
 ```
 
-### K8s Cluster on OCP VMs
+### K8s Cluster (RKE2) on OCP VMs
 
 - RKE2 Master Install
 
