@@ -284,18 +284,16 @@ cat << EOF > vm-centos9.yaml
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: centos9
-  namespace: default
-  finalizers:
-    - kubevirt.io/virtualMachineControllerFinalize
+  name: k8s-master
+  namespace: linvm
   labels:
-    app: centos9
+    app: k8s-master
 spec:
   dataVolumeTemplates:
     - apiVersion: cdi.kubevirt.io/v1beta1
       kind: DataVolume
       metadata:
-        name: centos9
+        name: k8s-master
       spec:
         sourceRef:
           kind: DataSource
@@ -309,7 +307,7 @@ spec:
   template:
     metadata:
       labels:
-        kubevirt.io/domain: centos9
+        kubevirt.io/domain: k8s-master
     spec:
       accessCredentials:
         - sshPublicKey:
@@ -317,49 +315,117 @@ spec:
               noCloud: {}
             source:
               secret:
-                secretName: common-ssh
+                secretName: lin-common-ssh
       architecture: amd64
       domain:
         cpu:
-          cores: 2
+          cores: 4
           sockets: 1
           threads: 1
         devices:
           disks:
-            - bootOrder: 1
-              disk:
+            - disk:
                 bus: virtio
               name: rootdisk
             - disk:
                 bus: virtio
               name: cloudinitdisk
           interfaces:
-            - macAddress: '02:55:c3:fb:7c:b5'
-              masquerade: {}
-              model: virtio
-              name: default
             - bridge: {}
-              macAddress: '02:55:c3:fb:7c:b6'
               model: virtio
-              name: ext-nic
+              name: nic-ext
               state: up
-          rng: {}
         machine:
           type: pc-q35-rhel9.6.0
         memory:
-          guest: 2Gi
+          guest: 4Gi
         resources: {}
       networks:
-        - name: default
-          pod: {}
         - multus:
-            networkName: nad-centos-vm
-          name: ext-nic
+            networkName: cudn-localnet
+          name: nic-ext
       subdomain: headless
       terminationGracePeriodSeconds: 180
       volumes:
         - dataVolume:
-            name: centos9
+            name: k8s-master
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: centos
+              password: cloudcafe2675
+              chpasswd: { expire: False }
+          name: cloudinitdisk
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: k8s-worker
+  namespace: linvm
+  labels:
+    app: k8s-worker
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: k8s-worker
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: centos-stream9
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: k8s-worker
+    spec:
+      accessCredentials:
+        - sshPublicKey:
+            propagationMethod:
+              noCloud: {}
+            source:
+              secret:
+                secretName: lin-common-ssh
+      architecture: amd64
+      domain:
+        cpu:
+          cores: 4
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - bridge: {}
+              model: virtio
+              name: nic-ext
+              state: up
+        machine:
+          type: pc-q35-rhel9.6.0
+        memory:
+          guest: 4Gi
+        resources: {}
+      networks:
+        - multus:
+            networkName: cudn-localnet
+          name: nic-ext
+      subdomain: headless
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - dataVolume:
+            name: k8s-worker
           name: rootdisk
         - cloudInitNoCloud:
             userData: |-
