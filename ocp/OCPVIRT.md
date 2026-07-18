@@ -53,7 +53,7 @@ EOF
 oc get po -n openshift-cnv
 ```
 
-### OpenShift Migration 
+### Migration 
 
 - Install MTV Operator
 
