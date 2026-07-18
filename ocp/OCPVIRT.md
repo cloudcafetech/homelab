@@ -53,6 +53,58 @@ EOF
 oc get po -n openshift-cnv
 ```
 
+### OpenShift Migration 
+
+- Install MTV Operator
+
+```
+cat << EOF > ocp-mtv-operator.yaml
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  name: openshift-mtv
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: migration
+  namespace: openshift-mtv
+spec:
+  targetNamespaces:
+    - openshift-mtv
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: mtv-operator
+  namespace: openshift-mtv
+spec:
+  channel: release-v2.12
+  installPlanApproval: Automatic
+  name: mtv-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: "mtv-operator.v2.12.2"
+EOF
+```
+
+- Create ForkliftController CR
+
+```
+cat << EOF | oc apply -f -
+apiVersion: forklift.konveyor.io/v1beta1
+kind: ForkliftController
+metadata:
+  name: forklift-controller
+  namespace: openshift-mtv
+spec:
+  olm_managed: true
+EOF
+```
+- Verify MTV pods are running
+
+```oc get pods -n openshift-mtv```
+
 ### Storage
 
 > SNO with one disk, the Storage Virtualization Operator by default install Host Path Provisioner Operator
