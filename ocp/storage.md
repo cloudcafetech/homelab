@@ -91,7 +91,7 @@ metadata:
   name: host-command-executor
   namespace: local-path-storage
 spec:
-  nodeName: hcp-ctx-worker-01
+  nodeName: hcp-ctx-worker1
   hostPID: true
   containers:
   - name: executor
@@ -127,7 +127,7 @@ data:
     {
             "nodePathMap":[
             {
-                    "node":"hcp-ctx-worker-01",
+                    "node":"hcp-ctx-worker1",
                     "paths":["/opt/local-path-provisioner"]
             }
             ]
