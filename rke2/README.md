@@ -430,11 +430,23 @@ kubectl annotate --overwrite -n kubevirt-hyperconverged hco kubevirt-hyperconver
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/values.yml
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/metallb/metallb-ippol.yaml
 wget https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/hco/secondary-dns.yaml
+
 helm repo add metallb https://metallb.github.io/metallb
-helm install metallb metallb/metallb -f values.yml --namespace kube-system
-sleep 30
-kubectl -n kube-system wait deployment/metallb-controller --for=condition=Available --timeout 300s
-kubectl -n kube-system rollout status ds/metallb-speaker --timeout 300s
+helm repo update
+
+kubectl create namespace metallb-system
+
+kubectl label namespace metallb-system \
+  pod-security.kubernetes.io/enforce=privileged \
+  pod-security.kubernetes.io/audit=privileged \
+  pod-security.kubernetes.io/warn=privileged \
+  --overwrite
+
+helm install metallb metallb/metallb \
+  --namespace metallb-system \
+  --wait
+
+kubectl get pods -n metallb-system
 kubectl create -f metallb-ippol.yaml 
 kubectl create -f secondary-dns.yaml
 ```
