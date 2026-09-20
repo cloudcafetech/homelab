@@ -369,7 +369,7 @@ kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['dat
 
 ```
 HCONS=kubevirt-hyperconverged
-HCOV=v1.14.0
+HCOV=v1.18.0
 for ns in $HCONS openshift konveyor-forklift virtualmachines olm; do  kubectl create ns $ns; done
 for ns in $HCONS openshift konveyor-forklift virtualmachines olm; do  kubectl label ns $ns pod-security.kubernetes.io/enforce=privileged ; done
 ```
@@ -385,6 +385,9 @@ kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevir
 kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/hostpath-provisioner00.crd.yaml
 kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/scheduling-scale-performance00.crd.yaml
 kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/application-aware-quota00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/migration-operator00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/vm-file-restore-operator00.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/vm-file-restore-operator01.crd.yaml
 ```
 
 - Deploy Cert Manager for webhook certificates
