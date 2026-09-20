@@ -388,6 +388,7 @@ kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevir
 kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/migration-operator00.crd.yaml
 kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/vm-file-restore-operator00.crd.yaml
 kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/vm-file-restore-operator01.crd.yaml
+kubectl apply ${LABEL_SELECTOR_ARG} -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/refs/tags/$HCOV/deploy/crds/inflightoperations01.crd.yaml
 ```
 
 - Deploy Cert Manager for webhook certificates
