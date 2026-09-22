@@ -689,3 +689,25 @@ Get node port of virtvnc service ```kubectl get svc -n kubevirt virtvnc```
 Manage virtual machines in namespace.
 
 http://NODEIP:NODEPORT/?namespace=test
+
+### CDI upload pod Out of Memory (OOM)
+
+```
+kubectl patch hyperconverged kubevirt-hyperconverged -n kubevirt-hyperconverged --type merge --patch '
+{
+  "spec": {
+    "storage": {
+      "workloadResourceRequirements": {
+        "limits": {
+          "cpu": "900m",
+          "memory": "6Gi"
+        },
+        "requests": {
+          "cpu": "600m",
+          "memory": "4Gi"
+        }
+      }
+    }
+  }
+}'
+````
