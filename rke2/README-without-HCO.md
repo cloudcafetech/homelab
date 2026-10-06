@@ -273,6 +273,8 @@ kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/he
 ```
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/01-local-path-provisioner/local-path-storage.yaml
 kubectl label ns local-path-storage pod-security.kubernetes.io/enforce=privileged
+sleep 30
+kubectl patch storageprofile local-path --type=merge -p '{"spec": {"claimPropertySets": [{"accessModes": ["ReadWriteOnce"], "volumeMode": "Filesystem"}]}}'
 ```
 
 - MinIO object storage
@@ -387,6 +389,46 @@ kubectl create -f https://github.com/kubevirt/containerized-data-importer/releas
 kubectl create -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/talos/talos-kubevirt/03-cdi-operator/01-cdi-cr.yaml
 sleep 30
 #kubectl patch cdi cdi --patch '{"spec": {"config": {"podResourceRequirements": {"limits": {"memory": "5G"}}}}}' --type merge
+```
+
+- Local DNS not polulated
+> If local DNS not populated (from pod local dns record not resolved by nslookup) then modify configmap as follows.
+
+```
+kubectl edit configmap rke2-coredns-rke2-coredns -n kube-system
+```
+
+```
+data:
+  Corefile: |-
+    .:53 {
+        errors
+        health {
+            lameduck 10s
+        }
+        ready
+        # 1. Internal cluster engine owns pkar.tech first
+        kubernetes pkar.tech in-addr.arpa ip6.arpa {
+            pods insecure
+            # The key change: add 'pkar.tech' to fallthrough so it checks upstream if it's not a pod/service
+            # This tells CoreDNS: "If you look for something ending in pkar.tech
+            # and it is not an internal K8S service, don't give up—pass it down to the external forwarders."
+            fallthrough pkar.tech in-addr.arpa ip6.arpa
+            ttl 30
+        }
+        prometheus 0.0.0.0:9153
+        # 2. Directly forward all non-cluster queries to your real local servers
+        forward . 192.168.0.159 192.168.0.1
+        cache 30
+        loop
+        reload
+        loadbalance
+    }
+```
+
+```
+kubectl delete pods -n kube-system -l k8s-app=kube-dns
+sleep 30
 ```
 
 - Enable KubeSecondaryDNS
