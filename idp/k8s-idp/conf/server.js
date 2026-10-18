@@ -62,7 +62,7 @@ app.post('/api/requests', async (req, res) => {
   const {
     resourceType = 'K8S_NAMESPACE', appName, env = 'dev', cpu = '500m', 
     memory = '512Mi', storage = '10Gi', vmOsImage = 'rhel-9-image', 
-    cluster, requesterEmail, managerEmail
+    cluster,  purpose, requesterEmail, managerEmail
   } = req.body;
 
   if (!appName || !requesterEmail || !managerEmail) {
@@ -71,21 +71,39 @@ app.post('/api/requests', async (req, res) => {
 
   try {
     const query = `
-      INSERT INTO requests (resource_type, app_name, env, cpu, memory, storage, vm_os_image, cluster, requester_email, manager_email, ticket_system, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      INSERT INTO requests (resource_type, app_name, env, cpu, memory, storage, vm_os_image, cluster, purpose, requester_email, manager_email, ticket_system, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING id;
     `;
     const result = await pool.query(query, [
-      resourceType, appName, env, cpu, memory, storage, vmOsImage, cluster, requesterEmail, managerEmail, 'SERVICENOW', 'PENDING_APPROVAL'
+      resourceType, appName, env, cpu, memory, storage, vmOsImage, cluster, purpose, requesterEmail, managerEmail, 'SERVICENOW', 'PENDING_APPROVAL'
     ]);
     const requestId = result.rows[0].id;
 
     const appBaseUrl = process.env.PUBLIC_URL || `http://${req.headers.host}`;
+
+    // FIXED: Created a detailed text body for the manager's email
+    const emailBody = `An environment request has been submitted and requires your approval.
+
+IDP Orchestration Resource Details:
+- Resource Type: ${resourceType}
+- Application Name: ${appName}
+- Environment: ${env}
+- Target Cluster: ${cluster || 'Not Specified'}
+- CPU Quota: ${cpu}
+- Memory Quota: ${memory}
+- Storage Quota: ${storage}
+- Business Purpose: ${purpose || 'Not Provided'}
+- Requester: ${requesterEmail}
+
+Click the link below to approve this request and automatically trigger the ServiceNow infrastructure ticket:
+${appBaseUrl}/api/approve/${requestId}`;
+
     await mailer.sendMail({
       from: 'portal@internal.dev',
       to: managerEmail,
-      subject: `[IDP Approval Required] Setup for ${appName}`,
-      text: `An environment request has been submitted by ${requesterEmail}. Click here to approve:\n\n${appBaseUrl}/api/approve/${requestId}`
+      subject: `[IDP Approval Required] Setup for ${appName} (${env.toUpperCase()})`,
+      text: emailBody // FIXED: Sent the comprehensive layout text
     });
 
     res.status(201).json({ requestId, status: 'PENDING_APPROVAL' });
@@ -104,7 +122,7 @@ app.get('/api/approve/:id', async (req, res) => {
 
     let ticketId = `MOCK-SNOW-${Math.floor(100000 + Math.random() * 900000)}`;
     const summary = `IDP ${reqData.resource_type}: Provision ${reqData.app_name} [Env: ${reqData.env}]`;
-    const technicalDescription = `IDP Orchestration Resource Details:\n- Resource Type: ${reqData.resource_type}\n- Cluster: ${reqData.cluster}\n- CPU: ${reqData.cpu}\n- Memory: ${reqData.memory}\n- Storage: ${reqData.storage}\n- Requester: ${reqData.requester_email}`;
+    const technicalDescription = `IDP Orchestration Resource Details:\n- Resource Type: ${reqData.resource_type}\n- Cluster: ${reqData.cluster}\n- CPU: ${reqData.cpu}\n- Memory: ${reqData.memory}\n- Storage: ${reqData.storage}\n- Requester: ${reqData.requester_email}\n- Business Purpose: ${reqData.purpose || 'Not Provided'}`;
 
     try {
       const snowRes = await axios.post(`${process.env.SNOW_HOST}/api/now/table/incident`, {
