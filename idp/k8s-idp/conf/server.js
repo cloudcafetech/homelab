@@ -7,7 +7,6 @@ const fs = require('fs');
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
 const connectionString = process.env.DATABASE_URL || 'postgres://postgres:secret@postgres.idp-system.svc:5432/idpdb';
 const pool = new Pool({ connectionString });
@@ -17,52 +16,76 @@ const mailer = nodemailer.createTransport({
   port: parseInt(process.env.SMTP_PORT || '1025', 10)
 });
 
-async function initDbWithRetry(retries = 10, delayMs = 3000) {
-  for (let i = 1; i <= retries; i++) {
-    try {
-      const client = await pool.connect();
-      const initSqlPath = '/app/db/init.sql';
-      if (fs.existsSync(initSqlPath)) {
-        const sql = fs.readFileSync(initSqlPath, 'utf8');
-        await client.query(sql);
-        console.log('Database tables and VM columns verified.');
-      }
-      client.release();
-      return;
-    } catch (err) {
-      console.warn(`DB connection attempt ${i}/${retries} failed (${err.message}). Retrying...`);
-      await new Promise(r => setTimeout(r, delayMs));
-    }
+// Helper matrix function converting ServiceNow numbers or local workflow states to text strings
+function mapSnowState(stateCode) {
+  if (typeof stateCode === 'string') {
+    if (stateCode === 'PENDING_APPROVAL') return 'Pending Approval';
+    if (stateCode === 'APPROVED') return 'Approved';
+    if (stateCode === 'TICKET_CREATED') return 'Ticket Created';
   }
-  console.error('All DB connection retries exhausted.');
+
+  switch (parseInt(stateCode, 10)) {
+    case 1: return 'New';
+    case 2: return 'In Progress';
+    case 3: return 'On Hold';
+    case 6: return 'Resolved';
+    case 7: return 'Closed';
+    case 8: return 'Canceled';
+    default: 
+      return stateCode || 'Pending Approval';
+  }
 }
 
+// Flat-file serving infrastructure endpoints
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
+app.get('/request-apps', (req, res) => {
+  res.sendFile(path.join(__dirname, 'request-apps.html'));
+});
+
+app.get('/request-vm', (req, res) => {
+  res.sendFile(path.join(__dirname, 'request-vm.html'));
+});
+
+app.get('/workflow', (req, res) => {
+  res.sendFile(path.join(__dirname, 'workflow-feed.html'));
+});
+
+app.get('/monitoring', (req, res) => {
+  res.sendFile(path.join(__dirname, 'live-monitoring.html'));
+});
+
+// App Entry Point: Creation of Infrastructure Request
 app.post('/api/requests', async (req, res) => {
   const {
-    resourceType = 'K8S_NAMESPACE',
-    appName, env = 'dev', cpu = '500m', memory = '512Mi', storage = '10Gi',
-    vmOsImage = 'rhel-9-image', cluster, requesterEmail, managerEmail
+    resourceType = 'K8S_NAMESPACE', appName, env = 'dev', cpu = '500m', 
+    memory = '512Mi', storage = '10Gi', vmOsImage = 'rhel-9-image', 
+    cluster, requesterEmail, managerEmail
   } = req.body;
+
+  if (!appName || !requesterEmail || !managerEmail) {
+    return res.status(400).json({ error: 'Missing mandatory request form configuration parameters.' });
+  }
 
   try {
     const query = `
-      INSERT INTO requests (resource_type, app_name, env, cpu, memory, storage, vm_os_image, cluster, requester_email, manager_email, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      INSERT INTO requests (resource_type, app_name, env, cpu, memory, storage, vm_os_image, cluster, requester_email, manager_email, ticket_system, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING id;
     `;
     const result = await pool.query(query, [
-      resourceType, appName, env, cpu, memory, storage, vmOsImage, cluster, requesterEmail, managerEmail, 'PENDING_APPROVAL'
+      resourceType, appName, env, cpu, memory, storage, vmOsImage, cluster, requesterEmail, managerEmail, 'SERVICENOW', 'PENDING_APPROVAL'
     ]);
     const requestId = result.rows[0].id;
 
-    const appBaseUrl = process.env.PUBLIC_URL || 'http://localhost:3000';
-    const isVm = resourceType === 'VIRTUAL_MACHINE';
-    const labelText = isVm ? `Virtual Machine: ${appName}` : `Namespace: ${appName}`;
+    const appBaseUrl = process.env.PUBLIC_URL || `http://${req.headers.host}`;
     await mailer.sendMail({
       from: 'portal@internal.dev',
       to: managerEmail,
-      subject: `Approval Required: ${labelText}`,
-      text: `Approve here: ${appBaseUrl}/api/approve/${requestId}`
+      subject: `[IDP Approval Required] Setup for ${appName}`,
+      text: `An environment request has been submitted by ${requesterEmail}. Click here to approve:\n\n${appBaseUrl}/api/approve/${requestId}`
     });
 
     res.status(201).json({ requestId, status: 'PENDING_APPROVAL' });
@@ -71,68 +94,144 @@ app.post('/api/requests', async (req, res) => {
   }
 });
 
+// Manager Approval Endpoint -> Creates ServiceNow Ticket Task
 app.get('/api/approve/:id', async (req, res) => {
   const { id } = req.params;
   try {
     await pool.query("UPDATE requests SET status = 'APPROVED', updated_at = NOW() WHERE id = $1", [id]);
-    const reqData = (await pool.query("SELECT * FROM requests WHERE id = $1", [id])).rows[0];
+    const resultRows = await pool.query("SELECT * FROM requests WHERE id = $1", [id]);
+    const reqData = resultRows.rows[0];
 
-    let jiraKey = 'MOCK-JIRA-456';
-    const summaryPrefix = reqData.resource_type === 'VIRTUAL_MACHINE' ? 'Provision KubeVirt VM' : 'Provision Namespace';
+    let ticketId = `MOCK-SNOW-${Math.floor(100000 + Math.random() * 900000)}`;
+    const summary = `IDP ${reqData.resource_type}: Provision ${reqData.app_name} [Env: ${reqData.env}]`;
+    const technicalDescription = `IDP Orchestration Resource Details:\n- Resource Type: ${reqData.resource_type}\n- Cluster: ${reqData.cluster}\n- CPU: ${reqData.cpu}\n- Memory: ${reqData.memory}\n- Storage: ${reqData.storage}\n- Requester: ${reqData.requester_email}`;
+
     try {
-      const jiraRes = await axios.post(`${process.env.JIRA_HOST}/rest/api/3/issue`, {
-        fields: {
-          project: { key: 'K8SOPS' },
-          summary: `${summaryPrefix}: ${reqData.app_name} (${reqData.storage} storage) on ${reqData.cluster}`,
-          issuetype: { name: 'Task' }
+      const snowRes = await axios.post(`${process.env.SNOW_HOST}/api/now/table/incident`, {
+        short_description: summary,
+        description: technicalDescription,
+        assignment_group: "Cloud Operations", 
+        caller_id: "admin"
+      }, { 
+        auth: { 
+          username: process.env.SNOW_USER, 
+          password: process.env.SNOW_PASSWORD 
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
-      }, {
-        auth: { username: process.env.JIRA_USER, password: process.env.JIRA_TOKEN }
       });
-      jiraKey = jiraRes.data.key;
+      
+      if (snowRes.data && snowRes.data.result) {
+        ticketId = snowRes.data.result.number;
+      }
     } catch (err) {
-      console.log('Jira skipped/mocked for dev:', err.message);
+      console.error(`ServiceNow connection skipped/mocked for environment logs:`, err.message);
     }
 
-    await pool.query("UPDATE requests SET status = 'JIRA_CREATED', jira_ticket = $2, updated_at = NOW() WHERE id = $1", [id, jiraKey]);
+    await pool.query(
+      "UPDATE requests SET status = 'TICKET_CREATED', tracking_ticket_id = $2, updated_at = NOW() WHERE id = $1",
+      [id, ticketId]
+    );
 
-    setTimeout(async () => {
-      try {
-        await pool.query("UPDATE requests SET status = 'LIVE', updated_at = NOW() WHERE id = $1", [id]);
-        await mailer.sendMail({
-          from: 'portal@internal.dev',
-          to: reqData.requester_email,
-          subject: `Your ${reqData.resource_type === 'VIRTUAL_MACHINE' ? 'VM' : 'Namespace'} ${reqData.app_name} is Live!`,
-          text: `Cluster: ${reqData.cluster}\nStorage: ${reqData.storage}\nJira: ${jiraKey}`
-        });
-      } catch (e) { console.error('Async completion notification failed:', e.message); }
-    }, 5000);
-
-    res.send(`<h2>Request Approved!</h2><p>Jira ticket ${jiraKey} created. Infrastructure syncing.</p>`);
+    res.send(`<h2>Request Successfully Processed!</h2><p>ServiceNow Ticket ${ticketId} created.</p>`);
   } catch (err) {
-    res.status(500).send(`Error processing approval: ${err.message}`);
+    res.status(500).send(`Error processing manager approval: ${err.message}`);
   }
 });
 
+// Advanced Server-Side Database Search Query with strict LIMIT 10 latest entries filter
 app.get('/api/requests', async (req, res) => {
+  const searchVal = req.query.search ? req.query.search.trim() : '';
   try {
-    const result = await pool.query('SELECT * FROM requests ORDER BY created_at DESC');
-    res.json(result.rows);
+    let result;
+    if (searchVal) {
+      const sqlQuery = `
+        SELECT * FROM requests 
+        WHERE app_name ILIKE $1 
+           OR resource_type ILIKE $1 
+           OR tracking_ticket_id ILIKE $1 
+           OR cluster ILIKE $1 
+           OR requester_email ILIKE $1 
+        ORDER BY created_at DESC 
+        LIMIT 10;
+      `;
+      result = await pool.query(sqlQuery, [`%${searchVal}%`]);
+    } else {
+      result = await pool.query('SELECT * FROM requests ORDER BY created_at DESC LIMIT 10;');
+    }
+
+    // Map the status values before returning them to frontend dashboard UI
+    const transformedRows = result.rows.map(row => ({
+      ...row,
+      status: mapSnowState(row.status)
+    }));
+
+    res.json(transformedRows);
   } catch (err) {
+    console.error('Database query exception caught: ', err.message);
     res.json([]);
   }
 });
 
+// On-Demand Manual Ticket Synchronization Status Trigger Route
+app.post('/api/requests/:id/sync', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("SELECT * FROM requests WHERE id = $1", [id]);
+    const reqData = result.rows[0];
+    if (!reqData || !reqData.tracking_ticket_id) {
+      return res.status(400).json({ error: "Ticket reference trace details missing from target row" });
+    }
+
+    let updatedStatusText = mapSnowState(reqData.status);
+
+    try {
+      const snowRes = await axios.get(`${process.env.SNOW_HOST}/api/now/table/incident`, {
+        params: {
+          sysparm_query: `number=${reqData.tracking_ticket_id}`,
+          sysparm_limit: 1
+        },
+        auth: { 
+          username: process.env.SNOW_USER, 
+          password: process.env.SNOW_PASSWORD 
+        },
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (snowRes.data && snowRes.data.result && snowRes.data.result.length > 0) {
+        const snowIncident = snowRes.data.result[0];
+        // Translate the dynamic numeric state directly to text labels via the helper function
+        updatedStatusText = mapSnowState(snowIncident.state);
+        
+        await pool.query(
+          "UPDATE requests SET status = $1, updated_at = NOW() WHERE id = $2", 
+          [updatedStatusText, id]
+        );
+      }
+    } catch (err) {
+      console.error(`ServiceNow live sync failed, retaining fallback:`, err.message);
+    }
+
+    res.json({ 
+      message: "Sync executed successfully", 
+      ticket: reqData.tracking_ticket_id, 
+      currentWorkflowStatus: updatedStatusText 
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Grafana configuration values fetch route
 app.get('/api/config/monitoring', (req, res) => {
   res.json({
-    grafanaHost: process.env.GRAFANA_URL || 'http://grafana.idp-system.svc:3000',
+    grafanaHost: process.env.GRAFANA_URL || 'http://grafana.idp-system.svc',
     defaultDashboardUid: process.env.GRAFANA_DASHBOARD_UID || 'k8s-cluster-ns-overview'
   });
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
-  console.log(`HTTP server listening on port ${PORT}`);
-  await initDbWithRetry();
-});
+app.listen(PORT, () => console.log(`IDP Backend running on port ${PORT}`));
 

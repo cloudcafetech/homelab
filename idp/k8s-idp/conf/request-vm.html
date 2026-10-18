@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDP Portal - Request VM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans antialiased text-gray-900">
+  <div class="flex min-h-screen">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-indigo-900 text-white flex flex-col shadow-xl flex-shrink-0">
+      <div class="p-5 border-b border-indigo-800 flex items-center space-x-3">
+        <i class="fa-solid fa-cubes text-2xl text-indigo-300"></i>
+        <span class="text-xl font-bold tracking-wide">IDP Core Portal</span>
+      </div>
+      <nav class="flex-1 p-4 space-y-2 text-sm font-medium">
+        <a href="/" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
+          <i class="fa-solid fa-box w-5"></i><span>IDP Dashboard Hub</span>
+        </a>
+        <a href="/request-apps" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
+          <i class="fa-solid fa-network-wired w-5"></i><span>Request Apps Namespace</span>
+        </a>
+        <a href="/request-vm" class="flex items-center space-x-3 p-3 rounded-lg bg-indigo-700 text-white transition shadow-inner">
+          <i class="fa-solid fa-desktop w-5"></i><span>Request Virtual Machine</span>
+        </a>
+        <a href="/workflow" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
+          <i class="fa-solid fa-list-check w-5"></i><span>Workflow Feed</span>
+        </a>
+        <a href="/monitoring" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
+          <i class="fa-solid fa-chart-line w-5"></i><span>Live Monitoring</span>
+        </a>
+      </nav>
+      <div class="p-4 border-t border-indigo-800 text-xs text-indigo-400 text-center">v1.4.2 &copy; Platform Team</div>
+    </aside>
+
+    <!-- Content Workspace -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      <div class="max-w-2xl mx-auto">
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-6 tracking-tight">Request KubeVirt Virtual Machine</h2>
+        
+        <form id="form-request-vm" class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Virtual Machine Hostname</label>
+            <input type="text" name="appName" required class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="e.g. rhel-replica-01">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Target KubeVirt Cluster Node</label>
+            <select name="cluster" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="Cluster Dev (On-Prem KubeVirt)">Cluster Dev (On-Prem KubeVirt)</option>
+              <option value="Cluster Stage (OpenShift Virt)">Cluster Stage (OpenShift Virt)</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">vCPU Cores</label>
+              <input type="text" name="cpu" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" value="2">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">RAM Size</label>
+              <input type="text" name="memory" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" value="4Gi">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Disk Storage Size</label>
+              <input type="text" name="storage" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" value="50Gi">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">OS Distribution Template</label>
+            <select name="vmOsImage" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="rhel-9-image">Red Hat Enterprise Linux 9</option>
+              <option value="ubuntu-22-image">Ubuntu Server 22.04 LTS</option>
+              <option value="win-22-image">Windows Server 2022</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Requester Email ID</label>
+              <input type="email" name="requesterEmail" required class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="user@company.com">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Manager Email (Approver)</label>
+              <input type="email" name="managerEmail" required class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="manager@company.com">
+            </div>
+          </div>
+          <button type="submit" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg text-sm font-semibold shadow-md active:scale-95 transition-all">Submit VM Request</button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('form-request-vm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const payload = {
+        resourceType: 'VIRTUAL_MACHINE',
+        appName: formData.get('appName'),
+        cluster: formData.get('cluster'),
+        env: 'dev',
+        cpu: formData.get('cpu'),
+        memory: formData.get('memory'),
+        storage: formData.get('storage'),
+        vmOsImage: formData.get('vmOsImage'),
+        requesterEmail: formData.get('requesterEmail'),
+        managerEmail: formData.get('managerEmail')
+      };
+
+      try {
+        const response = await fetch('/api/requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (response.ok) {
+          alert(`Success! Virtual Machine request initialized with local database tracer ID: ${result.requestId}. Pending manager confirmation.`);
+          e.target.reset();
+        } else {
+          alert(`Submission Anomaly: ${result.error}`);
+        }
+      } catch (err) {
+        alert(`Failed to execute transaction: ${err.message}`);
+      }
+    });
+  </script>
+</body>
+</html>
+

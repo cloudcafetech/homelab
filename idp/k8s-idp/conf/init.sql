@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS requests (
   id SERIAL PRIMARY KEY,
-  resource_type VARCHAR(30) NOT NULL DEFAULT 'K8S_NAMESPACE',
+  resource_type VARCHAR(30) NOT NULL DEFAULT 'K8S_NAMESPACE', -- 'K8S_NAMESPACE' or 'VIRTUAL_MACHINE'
   app_name VARCHAR(100) NOT NULL,
   env VARCHAR(20) NOT NULL DEFAULT 'dev',
   cpu VARCHAR(20) NOT NULL DEFAULT '500m',
@@ -10,12 +10,13 @@ CREATE TABLE IF NOT EXISTS requests (
   cluster VARCHAR(100) NOT NULL,
   requester_email VARCHAR(150) NOT NULL,
   manager_email VARCHAR(150) NOT NULL,
-  jira_ticket VARCHAR(50),
+  ticket_system VARCHAR(20) NOT NULL DEFAULT 'JIRA', -- 'JIRA' or 'SERVICENOW'
+  tracking_ticket_id VARCHAR(50),
   status VARCHAR(40) NOT NULL DEFAULT 'PENDING_APPROVAL',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_requests_status ON requests(status);
-CREATE INDEX IF NOT EXISTS idx_requests_cluster ON requests(cluster);
 CREATE INDEX IF NOT EXISTS idx_requests_type ON requests(resource_type);
+

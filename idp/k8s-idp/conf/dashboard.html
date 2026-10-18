@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDP Hub Portal - Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans antialiased text-gray-900">
+  <div class="flex min-h-screen">
+    
+    <!-- Sidebar Navigation Left Panel Block Layout -->
+    <aside class="w-64 bg-indigo-900 text-white flex flex-col shadow-xl flex-shrink-0">
+      <div class="p-5 border-b border-indigo-800 flex items-center space-x-3">
+        <i class="fa-solid fa-cubes text-2xl text-indigo-300"></i>
+        <span class="text-xl font-bold tracking-wide">IDP Core Portal</span>
+      </div>
+      <nav class="flex-1 p-4 space-y-2 text-sm font-medium">
+        <a href="/" class="flex items-center space-x-3 p-3 rounded-lg bg-indigo-700 text-white transition shadow-inner">
+          <i class="fa-solid fa-box w-5"></i><span>IDP Dashboard Hub</span>
+        </a>
+        <a href="/request-apps" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
+          <i class="fa-solid fa-network-wired w-5"></i><span>Request Apps Namespace</span>
+        </a>
+        <a href="/request-vm" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
+          <i class="fa-solid fa-desktop w-5"></i><span>Request Virtual Machine</span>
+        </a>
+        <a href="/workflow" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
+          <i class="fa-solid fa-list-check w-5"></i><span>Workflow Feed</span>
+        </a>
+        <a href="/monitoring" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
+          <i class="fa-solid fa-chart-line w-5"></i><span>Live Monitoring</span>
+        </a>
+      </nav>
+      <div class="p-4 border-t border-indigo-800 text-xs text-indigo-400 text-center">v1.4.2 &copy; Platform Team</div>
+    </aside>
+
+    <!-- Main Workspace Area -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      <div class="max-w-4xl mx-auto space-y-8">
+        
+        <!-- Welcome Jumbotron -->
+        <div class="bg-gradient-to-r from-indigo-800 to-blue-700 rounded-2xl shadow-lg p-8 text-white">
+          <h1 class="text-4xl font-extrabold mb-3">📦 Welcome to the IDP Dashboard Hub</h1>
+          <p class="text-indigo-100 text-lg">Internal Developer Platform for Self Service Environment Request.</p>
+        </div>
+
+        <!-- Platform Purpose Narrative Grid Card -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
+          <h2 class="text-2xl font-bold text-gray-900 border-b border-gray-100 pb-2"><i class="fa-solid fa-bullseye text-indigo-600 mr-2"></i>Purpose of this IDP Ecosystem</h2>
+          <p class="text-gray-600 leading-relaxed">
+            This platform acts as a unified automation boundary designed to eliminate operational silos within engineering workflows. By bridging cloud-native architectures directly with internal IT service structures, it fulfills three main operational goals:
+          </p>
+          <ul class="list-none space-y-3 pl-1 text-gray-600">
+            <li class="flex items-start"><i class="fa-solid fa-check-circle text-emerald-500 mt-1 mr-3 flex-shrink-0"></i><span><strong>Standardized Self-Service Provisioning:</strong> Spin up namespace sandbox environments or KubeVirt Virtual Machines (VM) using simple configurations, completely cutting out manual configuration pipelines.</span></li>
+            <li class="flex items-start"><i class="fa-solid fa-check-circle text-emerald-500 mt-1 mr-3 flex-shrink-0"></i><span><strong>Automated ServiceNow Lifecycle Hookups:</strong> Every approved cluster allocation instantly fires outbound REST queries to spawn standard operational tracking incidents automatically.</span></li>
+            <li class="flex items-start"><i class="fa-solid fa-check-circle text-emerald-500 mt-1 mr-3 flex-shrink-0"></i><span><strong>Real-Time Observability Alignments:</strong> Keep drift low by reviewing real-time ServiceNow incident workflows alongside dynamic Grafana telemetry dashboard aggregations.</span></li>
+          </ul>
+        </div>
+
+        <!-- System Escalation Support Contact Profile Panel -->
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-bold text-blue-900 mb-3"><i class="fa-solid fa-headset mr-2"></i>Platform Core Escalation Contacts</h3>
+          <p class="text-sm text-blue-800 mb-4">For any require immediate system expansion assistance, reach out directly to our platform team:</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white border border-blue-100 rounded-lg p-4 flex items-center space-x-3 shadow-inner">
+              <i class="fa-solid fa-phone text-blue-600 text-xl"></i>
+              <div>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">On Call Support</p>
+                <p class="text-base font-mono font-bold text-gray-900">+91 9830736299</p>
+              </div>
+            </div>
+            <div class="bg-white border border-blue-100 rounded-lg p-4 flex items-center space-x-3 shadow-inner">
+              <i class="fa-solid fa-envelope text-blue-600 text-xl"></i>
+              <div>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Platform Operations Mail</p>
+                <a href="mailto:abcd@gmail.com" class="text-base font-semibold text-blue-600 hover:underline">prasenforu@gmail.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+
