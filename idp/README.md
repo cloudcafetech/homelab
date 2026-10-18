@@ -1,6 +1,6 @@
 ## Internal Developer Portal
 
->create an web based application k8s based ...which will connect multiple k8s cluster and take a request for provision namespace based application hosting, manage application, deployment and monitor as well .. request goes to manager for approval then Jira ticket creation .... ticket assign to k8s operation team ... and once done mail send to requester .... all workflow requester can see in dashboard. 
+>Web Portal k8s based, which will connect multiple k8s cluster and take a request for provision namespace based application hosting, manage application, deployment and monitor as well .. request goes to manager for approval then Jira ticket creation .... ticket assign to k8s operation team ... and once done mail send to requester .... all workflow requester can see in dashboard. 
 
 - Folder structure
 
