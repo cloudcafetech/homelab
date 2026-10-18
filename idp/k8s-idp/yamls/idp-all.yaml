@@ -227,7 +227,7 @@ spec:
         - name: SNOW_USER
           value: "admin"
         - name: SNOW_PASSWORD
-          value: "4/L0G^MCwzma"
+          value: "xxxxxxxx"
         - name: GRAFANA_URL
           value: "http://192.168.0.160:30997"
           #value: "http://grafana.idp-system.svc"
