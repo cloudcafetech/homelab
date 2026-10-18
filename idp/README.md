@@ -11,10 +11,14 @@ k8s-idp/
 │   └── Dockerfile          
 ├── conf/
 │   ├── server.js           
-│   ├── index.html          
+│   ├── dashboard.html
+│   ├── request-apps.html
+│   ├── request-vm.html
+│   ├── workflow-feed.html
+│   ├── live-monitoring.html      
 │   └── init.sql            
 └── yamls/
-    └── idp-all.yaml  
+    └── idp-all.yaml 
 ```
 
 - Base Runtime Image (base-image/package.json)
@@ -74,7 +78,11 @@ metadata:
   namespace: idp-system
 binaryData:
   server.js: $(base64 -w 0 ./server.js)
-  index.html: $(base64 -w 0 ./index.html)
+  dashboard.html: $(base64 -w 0 ./dashboard.html)
+  request-apps.html: $(base64 -w 0 ./request-apps.html)
+  request-vm.html: $(base64 -w 0 ./request-vm.html)
+  workflow-feed.html: $(base64 -w 0 ./workflow-feed.html)
+  live-monitoring.html: $(base64 -w 0 ./live-monitoring.html)
 EOF
 ```
 
