@@ -13,8 +13,8 @@ k8s-idp/
 │   ├── server.js           
 │   ├── index.html          
 │   └── init.sql            
-├── yamls/
-│   └── idp-all.yaml  
+└── yamls/
+    └── idp-all.yaml  
 ```
 
 - Base Runtime Image (base-image/package.json)
