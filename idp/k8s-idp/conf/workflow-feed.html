@@ -35,7 +35,7 @@
         </a>
         <a href="/request-apps" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
           <i class="fa-solid fa-network-wired w-5"></i>
-          <span>Request Apps Namespace</span>
+          <span>Request Apps Project</span>
         </a>
         <a href="/request-vm" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
           <i class="fa-solid fa-desktop w-5"></i>
@@ -52,7 +52,7 @@
       </nav>
       
       <div class="p-4 border-t border-indigo-800 text-xs text-indigo-400 text-center">
-        v1.4.2 &copy; Internal Platform Team
+        v1.0.0 &copy; Internal Platform Team
       </div>
     </aside>
 
@@ -153,7 +153,7 @@
                   <h3 class="text-lg font-bold text-gray-900">${typeLabel}: ${req.app_name || 'unnamed'}</h3>
                 </div>
                 <p class="text-xs text-gray-500 mt-1">
-                  Target Context: <span class="font-medium text-gray-700">${contextString}</span> 
+                  Target Cluster: <span class="font-medium text-gray-700">${contextString}</span> 
                   <span class="mx-1.5 text-gray-300">|</span> 
                   Ticket Ref: <span class="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-bold">${req.tracking_ticket_id || 'NOT_ASSIGNED'}</span>
                 </p>
@@ -168,7 +168,7 @@
                   class="flex items-center space-x-1.5 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all"
                 >
                   <i class="fa-solid fa-arrows-rotate"></i>
-                  <span>Update On-Demand</span>
+                  <span>Update</span>
                 </button>
               </div>
             </div>
@@ -180,7 +180,7 @@
               </div>
               <div class="flex flex-col space-y-1">
                 <p class="text-gray-500">CPU Allocated: <span class="font-semibold text-gray-800">${req.cpu || '500m'}</span></p>
-                <p class="text-gray-500">OS Template: <span class="font-semibold text-gray-800">${req.vm_os_image || 'rhel-9-image'}</span></p>
+                <p class="text-gray-500">OS Template: <span class="font-semibold text-gray-800">${isNamespace ? '' : (req.vm_os_image || 'rhel-9-image')}</span></p>
               </div>
               <div class="flex flex-col space-y-1">
                 <p class="text-gray-500">Memory Capacity: <span class="font-semibold text-gray-800">${req.memory || '512Mi'}</span></p>

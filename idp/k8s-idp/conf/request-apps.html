@@ -21,7 +21,7 @@
           <i class="fa-solid fa-box w-5"></i><span>IDP Dashboard Hub</span>
         </a>
         <a href="/request-apps" class="flex items-center space-x-3 p-3 rounded-lg bg-indigo-700 text-white transition shadow-inner">
-          <i class="fa-solid fa-network-wired w-5"></i><span>Request Apps Namespace</span>
+          <i class="fa-solid fa-network-wired w-5"></i><span>Request Apps Project</span>
         </a>
         <a href="/request-vm" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-800 transition text-indigo-200">
           <i class="fa-solid fa-desktop w-5"></i><span>Request Virtual Machine</span>
@@ -33,21 +33,21 @@
           <i class="fa-solid fa-chart-line w-5"></i><span>Live Monitoring</span>
         </a>
       </nav>
-      <div class="p-4 border-t border-indigo-800 text-xs text-indigo-400 text-center">v1.4.2 &copy; Platform Team</div>
+      <div class="p-4 border-t border-indigo-800 text-xs text-indigo-400 text-center">v1.0.0 &copy; Platform Team</div>
     </aside>
 
     <!-- Content Workspace -->
     <main class="flex-1 p-8 overflow-y-auto">
       <div class="max-w-2xl mx-auto">
-        <h2 class="text-3xl font-extrabold text-gray-900 mb-6 tracking-tight">Request Application Namespace</h2>
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-6 tracking-tight">Request Application Project</h2>
         
         <form id="form-request-apps" class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Application Namespace Name</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Application Project Name</label>
             <input type="text" name="appName" required class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="e.g. engineering-api">
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Target Cluster Node Context</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Target Cluster</label>
             <select name="cluster" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
               <option value="Cluster Dev (On-Prem)">Cluster Dev (On-Prem)</option>
               <option value="Cluster Staging (AWS EKS)">Cluster Staging (AWS EKS)</option>
