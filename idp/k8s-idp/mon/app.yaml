@@ -26,8 +26,9 @@ spec:
         volumeMounts:
         # --- Multi-Cluster Secret ---
         - name: kubeconfig-volume
-          mountPath: /app/secrets/kubeconfig
+          mountPath: /app/secrets/kubeconfig          
           readOnly: true
+        # --- Multi-Cluster Secret ---          
         - name: code-volume
           mountPath: /app/src/server.js
           subPath: server.js
