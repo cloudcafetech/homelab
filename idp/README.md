@@ -79,6 +79,7 @@ oc get cm,po,svc,pvc -n idp-system
 ```
 
 ### Monitoring App
+
 > Goto mon folder
 
 - Create Configmap yaml
@@ -101,11 +102,11 @@ EOF
 
 ```
 kubectl create ns idp-system
-kubectl create -f brac.yaml
+kubectl create -f rbac.yaml
 ```
 
 - Get TOKEN 
-> This TOKEN, need to generate every Clusters for create KUBECONFIG file
+> Need to generate TOKEN every Clusters for create KUBECONFIG file (Chech example)
 
 ```
 kubectl get secret dashboard-admin-sa-token -n idp-system -o jsonpath='{.data.token}' | base64 --decode
