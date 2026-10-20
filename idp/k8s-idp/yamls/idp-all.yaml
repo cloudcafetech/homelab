@@ -206,7 +206,7 @@ spec:
         - name: SNOW_USER
           value: "admin"
         - name: SNOW_PASSWORD
-          value: "4/L0G^MCwzma"
+          value: "xxxxxxx"
         - name: GRAFANA_URL
           value: "http://192.168.0.160:32000"
         volumeMounts:
