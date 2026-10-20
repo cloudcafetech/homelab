@@ -20,51 +20,27 @@ k8s-idp/
 │   ├── request-vm.html
 │   ├── workflow-feed.html
 │   ├── live-monitoring.html      
-│   └── init.sql            
+│   └── init.sql
+├── mon/
+│   ├── server.js
+│   ├── browser.js      
+│   ├── index.html
+│   ├── app.yaml
+│   └── rbac.yaml        
 └── yamls/
     └── idp-all.yaml 
 ```
 
 - Base Runtime Image (base-image/package.json)
 
-```
-{
-  "name": "idp-base-runtime",
-  "version": "1.0.0",
-  "dependencies": {
-    "axios": "^1.7.0",
-    "express": "^4.19.0",
-    "nodemailer": "^6.9.13",
-    "pg": "^8.11.5"
-  }
-}
-```
-
 - Dockerfile (base-image/Dockerfile)
-
-```
-FROM node:20-alpine
-WORKDIR /app
-# Create working directory structure and ensure GID 0 write access
-RUN mkdir -p /app/src/public /app/db && \
-    chown -R 1001:0 /app && \
-    chmod -R 775 /app
-COPY package*.json ./
-RUN npm install --production && \
-    chown -R 1001:0 /app/node_modules && \
-    chmod -R 775 /app/node_modules
-# Use a non-root UID; OpenShift overrides this dynamically anyway
-USER 1001:0
-ENV NODE_PATH=/app/node_modules
-CMD ["node", "/app/src/server.js"]
-```
 
 - Build Docker 
 
 ```
-podman build -it docker.io/prasenforu/idp-base:v1 .
+podman build -it docker.io/prasenforu/idp-base:v3 .
 podman login docker.io
-podman push docker.io/prasenforu/idp-base:v1
+podman push docker.io/prasenforu/idp-base:v3
 ```
 
 - Application Source  (server.js)
@@ -101,6 +77,63 @@ oc create -f idp-all.yaml
 
 oc get cm,po,svc,pvc -n idp-system
 ```
+
+### Monitoring App
+> Goto mon folder
+
+- Create Configmap yaml
+
+```
+cat <<EOF > monitoring-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: monitoring-code
+  namespace: idp-system
+binaryData:
+  server.js: $(base64 -w 0 ./server.js)
+  browser.js: $(base64 -w 0 ./browser.js)
+  index.html: $(base64 -w 0 ./index.html)
+EOF
+```
+- Create RBAC
+> This RBAC, need to deploy every Clusters
+
+```
+kubectl create ns idp-system
+kubectl create -f brac.yaml
+```
+
+- Get TOKEN 
+> This TOKEN, need to generate every Clusters for create KUBECONFIG file
+
+```
+kubectl get secret dashboard-admin-sa-token -n idp-system -o jsonpath='{.data.token}' | base64 --decode
+```
+
+- Create kubeconfig from every cluster using each Cluster TOKEN
+
+- Merge All kubeconfig files
+
+```
+export KUBECONFIG=/path/to/first-config.yaml:/path/to/second-config.yaml
+kubectl config view --flatten > merged-config.yaml
+cp merged-config.yaml kubeconfig.yaml
+```
+
+- Create Kubeconfig secret
+
+```
+kubectl create secret generic multi-cluster-kubeconfig --from-file=config=kubeconfig.yaml -n idp-system 
+```
+
+- Create Monitoring App
+
+```
+kubectl create -f app.yaml
+```
+
+- Update Main IDP app variable GRAFANA_URL 
 
 ### Manually Create DB
 
@@ -139,6 +172,12 @@ CREATE INDEX IF NOT EXISTS idx_requests_cluster ON requests(cluster);
 oc delete statefulset postgres -n idp-system
 oc delete pvc pgdata-postgres-0 -n idp-system
 oc apply -f idp-all.yaml
+```
+
+- Restart app
+
+```
+kubectl rollout restart deployment/monitoring-dashboard -n idp-system
 ```
 
 
