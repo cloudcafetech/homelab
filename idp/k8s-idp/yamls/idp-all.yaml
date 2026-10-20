@@ -28,6 +28,20 @@ data:
     CREATE INDEX IF NOT EXISTS idx_requests_status ON requests(status);
     CREATE INDEX IF NOT EXISTS idx_requests_type ON requests(resource_type);
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cred
+  namespace: idp-system
+type: Opaque
+data:
+  # Below base64 (echo -n "original" | base64)
+  smtp-username: xxxxxxxxxxxxxx
+  smtp-password: xxxxxxxxxxxxxxx
+  db-pass: c2VjcmV0
+  snow-user: YWRtaW4=
+  snow-pass: xxxxxxxxxx
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -50,12 +64,15 @@ spec:
       - name: postgres
         image: postgres:15-alpine
         env:
+        - name: POSTGRES_DB
+          value: "idpdb"
         - name: POSTGRES_USER
           value: "postgres"
         - name: POSTGRES_PASSWORD
-          value: "secret"
-        - name: POSTGRES_DB
-          value: "idpdb"
+          valueFrom:
+            secretKeyRef:
+              name: cred
+              key: db-pass
         ports:
         - containerPort: 5432
         volumeMounts:
@@ -89,16 +106,6 @@ spec:
     app: postgres
   clusterIP: None
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: smtp-cred
-  namespace: idp-system
-type: Opaque
-data:
-  smtp-username: uuuu@gmail.com # base64 username
-  smtp-password: password # base64 password
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -131,12 +138,12 @@ spec:
         - name: MP_SMTP_RELAY_USERNAME
           valueFrom:
             secretKeyRef:
-              name: smtp-cred
+              name: cred
               key: smtp-username
         - name: MP_SMTP_RELAY_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: smtp-cred
+              name: cred
               key: smtp-password
         ports:
         - containerPort: 1025
@@ -195,8 +202,13 @@ spec:
         ports:
         - containerPort: 3000
         env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cred
+              key: db-pass
         - name: DATABASE_URL
-          value: "postgres://postgres:secret@postgres.idp-system.svc:5432/idpdb"
+          value: "postgres://postgres:$(DB_PASSWORD)@postgres.idp-system.svc:5432/idpdb"
         - name: SMTP_HOST
           value: "mail.idp-system.svc"
         - name: SMTP_PORT
@@ -204,9 +216,15 @@ spec:
         - name: SNOW_HOST
           value: "https://dev427345.service-now.com"
         - name: SNOW_USER
-          value: "admin"
+          valueFrom:
+            secretKeyRef:
+              name: cred
+              key: snow-user
         - name: SNOW_PASSWORD
-          value: "xxxxxxx"
+          valueFrom:
+            secretKeyRef:
+              name: cred
+              key: snow-pass          
         - name: GRAFANA_URL
           value: "http://192.168.0.160:32000"
         volumeMounts:
