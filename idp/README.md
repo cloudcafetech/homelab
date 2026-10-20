@@ -2,11 +2,13 @@
 
 >A self-service portal (IDP), take request for provision namespace/project or VM. Based on manager approval it will create ServiceNOW ticket. Requester can see status of ticket in portal and get on-demand update.
 
+#### Architecture
+
 <p align="center">
   <img src="https://github.com/cloudcafetech/homelab/blob/main/idp/screenshot/updated.jpg" width="676" height="580" alt="Migration Diagram">
 </p>
 
-- Folder structure
+#### Folder structure
 
 ```
 k8s-idp/
@@ -31,6 +33,8 @@ k8s-idp/
     └── idp-all.yaml 
 ```
 
+#### Image Build
+
 - Base Runtime Image (base-image/package.json)
 
 - Dockerfile (base-image/Dockerfile)
@@ -43,10 +47,7 @@ podman login docker.io
 podman push docker.io/prasenforu/idp-base:v3
 ```
 
-- Application Source  (server.js)
-> Backend (conf/server.js). Updated paths to read from /app/src and /app/db.
-
-- Dashboard Frontend (index.html)
+#### Deploy Application
 
 - Create Configmap 
 ```
@@ -66,19 +67,16 @@ binaryData:
 EOF
 ```
 
-- Deploy all in one yaml
-
+- Create NS, Deploy Configmap and all in one yaml
 ```
 oc create ns idp-system
-
 oc create -f configmap.yaml
-
 oc create -f idp-all.yaml
 
 oc get cm,po,svc,pvc -n idp-system
 ```
 
-### Monitoring App
+#### Monitoring App
 
 > Goto mon folder
 
@@ -136,7 +134,7 @@ kubectl create -f app.yaml
 
 - Update Main IDP app variable GRAFANA_URL 
 
-### Manually Create DB
+#### Ops
 
 - Connect and create the database
 
