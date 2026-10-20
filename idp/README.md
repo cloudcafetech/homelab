@@ -106,7 +106,7 @@ kubectl create -f rbac.yaml
 ```
 
 - Get TOKEN 
-> Need to generate TOKEN every Clusters for create KUBECONFIG file (Chech example)
+> Need to generate TOKEN every Clusters for create kubeconfig file (Check example)
 
 ```
 kubectl get secret dashboard-admin-sa-token -n idp-system -o jsonpath='{.data.token}' | base64 --decode
