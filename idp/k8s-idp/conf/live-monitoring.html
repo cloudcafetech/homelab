@@ -63,7 +63,7 @@
         const config = await response.json();
         
         // Assemble target integration endpoint string
-        const targetIframeUrl = `${config.grafanaHost}/d/${config.defaultDashboardUid}?orgId=1&refresh=5s&kiosk=tv`;
+        const targetIframeUrl = `${config.grafanaHost}`;
         
         iframe.src = targetIframeUrl;
         

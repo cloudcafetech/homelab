@@ -53,6 +53,7 @@ app.get('/workflow', (req, res) => {
   res.sendFile(path.join(__dirname, 'workflow-feed.html'));
 });
 
+// 🚀 FIXED: Reverted back to clean static file routing to avoid losing the sidebar structure
 app.get('/monitoring', (req, res) => {
   res.sendFile(path.join(__dirname, 'live-monitoring.html'));
 });
@@ -116,8 +117,8 @@ ${appBaseUrl}/api/approve/${requestId}`;
 app.get('/api/approve/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query("UPDATE requests SET status = 'APPROVED', updated_at = NOW() WHERE id = $1", [id]);
-    const resultRows = await pool.query("SELECT * FROM requests WHERE id = $1", [id]);
+    await pool.query("UPDATE requests SET status = 'APPROVED', updated_at = NOW() WHERE id = \$1", [id]);
+    const resultRows = await pool.query("SELECT * FROM requests WHERE id = \$1", [id]);
     const reqData = resultRows.rows[0];
 
     let ticketId = `MOCK-SNOW-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -149,7 +150,7 @@ app.get('/api/approve/:id', async (req, res) => {
     }
 
     await pool.query(
-      "UPDATE requests SET status = 'TICKET_CREATED', tracking_ticket_id = $2, updated_at = NOW() WHERE id = $1",
+      "UPDATE requests SET status = 'TICKET_CREATED', tracking_ticket_id = \$2, updated_at = NOW() WHERE id = \$1",
       [id, ticketId]
     );
 
@@ -197,7 +198,7 @@ app.get('/api/requests', async (req, res) => {
 app.post('/api/requests/:id/sync', async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await pool.query("SELECT * FROM requests WHERE id = $1", [id]);
+    const result = await pool.query("SELECT * FROM requests WHERE id = \$1", [id]);
     const reqData = result.rows[0];
     if (!reqData || !reqData.tracking_ticket_id) {
       return res.status(400).json({ error: "Ticket reference trace details missing from target row" });
@@ -220,11 +221,10 @@ app.post('/api/requests/:id/sync', async (req, res) => {
 
       if (snowRes.data && snowRes.data.result && snowRes.data.result.length > 0) {
         const snowIncident = snowRes.data.result[0];
-        // Translate the dynamic numeric state directly to text labels via the helper function
         updatedStatusText = mapSnowState(snowIncident.state);
         
         await pool.query(
-          "UPDATE requests SET status = $1, updated_at = NOW() WHERE id = $2", 
+          "UPDATE requests SET status = \$1, updated_at = NOW() WHERE id = \$2", 
           [updatedStatusText, id]
         );
       }
@@ -242,11 +242,13 @@ app.post('/api/requests/:id/sync', async (req, res) => {
   }
 });
 
-// Grafana configuration values fetch route
+// 🚀 REGENERATED: Dynamic tracking routing configuration endpoint mapped cleanly to Environment Variables
 app.get('/api/config/monitoring', (req, res) => {
   res.json({
-    grafanaHost: process.env.GRAFANA_URL || 'http://grafana.idp-system.svc',
-    defaultDashboardUid: process.env.GRAFANA_DASHBOARD_UID || 'k8s-cluster-ns-overview'
+    // Leverages DASHBOARD_URL environment variable from deployment or falls back cleanly
+    //grafanaHost: process.env.GRAFANA_URL || 'http://192.168.0.160:32000',
+    grafanaHost: process.env.GRAFANA_URL || 'http://idp-monitoring-dashboard-svc.idp-system.svc',
+    defaultDashboardUid: 'k8s-monitoring-dashboard'
   });
 });
 
