@@ -12,7 +12,7 @@ const connectionString = process.env.DATABASE_URL || 'postgres://postgres:secret
 const pool = new Pool({ connectionString });
 
 const mailer = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'mailhog.idp-system.svc',
+  host: process.env.SMTP_HOST || 'mail.idp-system.svc',
   port: parseInt(process.env.SMTP_PORT || '1025', 10)
 });
 
