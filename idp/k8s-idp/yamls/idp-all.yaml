@@ -198,14 +198,16 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
-        fsGroup: 0
+        #fsGroup: 0
+      serviceAccountName: idp-backend-sa
       containers:
       - name: orchestrator
-        image: docker.io/prasenforu/idp-base:v1
+        image: docker.io/prasenforu/idp-base:v3
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
             drop: ["ALL"]
+          runAsUser: 10001 
         ports:
         - containerPort: 3000
         env:
@@ -215,24 +217,14 @@ spec:
           value: "mailhog.idp-system.svc"
         - name: SMTP_PORT
           value: "1025"
-        # Core configuration secrets for integration platforms
-        - name: JIRA_HOST
-          value: "https://atlassian.net"
-        - name: JIRA_USER
-          value: "jira-automation-service-account@company.com"
-        - name: JIRA_TOKEN
-          value: "your-jira-api-token"
         - name: SNOW_HOST
           value: "https://dev427345.service-now.com"
         - name: SNOW_USER
           value: "admin"
         - name: SNOW_PASSWORD
-          value: "xxxxxxxx"
+          value: "4/L0G^MCwzma"
         - name: GRAFANA_URL
-          value: "http://192.168.0.160:30997"
-          #value: "http://grafana.idp-system.svc"
-        - name: GRAFANA_DASHBOARD_UID
-          value: "k8s-cluster-ns-overview"
+          value: "http://192.168.0.160:32000"
         volumeMounts:
         - name: src-volume
           mountPath: /app/src
@@ -265,11 +257,10 @@ kind: Ingress
 metadata:
   name: idp-ingress
   namespace: idp-system
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
 spec:
+  ingressClassName: nginx
   rules:
-  - host: idp.internal.dev
+  - host: idp-internal.apps.192.168.0.160.nip.io
     http:
       paths:
       - path: /
