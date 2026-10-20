@@ -8,39 +8,54 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static('/app/src/public')); // Serves index.html and browser.js
 
-// 2. Initialize KubeConfig parsing patterns
-const kc = new KubeConfig();
-if (process.env.KUBECONFIG) {
-    kc.loadFromFile(process.env.KUBECONFIG);
-} else {
-    kc.loadFromDefault();
-}
+// 2. Cache the Kubeconfig file path or load it dynamically to prevent race conditions
+const KUBECONFIG_PATH = process.env.KUBECONFIG;
 
-// 3. Helper engine to swap or fallback cluster context frames securely
+// 3. Helper engine to generate an isolated client instance per request frame
 function getClientsForCluster(contextName) {
     console.log(`[Dashboard Backend] Client requested context lookup for: "${contextName}"`);
+    
+    // Create a local, independent KubeConfig instance to avoid global state mutation issues
+    const requestKc = new KubeConfig();
     try {
-        const availableContexts = kc.getContexts().map(ctx => ctx.name);
+        if (KUBECONFIG_PATH) {
+            requestKc.loadFromFile(KUBECONFIG_PATH);
+        } else {
+            requestKc.loadFromDefault();
+        }
+
+        const availableContexts = requestKc.getContexts().map(ctx => ctx.name);
         
         if (contextName && availableContexts.includes(contextName)) {
-            kc.setCurrentContext(contextName);
+            requestKc.setCurrentContext(contextName);
         } else {
-            const activeCtx = kc.getCurrentContext();
+            const activeCtx = requestKc.getCurrentContext();
             console.log(`[Dashboard Backend] Context "${contextName}" not found. Falling back to active file context: "${activeCtx}"`);
-            kc.setCurrentContext(activeCtx);
+            requestKc.setCurrentContext(activeCtx);
         }
     } catch (e) {
         console.error("[Dashboard Backend] Warning during context selection switch:", e.message);
-        kc.setCurrentContext(kc.getCurrentContext());
+        // Attempt a graceful fallback on failure using standard configuration defaults
+        try {
+            if (KUBECONFIG_PATH) requestKc.loadFromFile(KUBECONFIG_PATH);
+            else requestKc.loadFromDefault();
+        } catch (innerErr) {
+            console.error("[Dashboard Backend] Critical configuration recovery failure:", innerErr.message);
+        }
     }
-    return { customObjects: kc.makeApiClient(CustomObjectsApi) };
+    return { customObjects: requestKc.makeApiClient(CustomObjectsApi) };
 }
 
 // --- Express API Routes ---
 
 app.get('/api/clusters', (req, res) => {
     try {
-        const clusterNames = kc.getContexts().map(ctx => ctx.name);
+        // Create an ephemeral instance just to scan the context inventory reliably
+        const bootKc = new KubeConfig();
+        if (KUBECONFIG_PATH) bootKc.loadFromFile(KUBECONFIG_PATH);
+        else bootKc.loadFromDefault();
+        
+        const clusterNames = bootKc.getContexts().map(ctx => ctx.name);
         res.json(clusterNames);
     } catch (error) {
         console.error('[Dashboard Backend] Failed to fetch contexts:', error.message);
@@ -61,7 +76,6 @@ app.get('/api/metrics/nodes', async (req, res) => {
             name: ''
         });
         
-        // Fix: Checks response.items directly first, then falls back to response.body.items
         const items = response.items || (response.body && response.body.items) || [];
         res.json(items);
     } catch (error) {
@@ -94,7 +108,6 @@ app.get('/api/metrics/pods', async (req, res) => {
             });
         }
         
-        // Fix: Checks response.items directly first, then falls back to response.body.items
         const items = response.items || (response.body && response.body.items) || [];
         res.json(items);
     } catch (error) {

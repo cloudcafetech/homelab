@@ -13,6 +13,10 @@ spec:
       labels:
         app: monitoring-dashboard
     spec:
+      #hostAliases:
+      #- ip: "192.168.0.125"
+      #  hostnames:
+      #  - "api.sno-bm1.pkar.tech"
       containers:
       - name: dashboard
         image: docker.io/prasenforu/idp-base:v3
@@ -26,9 +30,9 @@ spec:
         volumeMounts:
         # --- Multi-Cluster Secret ---
         - name: kubeconfig-volume
-          mountPath: /app/secrets/kubeconfig          
+          mountPath: /app/secrets/kubeconfig
           readOnly: true
-        # --- Multi-Cluster Secret ---          
+        # --- Multi-Cluster Secret ---
         - name: code-volume
           mountPath: /app/src/server.js
           subPath: server.js
