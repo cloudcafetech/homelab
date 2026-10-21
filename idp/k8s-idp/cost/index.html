@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cost Allocation Dashboard</title>
+  <style>
+    body { background-color: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header { margin-bottom: 30px; }
+    h1 { color: #ffffff; margin: 0 0 5px 0; font-size: 28px; font-weight: 800; }
+    .toolbar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid #30363d; margin-bottom: 25px; align-items: flex-end; }
+    .toolbar label { display: block; font-size: 11px; color: #8b949e; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; }
+    select, input { width: 100%; padding: 8px 12px; background: #21262d; border: 1px solid #30363d; border-radius: 6px; color: #ffffff; box-sizing: border-box; font-size: 14px; }
+    .btn-sync { width: 100%; padding: 9px; background: #238636; border: none; border-radius: 6px; color: #ffffff; font-weight: bold; cursor: pointer; font-size: 14px; }
+    .btn-sync:hover { background: #2ea043; }
+    .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; }
+    .card .title { font-size: 11px; color: #8b949e; text-transform: uppercase; }
+    .card .value { font-size: 26px; font-weight: 800; color: #ffffff; margin-top: 6px; display: block; }
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; margin-bottom: 25px; }
+    .chart-box { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; height: 340px; display: flex; flex-direction: column; }
+    .chart-box h3 { margin: 0 0 15px 0; font-size: 12px; color: #8b949e; text-transform: uppercase; }
+    .chart-container { flex: 1; position: relative; width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: space-around; border-bottom: 2px solid #30363d; padding-top: 20px; }
+    .bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; margin: 0 8px; height: 100%; justify-content: flex-end; position: relative; }
+    .bar-fill-total { width: 100%; max-width: 45px; background: #58a6ff; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s; position: relative; }
+    .bar-fill-stacked { width: 100%; max-width: 45px; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; border-radius: 4px 4px 0 0; overflow: hidden; }
+    .stack-cpu { background: #f85149; width: 100%; }
+    .stack-ram { background: #56d364; width: 100%; }
+    .stack-storage { background: #e3b341; width: 100%; }
+    .bar-label { font-size: 10px; color: #8b949e; margin-top: 8px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75px; }
+    .table-box { background: #161b22; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+    .table-title { padding: 15px 20px; background: #21262d; font-size: 13px; font-weight: 600; color: #c9d1d9; border-bottom: 1px solid #30363d; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+    th, td { padding: 14px 20px; font-size: 14px; border-bottom: 1px solid #30363d; }
+    th { background: #161b22; color: #8b949e; text-transform: uppercase; font-size: 11px; }
+    tr:hover { background: rgba(48, 54, 61, 0.25); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Cost Allocation Dashboard</h1>
+      <div style="font-size: 14px; color: #8b949e; margin-top: 4px;">Real-time cloud infrastructure and container cost allocator</div>
+    </header>
+    <div class="toolbar">
+      <div><label>Duration Horizon</label><select id="daysSelector"><option value="7">Last 7 Days</option><option value="30" selected>Last 30 Days</option><option value="60">Last 60 Days</option><option value="90">Last 90 Days</option></select></div>
+      <div><label>Target Cluster</label><select id="clusterSelector"><option value="">All Managed Clusters</option></select></div>
+      <div><label>Filter Object / Namespace</label><input type="text" id="nsFilter" placeholder="e.g. production"></div>
+      <div><label>Aggregate By</label><select id="aggregateSelector"><option value="namespace" selected>Namespace</option><option value="controller">Controller</option><option value="pod">Pod</option></select></div>
+      <div><button onclick="syncData()" class="btn-sync">🔄 Sync Data</button></div>
+    </div>
+    <div class="kpi-container">
+      <div class="card"><span class="title">Total Cluster Cost (Window)</span><span id="kpiTotalCost" class="value">$0.00</span></div>
+      <div class="card"><span class="title">Total Idle Cost Shared</span><span id="kpiIdleCost" class="value" style="color: #d97706;">$0.00</span></div>
+      <div class="card"><span class="title">Primary Cost Driver</span><span id="kpiDriver" class="value" style="color: #58a6ff; font-size: 16px;">N/A</span></div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-box"><h3>Cost Distribution Breakdowns</h3><div id="distributionContainer" class="chart-container"></div></div>
+      <div class="chart-box"><h3>Granular Cost Components</h3><div id="componentsContainer" class="chart-container"></div></div>
+    </div>
+    <div class="table-box">
+      <div class="table-title">Itemised Cost Ledger</div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead><tr><th>Cluster Target</th><th>Resource Object</th><th>CPU Cost</th><th>RAM Cost</th><th>Storage Cost</th><th style="text-align: right; color: #58a6ff;">Total Cost</th></tr></thead>
+          <tbody id="tableBody"><tr><td colspan="6" style="padding: 30px; text-align: center; color: #8b949e;">Awaiting synchronization initialization...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script>
+    async function syncData() {
+      try {
+        const response = await fetch('./api/costs?days=' + document.getElementById('daysSelector').value + '&cluster=' + document.getElementById('clusterSelector').value + '&namespace=' + document.getElementById('nsFilter').value + '&aggregate=' + document.getElementById('aggregateSelector').value);
+        const result = await response.json();
+        updateClusterOptions(result.clusters);
+        renderDashboard(result.data, result.idleCost);
+      } catch (err) {
+        alert("Frontend Synchronization Error: " + err.message);
+      }
+    }
+    function updateClusterOptions(clusters) {
+      const select = document.getElementById('clusterSelector');
+      const saved = select.value;
+      select.innerHTML = '<option value="">All Managed Clusters</option>';
+      if (clusters) {
+        clusters.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c; opt.textContent = c;
+          if (c === saved) opt.selected = true;
+          select.appendChild(opt);
+        });
+      }
+    }
+    function renderDashboard(data, idleCost) {
+      const tableBody = document.getElementById('tableBody');
+      const distContainer = document.getElementById('distributionContainer');
+      const compContainer = document.getElementById('componentsContainer');
+      tableBody.innerHTML = ''; distContainer.innerHTML = ''; compContainer.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="padding:30px; text-align:center; color:#8b949e;">No cost allocations found under parameter constraints.</td></tr>';
+        return;
+      }
+
+      let netCost = 0, driverName = 'N/A', topCost = 0;
+      data.forEach(item => {
+        netCost += item.totalCost;
+        if (item.totalCost > topCost) { topCost = item.totalCost; driverName = item.cluster + '/' + item.resourceObject; }
+      });
+
+      document.getElementById('kpiTotalCost').textContent = '$' + netCost.toFixed(2);
+      document.getElementById('kpiIdleCost').textContent = '$' + idleCost.toFixed(2);
+      document.getElementById('kpiDriver').textContent = driverName;
+
+      data.slice(0, 8).forEach(item => {
+        const percentageTotal = topCost > 0 ? (item.totalCost / topCost) * 100 : 0;
+        distContainer.insertAdjacentHTML('beforeend', '<div class="bar-wrapper"><div class="bar-fill-total" style="height: ' + Math.max(percentageTotal, 6) + '%;"></div><div class="bar-label">' + item.resourceObject + '</div></div>');
+        compContainer.insertAdjacentHTML('beforeend', '<div class="bar-wrapper" style="height:100%;"><div class="bar-fill-stacked" style="height: ' + Math.max(percentageTotal, 6) + '%;"><div class="stack-storage" style="height:'+(item.storageCost/item.totalCost*100)+'%;"></div><div class="stack-ram" style="height:'+(item.ramCost/item.totalCost*100)+'%;"></div><div class="stack-cpu" style="height:'+(item.cpuCost/item.totalCost*100)+'%;"></div></div><div class="bar-label">' + item.resourceObject + '</div></div>');
+      });
+
+      data.forEach(item => {
+        tableBody.insertAdjacentHTML('beforeend', '<tr><td style="color:#8b949e;">'+item.cluster+'</td><td style="font-weight:bold;color:#fff;">'+item.resourceObject+'</td><td>$'+item.cpuCost.toFixed(2)+'</td><td>$'+item.ramCost.toFixed(2)+'</td><td>$'+item.storageCost.toFixed(2)+'</td><td style="text-align:right;font-weight:bold;color:#58a6ff;">$'+item.totalCost.toFixed(2)+'</td></tr>');
+      });
+    }
+    window.onload = () => syncData();
+  </script>
+</body>
+</html>
+

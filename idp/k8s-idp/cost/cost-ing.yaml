@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cost-ingress
+  namespace: opencost
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: cost-kind.apps.192.168.0.159.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: opencost
+            port:
+              number: 9003
+              #number: 9090
