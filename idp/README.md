@@ -28,7 +28,11 @@ k8s-idp/
 │   ├── browser.js      
 │   ├── index.html
 │   ├── app.yaml
-│   └── rbac.yaml        
+│   └── rbac.yaml
+├── cost/
+│   ├── server.js     
+│   ├── index.html
+│   └── cost-app.yaml      
 └── yamls/
     └── idp-all.yaml 
 ```
@@ -133,7 +137,67 @@ kubectl create secret generic multi-cluster-kubeconfig --from-file=config=kubeco
 kubectl create -f app.yaml
 ```
 
-- Update Main IDP app variable GRAFANA_URL 
+- Update Main IDP app variable GRAFANA_URL
+
+#### Cost App
+
+- Prometheus 
+> Install in every Cluster 
+
+```
+helm install prometheus --repo https://prometheus-community.github.io/helm-charts prometheus \
+  --namespace prometheus-system --create-namespace \
+  --set prometheus-pushgateway.enabled=false \
+  --set alertmanager.enabled=false \
+  -f https://raw.githubusercontent.com/opencost/opencost/develop/kubernetes/prometheus/extraScrapeConfigs.yaml
+```
+
+- Opencost
+> Install in every Cluster. [Integrate existing Prometheus](https://opencost.io/docs/integrations/prometheus) 
+
+```
+kubectl create namespace opencost
+
+cat <<EOF > local.yaml
+opencost:
+  customPricing:
+    enabled: true
+    costModel:
+      description: Modified prices based on your internal pricing
+      CPU: 1.25
+      RAM: 0.50
+      storage: 0.25
+EOF
+
+helm install opencost --repo https://opencost.github.io/opencost-helm-chart opencost --namespace opencost -f local.yaml
+```
+
+- Expose opencost server with Nodeport or deploy Ingress
+> Install in every Cluster
+
+- Create Cost Configmap
+>go to cost folder
+
+```
+cat <<EOF > cost-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cost-code
+  namespace: idp-system
+binaryData:
+  server.js: $(base64 -w 0 ./server.js)
+  index.html: $(base64 -w 0 ./index.html)
+EOF
+```
+- Deploy Cost App
+> Deploy in Central (Management) Cluster 
+
+```
+kubectl create -f cost-configmap.yaml
+kubectl create -f app.yaml
+```
+- Update Main IDP app variable COST_URL
 
 #### Ops
 
