@@ -5,7 +5,7 @@
 #### Architecture
 
 <p align="center">
-  <img src="https://github.com/cloudcafetech/homelab/blob/main/idp/screenshot/updated.jpg" width="676" height="580" alt="Migration Diagram">
+  <img src="https://github.com/cloudcafetech/homelab/blob/main/idp/screenshot/arc.jpg" width="676" height="580" alt="Migration Diagram">
 </p>
 
 #### Folder structure
