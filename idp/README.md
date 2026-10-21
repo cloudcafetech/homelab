@@ -77,6 +77,7 @@ oc get cm,po,svc,pvc -n idp-system
 ```
 
 #### Monitoring App
+This Monitoring only fetch data from cluster metric-server, make sure metric server install, or deploy (```kubectl apply -f https://raw.githubusercontent.com/cloudcafetech/homelab/refs/heads/main/idp/k8s-idp/mon/metric.yaml```)
 
 > Goto mon folder
 
