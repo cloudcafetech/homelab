@@ -58,6 +58,11 @@ app.get('/monitoring', (req, res) => {
   res.sendFile(path.join(__dirname, 'live-monitoring.html'));
 });
 
+//Cost
+app.get('/cost-allocation', (req, res) => {
+  res.sendFile(path.join(__dirname, 'cost-allocation.html'));
+});
+
 // App Entry Point: Creation of Infrastructure Request
 app.post('/api/requests', async (req, res) => {
   const {
@@ -247,8 +252,16 @@ app.get('/api/config/monitoring', (req, res) => {
   res.json({
     // Leverages DASHBOARD_URL environment variable from deployment or falls back cleanly
     //grafanaHost: process.env.GRAFANA_URL || 'http://192.168.0.160:32000',
-    grafanaHost: process.env.GRAFANA_URL || 'http://idp-monitoring-dashboard-svc.idp-system.svc',
+    grafanaHost: process.env.GRAFANA_URL || 'http://monitoring-dashboard.idp-system.svc',
     defaultDashboardUid: 'k8s-monitoring-dashboard'
+  });
+});
+
+// For cost
+app.get('/api/config/cost', (req, res) => {
+  res.json({
+    // Leverages COST_URL environment variable from deployment or falls back cleanly
+    costUrl: process.env.COST_URL || 'http://cost.idp-system.svc'
   });
 });
 
