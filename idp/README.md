@@ -68,6 +68,7 @@ binaryData:
   request-vm.html: $(base64 -w 0 ./request-vm.html)
   workflow-feed.html: $(base64 -w 0 ./workflow-feed.html)
   live-monitoring.html: $(base64 -w 0 ./live-monitoring.html)
+  cost-allocation.html: $(base64 -w 0 ./cost-allocation.html)
 EOF
 ```
 
