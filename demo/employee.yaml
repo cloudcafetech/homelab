@@ -34,13 +34,16 @@ metadata:
   name: myemp
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: myemp
   template:
     metadata:
       labels:
         name: myemp
     spec:
       containers:
-      - name: myemp-dc-pod
+      - name: myemp
         image: prasenforu/employee
         ports:
         - containerPort: 8888
