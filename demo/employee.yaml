@@ -77,4 +77,4 @@ spec:
     targetPort: 8888
   selector:
     name: myemp
-  type: LoadBalancer
+  type: NodePort
