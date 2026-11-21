@@ -144,11 +144,7 @@ spec:
             name: frontend-config
         volumeMounts:
         - name: shared-code
-          mountPath: /app/src/server.js
-          subPath: frontend-server.js
-        - name: shared-code
-          mountPath: /app/src/public/index.html
-          subPath: index.html
+          mountPath: /app/src
       volumes:
       - name: shared-code
         configMap:
