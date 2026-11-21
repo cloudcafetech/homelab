@@ -55,8 +55,8 @@ spec:
               key: DB_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
-            configMapKeyRef:
-              name: app-db-config
+            secretKeyRef:
+              name: app-db-secre
               key: DB_PASSWORD
         volumeMounts:
         - name: postgres-data
@@ -95,14 +95,16 @@ spec:
         envFrom:
         - configMapRef:
             name: app-db-config
+        - secretRef: 
+            name: app-db-secret            
         volumeMounts:
         - name: shared-code
           mountPath: /app/src/server.js
           subPath: backend-server.js
       volumes:
-        - name: shared-code
-          configMap:
-            name: app-source-code
+      - name: shared-code
+        configMap:
+          name: app-source-code
 ---
 apiVersion: v1
 kind: Service
