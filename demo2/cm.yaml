@@ -1,0 +1,285 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-source-code
+data:
+  backend-server.js: |
+    const express = require('express');
+    const { Pool } = require('pg');
+
+    const app = express();
+    app.use(express.json());
+
+    const pool = new Pool({
+      host: process.env.DB_HOST || 'pg-svc',
+      port: process.env.DB_PORT || 5432,
+      database: process.env.DB_NAME || 'userdb',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || 'postgres123',
+    });
+
+    // --- 1. REPLACE OLD initDB WITH THESE TWO FUNCTIONS ---
+    const ensureTable = async () => {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS users (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(100) NOT NULL,
+          age INT NOT NULL,
+          sex VARCHAR(20) NOT NULL,
+          mobile_number VARCHAR(20) UNIQUE NOT NULL
+        );
+      `);
+    };
+
+    const initDBWithRetry = async () => {
+      while (true) {
+        try {
+          await ensureTable();
+          console.log('Database connected and users table ready');
+          break;
+        } catch (err) {
+          console.error('Waiting for DB...', err.message);
+          await new Promise(res => setTimeout(res, 3000));
+        }
+      }
+    };
+    initDBWithRetry();
+    // -----------------------------------------------------
+
+    app.post('/api/users', async (req, res) => {
+      const { name, age, sex, mobile_number } = req.body;
+      try {
+        await ensureTable(); // <-- 2. ADD THIS LINE TO EACH ROUTE
+        const result = await pool.query(
+          'INSERT INTO users (name, age, sex, mobile_number) VALUES ($1, $2, $3, $4) RETURNING *',
+          [name, age, sex, mobile_number]
+        );
+        res.status(201).json(result.rows);
+      } catch (err) {
+        res.status(400).json({ error: err.message });
+      }
+    });
+
+    app.get('/api/users', async (req, res) => {
+      const { query } = req.query;
+      try {
+        await ensureTable(); // <-- 2. ADD THIS LINE
+        const result = query
+          ? await pool.query('SELECT * FROM users WHERE mobile_number ILIKE $1 OR name ILIKE $1', [`%${query}%`])
+          : await pool.query('SELECT * FROM users ORDER BY id DESC');
+        res.json(result.rows);
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    });
+
+    app.put('/api/users/:mobile', async (req, res) => {
+      const { mobile } = req.params;
+      const { name, age, sex } = req.body;
+      try {
+        await ensureTable(); // <-- 2. ADD THIS LINE
+        const result = await pool.query(
+          'UPDATE users SET name = $1, age = $2, sex = $3 WHERE mobile_number = $4 RETURNING *',
+          [name, age, sex, mobile]
+        );
+        if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+        res.json(result.rows);
+      } catch (err) {
+        res.status(400).json({ error: err.message });
+      }
+    });
+
+    app.delete('/api/users/:mobile', async (req, res) => {
+      const { mobile } = req.params;
+      try {
+        await ensureTable(); // <-- 2. ADD THIS LINE
+        const result = await pool.query('DELETE FROM users WHERE mobile_number = $1 RETURNING *', [mobile]);
+        if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+        res.json({ message: 'Deleted successfully' });
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    });
+
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+
+  frontend-server.js: |
+    const express = require('express');
+    const axios = require('axios');
+    const path = require('path');
+
+    const app = express();
+    app.use(express.json());
+
+    const BACKEND_URL = process.env.BACKEND_API_URL || 'http://be-svc:5000';
+
+    app.use('/api', async (req, res) => {
+      try {
+        const response = await axios({
+          method: req.method,
+          url: `${BACKEND_URL}${req.originalUrl}`,
+          data: req.body,
+        });
+        res.status(response.status).json(response.data);
+      } catch (err) {
+        const status = err.response ? err.response.status : 500;
+        const data = err.response ? err.response.data : { error: err.message };
+        res.status(status).json(data);
+      }
+    });
+
+    app.use(express.static(path.join(__dirname, 'public')));
+
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`Frontend running on port ${PORT}`));
+
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>User Management Dashboard</title>
+      <style>
+        * { box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { margin: 0; display: flex; height: 100vh; background: #f4f6f9; }
+        .sidebar { width: 220px; background: #1e293b; color: white; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .sidebar h2 { font-size: 18px; margin-bottom: 20px; text-align: center; }
+        .sidebar button {
+          padding: 12px; border: none; border-radius: 6px; background: #334155;
+          color: white; font-size: 15px; cursor: pointer; text-align: left;
+        }
+        .sidebar button:hover, .sidebar button.active { background: #2563eb; }
+        .main { flex: 1; padding: 40px; }
+        .card { background: white; padding: 25px; border-radius: 8px; max-width: 500px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .hidden { display: none; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #cbd5e1; border-radius: 4px; }
+        button.submit { background: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; }
+      </style>
+    </head>
+    <body>
+      <div class="sidebar">
+        <h2>Dashboard</h2>
+        <button class="active" onclick="showTab('new', this)">➕ New</button>
+        <button onclick="showTab('update', this)">✏️ Update</button>
+        <button onclick="showTab('search', this)">🔍 Search</button>
+        <button onclick="showTab('delete', this)">🗑️ Delete</button>
+      </div>
+
+      <div class="main">
+        <div id="new" class="card">
+          <h3>Add New Record</h3>
+          <input id="n_name" placeholder="Full Name" required />
+          <input id="n_age" type="number" placeholder="Age" required />
+          <select id="n_sex">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <input id="n_mobile" placeholder="Mobile Number" required />
+          <button class="submit" onclick="createUser()">Save Record</button>
+        </div>
+
+        <div id="update" class="card hidden">
+          <h3>Update Record (by Mobile Number)</h3>
+          <input id="u_mobile" placeholder="Existing Mobile Number" required />
+          <input id="u_name" placeholder="New Name" required />
+          <input id="u_age" type="number" placeholder="New Age" required />
+          <select id="u_sex">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <button class="submit" onclick="updateUser()">Update Record</button>
+        </div>
+
+        <div id="search" class="card hidden" style="max-width: 700px;">
+          <h3>Search Records</h3>
+          <input id="s_query" placeholder="Enter Name or Mobile (leave blank for all)" />
+          <button class="submit" onclick="searchUsers()">Search</button>
+          <table>
+            <thead><tr><th>Name</th><th>Age</th><th>Sex</th><th>Mobile</th></tr></thead>
+            <tbody id="results"></tbody>
+          </table>
+        </div>
+
+        <div id="delete" class="card hidden">
+          <h3>Delete Record</h3>
+          <input id="d_mobile" placeholder="Mobile Number to Delete" required />
+          <button class="submit" style="background:#dc2626;" onclick="deleteUser()">Delete Record</button>
+        </div>
+      </div>
+
+      <script>
+        function showTab(tabId, btn) {
+          document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+          document.getElementById(tabId).classList.remove('hidden');
+          document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        }
+
+        async function createUser() {
+          const res = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: document.getElementById('n_name').value,
+              age: document.getElementById('n_age').value,
+              sex: document.getElementById('n_sex').value,
+              mobile_number: document.getElementById('n_mobile').value
+            })
+          });
+          alert(res.ok ? 'Saved successfully!' : 'Error saving record');
+        }
+
+        async function updateUser() {
+          const mobile = document.getElementById('u_mobile').value;
+          const res = await fetch(`/api/users/${mobile}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: document.getElementById('u_name').value,
+              age: document.getElementById('u_age').value,
+              sex: document.getElementById('u_sex').value
+            })
+          });
+          alert(res.ok ? 'Updated successfully!' : 'User not found');
+        }
+
+        async function searchUsers() {
+          const q = document.getElementById('s_query').value;
+          const res = await fetch(`/api/users?query=${encodeURIComponent(q)}`);
+          const data = await res.json();
+          document.getElementById('results').innerHTML = data.map(u =>
+            `<tr><td>${u.name}</td><td>${u.age}</td><td>${u.sex}</td><td>${u.mobile_number}</td></tr>`
+          ).join('');
+        }
+
+        async function deleteUser() {
+          const mobile = document.getElementById('d_mobile').value;
+          const res = await fetch(`/api/users/${mobile}`, { method: 'DELETE' });
+          alert(res.ok ? 'Deleted successfully!' : 'User not found');
+        }
+      </script>
+    </body>
+    </html>
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-db-config
+data:
+  DB_HOST: pg-svc
+  DB_PORT: "5432"
+  DB_NAME: userdb
+  DB_USER: postgres
+  DB_PASSWORD: postgres123
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+data:
+  BACKEND_API_URL: http://be-svc:5000
