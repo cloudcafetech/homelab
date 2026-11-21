@@ -1,0 +1,165 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-svc
+spec:
+  clusterIP: None
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-db
+spec:
+  serviceName: pg-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        args:
+        - "-c"
+        - "shared_buffers=16MB"
+        - "-c"
+        - "work_mem=2MB"
+        - "-c"
+        - "max_connections=20"
+        resources:
+          requests: { cpu: "50m", memory: "64Mi" }
+          limits: { cpu: "200m", memory: "128Mi" }
+        ports:
+        - containerPort: 5432
+        env:
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: app-db-config
+              key: DB_NAME
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-db-config
+              key: DB_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: app-db-config
+              key: DB_PASSWORD
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: docker.io/prasenforu/idp-base:v3
+        resources:
+          requests: { cpu: "50m", memory: "64Mi" }
+          limits: { cpu: "250m", memory: "128Mi" }
+        ports:
+        - containerPort: 5000
+        envFrom:
+        - configMapRef:
+            name: app-db-config
+        volumeMounts:
+        - name: shared-code
+          mountPath: /app/src/server.js
+          subPath: backend-server.js
+      volumes:
+        - name: shared-code
+          configMap:
+            name: app-source-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: be-svc
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 5000
+    targetPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: docker.io/prasenforu/idp-base:v3
+        resources:
+          requests: { cpu: "50m", memory: "64Mi" }
+          limits: { cpu: "250m", memory: "128Mi" }
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: frontend-config
+        volumeMounts:
+        - name: shared-code
+          mountPath: /app/src/server.js
+          subPath: frontend-server.js
+        - name: shared-code
+          mountPath: /app/src/public/index.html
+          subPath: index.html
+      volumes:
+      - name: shared-code
+        configMap:
+          name: app-source-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fe-svc
+spec:
+  type: NodePort
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 3000
