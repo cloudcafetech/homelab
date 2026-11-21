@@ -275,7 +275,6 @@ data:
   DB_PORT: "5432"
   DB_NAME: userdb
   DB_USER: postgres
-  DB_PASSWORD: postgres123
 ---
 apiVersion: v1
 kind: ConfigMap
