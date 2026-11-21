@@ -51,7 +51,7 @@ spec:
     spec:
       containers:
       - name: myemp
-        image: prasenforu/employee
+        image: prasenforu/employee:1.0
         resources:
           requests:
             cpu: "100m"
