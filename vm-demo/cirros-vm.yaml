@@ -21,9 +21,9 @@ spec:
             storage: 5Gi
       source:
         registry:
-          # Use "pullMethod: node" for no need of multiple time download. But it uses 2 containers (importer + registry-source container), which increase resource.
+          # Use "pullMethod: node" for one time download image when VM create. But it uses 2 containers (importer + registry-source container), which uses more resource.
           #pullMethod: node
-          # Use "pullMethod: pod" every time download when VM create. But it uses 1 containers (importer), which use less resource.          
+          # Use "pullMethod: pod" for every time download image when VM create. But it uses 1 containers (importer), which use less resource.          
           pullMethod: pod
           url: docker://docker.io/kubevirt/cirros-container-disk-demo
   runStrategy: Always
