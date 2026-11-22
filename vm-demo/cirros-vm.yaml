@@ -66,20 +66,15 @@ spec:
           name: cirros-vm
       - name: cloudinitdisk
         cloudInitNoCloud:
-          networkData: |
-            network:
-              version: 2
-              ethernets:
-                eth0:
-                  dhcp4: true
           userData: |-
-            #cloud-config
-            hostname: cirros-vm
-            user: cloudcafe
-            password: cloudcafe2675
-            chpasswd: { expire: False }
-            ssh_pwauth: True
-            disable_root: false
+            #!/bin/sh
+            # Default built-in user is cirros / gocubsgo
+            # Create custom user/password:
+            hostname cirros-vm
+            echo "cirros-vm" > /etc/hostname
+            adduser -D -s /bin/sh cloudcafe
+            echo "cloudcafe:cloudcafe2675" | chpasswd
+            echo "cloudcafe ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 ---
 apiVersion: v1
 kind: Service
