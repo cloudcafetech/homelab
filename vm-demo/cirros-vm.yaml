@@ -8,6 +8,8 @@ spec:
   dataVolumeTemplates:
   - metadata:
       name: cirros-vm
+      annotations:
+        cdi.kubevirt.io/storage.bind.immediate.requested: "true"      
       labels:
         vm: cirros-vm
     spec:
