@@ -21,7 +21,7 @@ spec:
             storage: 5Gi
       source:
         registry:
-          pullMethod: node
+          pullMethod: pod
           url: docker://docker.io/kubevirt/cirros-container-disk-demo
   runStrategy: Always
   template:
