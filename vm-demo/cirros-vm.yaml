@@ -1,0 +1,99 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: cirros-vm
+  labels:
+    vm: cirros-vm
+spec:
+  dataVolumeTemplates:
+  - metadata:
+      name: cirros-vm
+      labels:
+        vm: cirros-vm
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+      source:
+        registry:
+          pullMethod: node
+          url: docker://docker.io/kubevirt/cirros-container-disk-demo
+  runStrategy: Always
+  template:
+    metadata:
+      name: cirros-vm
+      labels:
+        kubevirt.io/domain: cirros-vm
+        vm: cirros-vm
+    spec:
+      domain:
+        cpu:
+          cores: 1
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: containerdisk
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          interfaces:
+          - name: default
+            masquerade: {}
+          rng: {}
+        machine:
+          type: q35
+        resources:
+          requests: { cpu: "500m", memory: "512Mi" }
+          limits: { cpu: "750m", memory: "1Gi" }
+          requests:
+            cpu: "1"
+            memory: 1Gi
+          limits:
+            cpu: "2"
+            memory: 2Gi
+      networks:
+      - name: default
+        pod: {}
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - name: containerdisk
+        dataVolume:
+          name: cirros-vm
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          networkData: |
+            network:
+              version: 2
+              ethernets:
+                eth0:
+                  dhcp4: true
+          userData: |-
+            #cloud-config
+            hostname: cirros-vm
+            user: cloudcafe
+            password: cloudcafe2675
+            chpasswd: { expire: False }
+            ssh_pwauth: True
+            disable_root: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cirros-vm-ssh
+  labels:
+    vm: cirros-vm
+spec:
+  type: NodePort
+  selector:
+    kubevirt.io/domain: cirros-vm
+  ports:
+  - name: ssh
+    protocol: TCP
+    port: 22
+    targetPort: 22
