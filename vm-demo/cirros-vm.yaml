@@ -26,7 +26,7 @@ spec:
           # Use "pullMethod: pod" for every time download image when VM create. But it uses 1 containers (importer), which use less resource.          
           pullMethod: pod
           #url: docker://docker.io/kubevirt/cirros-container-disk-demo
-          url: docker://quay.io/containerdisks/alpine:3.20
+          url: docker://quay.io/containerdisks/debian:12
   runStrategy: Always
   template:
     metadata:
