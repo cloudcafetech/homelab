@@ -1,17 +1,17 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: cirros-vm
+  name: demo-vm
   labels:
-    vm: cirros-vm
+    vm: demo-vm
 spec:
   dataVolumeTemplates:
   - metadata:
-      name: cirros-vm
+      name: demo-vm
       annotations:
         cdi.kubevirt.io/storage.bind.immediate.requested: "true"      
       labels:
-        vm: cirros-vm
+        vm: demo-vm
     spec:
       pvc:
         accessModes:
@@ -25,14 +25,15 @@ spec:
           #pullMethod: node
           # Use "pullMethod: pod" for every time download image when VM create. But it uses 1 containers (importer), which use less resource.          
           pullMethod: pod
-          url: docker://docker.io/kubevirt/cirros-container-disk-demo
+          #url: docker://docker.io/kubevirt/cirros-container-disk-demo
+          url: docker://quay.io/containerdisks/alpine:3.20
   runStrategy: Always
   template:
     metadata:
-      name: cirros-vm
+      name: demo-vm
       labels:
-        kubevirt.io/domain: cirros-vm
-        vm: cirros-vm
+        kubevirt.io/domain: demo-vm
+        vm: demo-vm
     spec:
       domain:
         cpu:
@@ -63,29 +64,29 @@ spec:
       volumes:
       - name: containerdisk
         dataVolume:
-          name: cirros-vm
+          name: demo-vm
       - name: cloudinitdisk
         cloudInitNoCloud:
           userData: |-
-            #!/bin/sh
-            # Default built-in user is cirros / gocubsgo
-            # Create custom user/password:
-            hostname cirros-vm
-            echo "cirros-vm" > /etc/hostname
-            adduser -D -s /bin/sh cloudcafe
-            echo "cloudcafe:cloudcafe2675" | chpasswd
-            echo "cloudcafe ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+            #cloud-config
+            # For cirros image, user is cirros / gocubsgo
+            hostname: demo-vm
+            user: cloudcafe
+            password: cloudcafe2675
+            chpasswd: { expire: False }
+            ssh_pwauth: True
+            sudo: ALL=(ALL) NOPASSWD:ALL
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: cirros-vm-ssh
+  name: demo-vm-ssh
   labels:
-    vm: cirros-vm
+    vm: demo-vm
 spec:
   type: NodePort
   selector:
-    kubevirt.io/domain: cirros-vm
+    kubevirt.io/domain: demo-vm
   ports:
   - name: ssh
     protocol: TCP
